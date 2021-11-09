@@ -1,0 +1,66 @@
+{
+  "name": "wreflect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.6.2",
+    "@testing-library/jest-dom": "5.11.4",
+    "@testing-library/react": "11.1.0",
+    "@testing-library/user-event": "12.1.10",
+    "@types/jest": "26.0.15",
+    "@types/node": "12.0.0",
+    "@types/react-dom": "16.9.8",
+    "@types/react-redux": "^7.1.20",
+    "antd": "^4.16.3",
+    "auth0-js": "9.14.2",
+    "axios": "0.21.1",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-redux": "^7.2.6",
+    "react-router-dom": "5.2.0",
+    "react-scripts": "4.0.1",
+    "react-select": "4.0.2",
+    "redux": "^4.1.2",
+    "reselect": "^4.1.2",
+    "typescript": "^4.4.4"
+  },
+  "devDependencies": {
+    "@types/auth0-js": "9.14.2",
+    "@types/file-saver": "^2.0.2",
+    "@types/lodash": "^4.14.176",
+    "@types/react-router-dom": "5.1.7",
+    "@types/react-select": "4.0.11",
+    "@typescript-eslint/eslint-plugin": "4.13.0",
+    "@typescript-eslint/parser": "4.13.0",
+    "eslint": "7.18.0",
+    "eslint-plugin-react": "7.22.0",
+    "nodeman": "^1.1.2"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
