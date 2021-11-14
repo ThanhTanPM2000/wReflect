@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react/prop-types */
 import React from 'react';
 import './Button.css';
@@ -7,7 +8,15 @@ const STYLES = ['btn--primary', 'btn--outline', 'btn--test'];
 
 const SIZES = ['btn--medium', 'btn--large'];
 
-export const Button = ({ children, type, onClick, buttonStyle, buttonSize }) => {
+interface Props {
+  children: string;
+  type: undefined;
+  onClick: undefined;
+  buttonStyle: string;
+  buttonSize: string;
+}
+
+export const Button = ({ children, type, onClick, buttonStyle, buttonSize }: Props) => {
   const checkButtonStyle = STYLES.includes(buttonStyle) ? buttonStyle : STYLES[0];
 
   const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
