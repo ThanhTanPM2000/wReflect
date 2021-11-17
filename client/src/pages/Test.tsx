@@ -22,7 +22,6 @@ const Test = (): JSX.Element => {
   return (
     <>
       <div> Hello</div>
-      <div>test Thao</div>
     </>
   );
 };
