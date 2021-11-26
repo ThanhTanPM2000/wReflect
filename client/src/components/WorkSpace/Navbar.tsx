@@ -28,7 +28,16 @@ const Navbar = () => {
   return (
     <div>
       <Layout style={{ minHeight: '100vh' }}>
-        <Sider collapsed={collapsed} onCollapse={onCollapse}>
+        <Sider
+          onMouseLeave={() => {
+            onCollapse(true);
+          }}
+          onMouseEnter={() => {
+            onCollapse(false);
+          }}
+          collapsed={collapsed}
+          onCollapse={onCollapse}
+        >
           {/* <div className="logo" /> */}
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
             <SubMenu key="sub1" icon={<TeamOutlined />} title="Team">
@@ -60,7 +69,7 @@ const Navbar = () => {
               <Breadcrumb.Item>WorkSpace</Breadcrumb.Item>
               <Breadcrumb.Item>My Portfolio</Breadcrumb.Item>
             </Breadcrumb>
-            <div className="site-layout-background" style={{ padding: 24, minHeight: 3600 }}>
+            <div className="site-layout-background" style={{ padding: 24, minHeight: 800 }}>
               TNT
             </div>
           </Content>

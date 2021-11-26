@@ -1,20 +1,3 @@
-.ant-layout-sider {
-  flex: 0 0 62px !important;
-  max-width: 62px !important;
-  min-width: 62px !important;
-  width: 62px !important;
-}
-
-.ant-layout-sider:hover {
-  flex: 0 0 200px !important;
-  max-width: 200px !important;
-  min-width: 200px !important;
-  width: 200px !important;
-}
-.ant-layout-sider-trigger:hover {
-  width: 200px !important;
-}
-
 .site-layout .site-layout-background {
   background: #fff;
 }
