@@ -1,18 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import LoginButton from '../components/Login/LoginButton';
-import LogoutButton from '../components/Login/LogoutButton';
-import Profile from '../components/Login/Profile';
+
+import HomeImage from '../image/image-body.png'
+
+import Header from '../components/Header/Header'
 
 const HomePage = () => {
   return (
     <Router>
       <Route path="/">
-        <div>
-          <LoginButton />
-          <LogoutButton />
-          <Profile />
-        </div>
+        <Header />
+        <img src={HomeImage} alt="" />
       </Route>
     </Router>
   );

@@ -1,0 +1,96 @@
+.header {
+  padding: 10px;
+  width: 100%;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  display: block;
+  z-index: 5;
+  -webkit-transform: translate3d(0%, 0px, 0px);
+          transform: translate3d(0%, 0px, 0px);
+  -webkit-transition: -webkit-transform 0.1s;
+  transition: -webkit-transform 0.1s;
+  transition: transform 0.1s;
+  transition: transform 0.1s, -webkit-transform 0.1s;
+  font-size: 12px;
+  font-family: auto;
+  background-color: white !important;
+  -webkit-box-shadow: 5px 2px #e9dfdf !important;
+          box-shadow: 5px 2px #e9dfdf !important;
+  margin-bottom: 30px;
+}
+
+.header:after {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  background: rgba(0, 0, 0, 0.55);
+  content: '';
+  opacity: 0;
+  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+}
+
+.header .menu {
+  height: 48px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+}
+
+.header .menu .navbar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+}
+
+.header .menu .navbar .nav-link {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-left: 70%;
+  padding: 25px;
+}
+
+.header .menu .navbar .nav-link a {
+  opacity: 0.6;
+  margin-left: 30px;
+  color: #001A26;
+}
+
+.header .menu .navbar .logo {
+  margin-left: 50px;
+}
+
+.header .menu .navbar .login {
+  margin-left: 80%;
+  padding: 25px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.header .menu .navbar .login .sign-up {
+  border: 1px solid black;
+  color: white;
+}
+
+.header .menu .navbar .login a {
+  color: #001A26;
+  font-weight: bold;
+}
+
+.header .menu .navbar .login div {
+  width: 40px;
+}
+/*# sourceMappingURL=Header.css.map */
