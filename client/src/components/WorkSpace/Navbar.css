@@ -1,13 +1,8 @@
-#components-layout-demo-side .logo {
-  height: 32px;
-  margin: 16px;
-  background: rgba(255, 255, 255, 0.3);
-}
 .ant-layout-sider {
-  flex: 0 0 65px !important;
-  max-width: 65px !important;
-  min-width: 65px !important;
-  width: 65px !important;
+  flex: 0 0 62px !important;
+  max-width: 62px !important;
+  min-width: 62px !important;
+  width: 62px !important;
 }
 
 .ant-layout-sider:hover {

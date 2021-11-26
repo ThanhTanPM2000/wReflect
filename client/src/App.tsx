@@ -7,8 +7,10 @@ const App = (): JSX.Element => {
   return (
     <>
       <Router>
-        <HomePage />
-        <WorkSpace />
+        <Switch>
+          <Route path="/" exact component={HomePage} />
+          <Route path="/workspace" exact component={WorkSpace} />
+        </Switch>
       </Router>
     </>
   );

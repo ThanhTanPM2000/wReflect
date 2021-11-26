@@ -3,8 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import 'antd/dist/antd.css';
 import './Navbar.css';
-import { Layout, Menu, Breadcrumb } from 'antd';
-import { VideoCameraOutlined, PieChartOutlined, FileOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { Layout, Menu, Breadcrumb, Row } from 'antd';
+import {
+  BarChartOutlined,
+  SettingOutlined,
+  PieChartOutlined,
+  StockOutlined,
+  TeamOutlined,
+  CarryOutOutlined,
+  CalendarOutlined,
+} from '@ant-design/icons';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -21,32 +29,38 @@ const Navbar = () => {
     <div>
       <Layout style={{ minHeight: '100vh' }}>
         <Sider collapsed={collapsed} onCollapse={onCollapse}>
-          <div className="logo" />
+          {/* <div className="logo" /> */}
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item key="1" icon={<PieChartOutlined />}>
-              Option 1
-            </Menu.Item>
-            <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-              Option 2
-            </Menu.Item>
-            <SubMenu key="sub1" icon={<UserOutlined />} title="User">
-              <Menu.Item key="3">Tom</Menu.Item>
-              <Menu.Item key="4">Bill</Menu.Item>
-              <Menu.Item key="5">Alex</Menu.Item>
+            <SubMenu key="sub1" icon={<TeamOutlined />} title="Team">
+              <Menu.Item key="3" icon={<PieChartOutlined />}>
+                Board
+              </Menu.Item>
+              <Menu.Item key="4" icon={<StockOutlined />}>
+                Health Check
+              </Menu.Item>
+              <Menu.Item key="5" icon={<CarryOutOutlined />}>
+                Task
+              </Menu.Item>
+              <Menu.Item key="6" icon={<CalendarOutlined />}>
+                Manager
+              </Menu.Item>
             </SubMenu>
-            <SubMenu key="sub2" icon={<TeamOutlined />} title="Team">
-              <Menu.Item key="6">Team 1</Menu.Item>
-              <Menu.Item key="8">Team 2</Menu.Item>
-            </SubMenu>
+            <Menu.Item key="1" icon={<BarChartOutlined />}>
+              Analyst
+            </Menu.Item>
+            <Menu.Item key="2" icon={<SettingOutlined />}>
+              Settings
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }} />
-          <Content style={{ margin: '0 16px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
+          <Header className="site-layout-background" style={{ padding: 10 }} />
+          <Content style={{ margin: '0 16px', height: '55px' }}>
+            <Breadcrumb style={{ margin: '16px 0', textAlign: 'center' }}>
               <Breadcrumb.Item>WorkSpace</Breadcrumb.Item>
+              <Breadcrumb.Item>My Portfolio</Breadcrumb.Item>
             </Breadcrumb>
-            <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
+            <div className="site-layout-background" style={{ padding: 24, minHeight: 3600 }}>
               TNT
             </div>
           </Content>

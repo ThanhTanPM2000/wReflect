@@ -16,7 +16,7 @@ const Header = () => {
             <a href="">Team</a>
             <a href="">Reflect</a>
             <a href="">Health&nbsp;Check</a>
-            <a href="">Contact</a>
+            <a href="/WorkSpace">WorkSpace</a>
           </div>
           <div className="login">
             <LoginButton />
