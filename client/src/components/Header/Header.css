@@ -14,6 +14,10 @@
   transition: transform 0.1s, -webkit-transform 0.1s;
   font-size: 12px;
   font-family: auto;
+  background-color: white !important;
+  -webkit-box-shadow: 5px 2px #e9dfdf !important;
+          box-shadow: 5px 2px #e9dfdf !important;
+  margin-bottom: 30px;
 }
 
 .header:after {
@@ -54,7 +58,7 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  margin-left: 30%;
+  margin-left: 70%;
   padding: 25px;
 }
 
@@ -69,7 +73,7 @@
 }
 
 .header .menu .navbar .login {
-  margin-left: 30%;
+  margin-left: 80%;
   padding: 25px;
   display: -webkit-box;
   display: -ms-flexbox;
