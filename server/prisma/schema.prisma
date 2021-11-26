@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_DATABASE_URL")
+}
+
+model Session {
+	id 				Int 		@id	@default(autoincrement())
+	userId			Int
+	token 			String
+	expiresAt		DateTime
+	data			String
+	createAt		DateTime
+	updateAt		DateTime
+	user			User	 	@relation(fields: [userId], references: [id])
+	@@index([expiresAt])
+	@@index([userId])
+}
+
+model WorkSpace {
+	id 				Int 		@id @default(autoincrement())
+	name 			String 
+	description 	String
+	owner			Owner?
+}
+
+model Team {
+	id				Int			@id @default(autoincrement())
+	title			String
+	
+}
+
+model Manager {
+	id				Int			@id @default(autoincrement())
+	userId			Int
+  	user         User           @relation(fields: [userId], references: [id])
+}
+
+model User {
+	id				Int			@id @default(autoincrement())
+	name			String
+	email			String		@unique
+	createAt 		DateTime 	@default(now())
+  	uplineUserId      Int?
+	updateAt		DateTime 	@updatedAt
+	isAdmin			Boolean	 	@default(false)
+	status 			String		@default("NotInitiated")
+	owner			Owner?
+	profile			Profile?	 	
+	session			Session[]		
+	manager			Manager[]
+
+ 	 @@index([email])
+}
+
+model Owner {
+	id				Int 		@id @default(autoincrement())
+	workSpaceId 	Int
+	userId			Int
+	createAt		DateTime
+	updateAt		DateTime	@updatedAt
+	workSpace		WorkSpace 	@relation(fields: [workSpaceId], references: [id])
+	user			User		@relation(fields: [userId], references:[id])
+}
+
+model Profile {
+  id   				Int		 	@id @default(autoincrement())
+  userId			Int
+  User 				User		@relation(fields: [userId], references: [id])
+}
