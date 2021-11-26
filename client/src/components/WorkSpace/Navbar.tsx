@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import 'antd/dist/antd.css';
 import './Navbar.css';
 import { Layout, Menu, Breadcrumb, Row } from 'antd';
+import Logo1 from '../../image/logo1.png';
 import {
   BarChartOutlined,
   SettingOutlined,
@@ -40,6 +41,9 @@ const Navbar = () => {
         >
           {/* <div className="logo" /> */}
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+            <Menu.Item>
+              <img src={Logo1} style={{ height: '45px', width: '150px' }} alt="logo-wreflect" />
+            </Menu.Item>
             <SubMenu key="sub1" icon={<TeamOutlined />} title="Team">
               <Menu.Item key="3" icon={<PieChartOutlined />}>
                 Board
@@ -69,7 +73,7 @@ const Navbar = () => {
               <Breadcrumb.Item>WorkSpace</Breadcrumb.Item>
               <Breadcrumb.Item>My Portfolio</Breadcrumb.Item>
             </Breadcrumb>
-            <div className="site-layout-background" style={{ padding: 24, minHeight: 800 }}>
+            <div className="site-layout-background" style={{ padding: 24, minHeight: 600 }}>
               TNT
             </div>
           </Content>
