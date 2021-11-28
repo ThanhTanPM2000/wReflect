@@ -38,9 +38,12 @@ export default {
   AUTH0_CALLBACK_URL: parseString('AUTH0_CALLBACK_URL'),
   AUTH0_CLIENT_ID: parseString('AUTH0_CLIENT_ID'),
   AUTH0_CLIENT_SECRET: parseString('AUTH0_CLIENT_SECRET'),
+  AUTH0_DOMAIN: parseString('AUTH0_DOMAIN'),
   NODE_ENV: parseString('NODE_ENV'),
   SERVER_PORT: parseNumber('SERVER_PORT'),
   SERVER_URL: parseString('SERVER_URL'),
   CLIENT_URL: parseString('CLIENT_URL'),
   REDIS_SERVER_URL: parseString('REDIS_SERVER_URL'),
+  SESSION_DURATION_MINUTES: parseNumber('SESSION_DURATION_MINUTES'),
+  STATIC_DIR: parseString('STATIC_DIR'),
 };
