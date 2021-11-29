@@ -26,7 +26,7 @@ export const checkAndExtendSession = async (email: string, token: string): Promi
     if (!user) return null;
     const now = new Date();
     const session = await prisma.session.findFirst({ where: { userId: user.id, token, expiresAt: { gte: now } } });
-    if (session) return null;
+    if (!session) return null;
     const newExpiredAt = addMinutes(now, config.SESSION_DURATION_MINUTES);
     await prisma.session.update({
       where: { id: user.id },

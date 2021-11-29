@@ -38,6 +38,8 @@ if (config.NODE_ENV === 'development') {
 
 app.use(cookieParser());
 app.use(bodyParser.json({ type: 'application/json' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(sessionManager);
 app.use('/api', apiRouter());
 app.use(

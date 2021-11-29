@@ -43,7 +43,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                 className={isLoggedIn ? 'flex flex-jc-c' : 'flex flex-jc-c flex-ai-c'}
               >
                 <Switch>
-                  {isLoggedIn && <Route path="/teams" component={TopNavBar}></Route>}
+                  {isLoggedIn && <Route path="/workspace" component={() => <div>Hello world</div>}></Route>}
                   <Route path="/home">
                     <HomePage />
                   </Route>

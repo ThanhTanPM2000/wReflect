@@ -44,6 +44,7 @@
   "devDependencies": {
     "@types/auth0-js": "9.14.2",
     "@types/file-saver": "^2.0.2",
+    "@types/http-status-codes": "^1.2.0",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "@types/react-router": "^5.1.17",
