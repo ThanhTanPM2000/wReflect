@@ -42,5 +42,4 @@ export type Me = {
   email: string;
   name: string;
   isAdmin: boolean;
-  status: string;
 };

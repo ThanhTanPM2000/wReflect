@@ -1,19 +1,20 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import WorkSpace from './pages/WorkSpace';
-import HomePage from './pages/HomePage';
+import React, { useState, useEffect } from 'react';
+import { Me } from './types';
+import { setUpdateLoginState, user } from './apis';
+import Routes from './Routes';
 
 const App = (): JSX.Element => {
-  return (
-    <>
-      <Router>
-        <Switch>
-          <Route path="/" exact component={HomePage} />
-          <Route path="/workspace" exact component={WorkSpace} />
-        </Switch>
-      </Router>
-    </>
-  );
+  const [me, setMe] = useState<null | Me>(null);
+  setUpdateLoginState((newMe: null | Me) => {
+    setMe(newMe);
+    localStorage.setItem('email', newMe?.email || '');
+  });
+  useEffect(() => {
+    (async function () {
+      await user.me();
+    })();
+  }, []);
+  return <Routes me={me} />;
 };
 
 export default App;
