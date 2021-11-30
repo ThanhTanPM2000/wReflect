@@ -1,22 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import auth0 from 'auth0-js';
+import { notification } from 'antd';
 
 type EmailVerificationNoticeProps = {
   email: null | string;
   needsEmailVerification: null | boolean;
   webAuth: auth0.WebAuth;
 };
+
 function EmailVerificationNotice({ email, needsEmailVerification, webAuth }: EmailVerificationNoticeProps) {
   if (!email) {
     return null;
   }
+
   if (needsEmailVerification) {
-    return <div>{email}, please visit your email to complete email verification</div>;
+    return (
+      <>
+        {notification.error({
+          message: `Notification`,
+          description: `${email}, please visit your email to complete email verification.`,
+          placement: 'bottomLeft',
+        })}
+      </>
+    );
   }
+
   return (
     <div className="emailVerificationNotice-scene">
       Welcome, {email}!
-      {location.pathname.includes('wa-client') ? (
+      {location.pathname.includes('workspace') ? (
         <>
           {' '}
           <a

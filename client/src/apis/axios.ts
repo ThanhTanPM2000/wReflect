@@ -32,6 +32,7 @@ instance.interceptors.response.use(
         id: response.data.id,
         email: response.data.email,
         isAdmin: response.data.isAdmin,
+        picture: response.data.picture,
       });
     }
     if (response.config.url === '/logout') {

@@ -14,6 +14,7 @@ type DecodedJwt = {
   email: string;
   email_verified: boolean;
   sub: string;
+  picture: string;
 };
 
 export const exchangeCodeForToken = async (code: string) => {

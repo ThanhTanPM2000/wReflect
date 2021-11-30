@@ -12,11 +12,11 @@ import { RequestWithUserInfo } from '../types';
 export const login = async (req: Request, res: Response): Promise<void | Response> => {
   try {
     const { body } = validators.login(req);
-    const { email, email_verified: isEmailVerified } = await services.auth0.exchangeCodeForToken(body.code);
+    const { email, email_verified: isEmailVerified, picture } = await services.auth0.exchangeCodeForToken(body.code);
     if (!isEmailVerified) {
-      return res.send({ email, requiresEmailVerification: !isEmailVerified });
+      return res.send({ email, requiresEmailVerification: !isEmailVerified, picture });
     }
-    const user = await services.user.findOrCreateUserByEmail(email);
+    const user = await services.user.findOrCreateUserByEmail(email, picture);
     const session = await services.session.createSession(user.id, config.SESSION_DURATION_MINUTES);
 
     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;

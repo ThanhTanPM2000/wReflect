@@ -40,6 +40,7 @@ export const me = async (req: RequestWithUserInfo, res: Response): Promise<void 
       email: sanitizedUser.email,
       id: sanitizedUser.id,
       isAdmin: sanitizedUser.isAdmin,
+      picture: sanitizedUser.picture,
     });
   } catch (err) {
     if (err instanceof ZodError) {

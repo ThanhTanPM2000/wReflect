@@ -32,9 +32,9 @@ const LoginSection = ({ email }: Props) => {
   );
 };
 
-const TopNavBar = ({ email }: Props) => {
+const Header = ({ email }: Props) => {
   return (
-    <div className="topNavBar">
+    <div className="topNavBar" style={{ backgroundColor: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
         <div style={{ flexGrow: 1 }}>
           <img height="50px" src="/logo.png" alt="wReflect Logo" />{' '}
@@ -47,4 +47,4 @@ const TopNavBar = ({ email }: Props) => {
   );
 };
 
-export default TopNavBar;
+export default Header;
