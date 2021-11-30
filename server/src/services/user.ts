@@ -1,7 +1,7 @@
 import prisma from '../prisma';
 import logger from '../logger';
 
-export const findOrCreateUserByEmail = async (email: string) => {
+export const findOrCreateUserByEmail = async (email: string, picture?: string) => {
   try {
     const user = await prisma.user.upsert({
       where: { email },
@@ -9,6 +9,7 @@ export const findOrCreateUserByEmail = async (email: string) => {
       create: {
         email,
         name: 'anonymous',
+        picture
       },
     });
     return user;

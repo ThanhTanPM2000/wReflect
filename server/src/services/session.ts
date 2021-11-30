@@ -36,6 +36,7 @@ export const checkAndExtendSession = async (email: string, token: string): Promi
       id: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
+      picture: user.picture
     };
   } catch (error) {
     if (error instanceof Error) logger.error(error.message);

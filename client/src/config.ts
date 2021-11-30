@@ -14,7 +14,7 @@ const config = {
     domain: 'dev-m0ubghav.us.auth0.com',
     clientID: '0zjlxvwKZX46iUQYc0ArIqE29oqvHuSL',
     responseType: 'code',
-    redirectUri: 'https://localhost:3000/workspace',
+    redirectUri: 'https://localhost:3000/home',
   },
   SERVER_BASE_URL: 'http://localhost:4000',
 };

@@ -18,7 +18,7 @@ Table User {
   name String [not null]
   email String [unique, not null]
   createAt DateTime [default: `now()`, not null]
-  uplineUserId Int
+  picture String
   updateAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
   status String [not null, default: 'NotInitiated']

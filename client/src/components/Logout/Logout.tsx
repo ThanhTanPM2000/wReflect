@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Modal } from 'antd';
 import { auth } from '../../apis';
 
 type Props = {
@@ -8,7 +9,15 @@ type Props = {
 
 function Logout({ children }: Props): JSX.Element {
   const onClickLogout = () => {
-    auth.logout();
+    Modal.confirm({
+      title: 'Are you sure want to sign out',
+      centered: true,
+      okText: 'Sign Out',
+      cancelText: 'Cancel',
+      onOk: () => {
+        auth.logout();
+      },
+    });
   };
 
   return (

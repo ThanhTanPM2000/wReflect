@@ -4,6 +4,7 @@ export type SanitizedUser = {
   id: number;
   email: string;
   isAdmin: boolean;
+  picture: string | null;
 };
 
 export interface RequestWithUserInfo extends Request {

@@ -3,6 +3,8 @@ import { Me } from './types';
 import { setUpdateLoginState, user } from './apis';
 import Routes from './Routes';
 
+import 'antd/dist/antd.css';
+
 const App = (): JSX.Element => {
   const [me, setMe] = useState<null | Me>(null);
   setUpdateLoginState((newMe: null | Me) => {

@@ -42,4 +42,5 @@ export type Me = {
   email: string;
   name: string;
   isAdmin: boolean;
+  picture: string | null;
 };

@@ -49,7 +49,7 @@ model User {
 	name			String
 	email			String		@unique
 	createAt 		DateTime 	@default(now())
-  	uplineUserId      Int?
+	picture			String?	
 	updateAt		DateTime 	@updatedAt
 	isAdmin			Boolean	 	@default(false)
 	status 			String		@default("NotInitiated")
