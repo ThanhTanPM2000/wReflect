@@ -35,13 +35,6 @@ code {
   .flex-dir-r {
     flex-direction: row; }
 
-.ant-card {
-  min-width: 100%;
-  height: 100vh;
-  border: 0px !important;
-  margin-top: 10px !important;
-  text-align: center !important; }
-
 .ant-btn-small {
   font-size: 10px !important;
   height: 18px !important; }
@@ -49,6 +42,10 @@ code {
 .ant-card-body {
   max-height: 80%;
   overflow: auto; }
+
+.ant-empty {
+  height: 100%;
+  width: 100%; }
 
 .mb-10 {
   margin-bottom: 10px; }
@@ -94,3 +91,22 @@ code {
 
 .mr-12 {
   margin-right: 12px; }
+
+.ant-menu.ant-menu-dark .ant-menu-sub {
+  background: #a4a0f1; }
+
+.ant-layout-sider-children {
+  background-color: #a4a0f1; }
+
+span.ant-tabs-separator {
+  display: none; }
+
+.btn-new-team {
+  float: right;
+  margin-right: 15px; }
+
+.site-layout .site-layout-background {
+  background: #fff; }
+
+.ant-menu.ant-menu-dark {
+  background-color: #a4a0f1; }

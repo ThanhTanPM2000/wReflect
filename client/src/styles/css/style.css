@@ -107,4 +107,13 @@ span.ant-tabs-separator {
 .ant-menu.ant-menu-dark {
   background-color: #a4a0f1; }
 
+.ant-tabs-content {
+  height: 100%; }
 
+.ant-tabs-content {
+  min-height: 100% !important; }
+
+.ant-tabs {
+  height: 100%; }
+  .ant-tabs-content-holder {
+    display: flex; }

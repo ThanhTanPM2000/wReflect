@@ -59,7 +59,7 @@ model User {
 	updateAt		DateTime 	@updatedAt
 	isAdmin			Boolean	 	@default(false)
 	status 			String		@default("NotInitiated")
-	session			Session?
+	session			Session[]
 	members			Member[]
 	profile			Profile?
 

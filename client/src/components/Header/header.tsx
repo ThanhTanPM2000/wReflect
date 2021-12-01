@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Dropdown, Button,Avatar } from 'antd';
+import { Menu, Dropdown, Button, Avatar } from 'antd';
 
 import { Login } from '../Login';
 import { Logout } from '../Logout';
@@ -7,8 +7,6 @@ import { Logout } from '../Logout';
 type Props = {
   email: null | string;
   picture: null | string;
-
-
 };
 
 const LoginSection = ({ email }: Props) => {
@@ -25,7 +23,6 @@ const LoginSection = ({ email }: Props) => {
     return (
       <Dropdown placement="bottomRight" overlay={menu}>
         <Button type="text">{`Hi, ${email}`}</Button>
-        
       </Dropdown>
     );
   }
@@ -36,7 +33,7 @@ const LoginSection = ({ email }: Props) => {
   );
 };
 
-const Header = ({ email,picture }: Props) => {
+const Header = ({ email, picture }: Props) => {
   return (
     <div className="topNavBar" style={{ backgroundColor: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
@@ -44,8 +41,7 @@ const Header = ({ email,picture }: Props) => {
           <img height="50px" src="/images/logo.png" alt="wReflect Logo" />{' '}
         </div>
         <div style={{ flexGrow: 1, textAlign: 'right' }}>
-          <LoginSection email={email} picture={picture}/>
-          <Avatar className="avatarSetting" src={`${picture}`} size="default" />
+          <LoginSection email={email} picture={picture} />
         </div>
       </div>
     </div>

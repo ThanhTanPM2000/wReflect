@@ -48,7 +48,7 @@ Table User {
   updateAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
   status String [not null, default: 'NotInitiated']
-  session Session
+  session Session [not null]
   members Member [not null]
   profile Profile
 }
@@ -64,7 +64,7 @@ Enum UserState {
   INITIALTED
 }
 
-Ref: Session.userId - User.id
+Ref: Session.userId > User.id
 
 Ref: Member.userId > User.id
 
