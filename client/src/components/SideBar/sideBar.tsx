@@ -1,5 +1,5 @@
-import React from 'react';
-import { Menu, Tabs } from 'antd';
+import React, {useState} from 'react';
+import { Menu, Tabs, Layout } from 'antd';
 import { useLocation } from 'react-router-dom';
 
 import { Logout } from '../Logout';
@@ -12,12 +12,14 @@ import {
   StockOutlined,
   TeamOutlined,
   CarryOutOutlined,
+  HomeOutlined,
   CalendarOutlined,
-  PlusCircleOutlined,
 } from '@ant-design/icons';
 
+const {Sider} = Layout;
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;
+
 
 type Props = {
   email: null | string;
@@ -26,14 +28,25 @@ type Props = {
 
 const SideBar = ({ email, isAdmin }: Props) => {
   const location = useLocation();
+  const [isCollapse, setIsCollapse] = useState(true);
 
   return (
     <>
       {/* <Sider className="site-layout-background"> */}
       {email && (
+      <Sider 
+        onMouseEnter={() => setIsCollapse(false)}
+        onMouseLeave={() => setIsCollapse(true)}
+        style={{ overflow: 'hidden' }}
+        
+        collapsed={isCollapse}
+        onCollapse={(collapse) => setIsCollapse(collapse)} 
+        >
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item></Menu.Item>
-          <SubMenu key="sub1" icon={<TeamOutlined />} title="Team">
+        <Menu.Item style={{marginTop:"100px"}}  icon={<HomeOutlined />} key="/WorkSpace" >
+            <span>Home</span>           
+        </Menu.Item>
+          <SubMenu key="sub1" style={{marginTop:"50px"}} icon={<TeamOutlined />} title="Team">
             <Menu.Item key="3" icon={<PieChartOutlined />}>
               Board
             </Menu.Item>
@@ -53,12 +66,13 @@ const SideBar = ({ email, isAdmin }: Props) => {
           <Menu.Item key="2" icon={<SettingOutlined />}>
             Settings
           </Menu.Item>
-          <Menu.Item style={{ alignSelf: 'bot' }} key="7" icon={<LogoutOutlined />}>
+          <Menu.Item style={{marginTop:"520px"}} key="7" icon={<LogoutOutlined />}>
             <Logout>
               <>Sign out</>
             </Logout>
           </Menu.Item>
         </Menu>
+      </Sider>
       )}
       {/* </Sider> */}
     </>

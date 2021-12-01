@@ -3,56 +3,48 @@ import { Layout } from 'antd';
 import { BrowserRouter as Router, Switch, Redirect, Route } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
-import { TopNavBar } from './components/TopNavBar';
 import { Header } from './components/Header';
 import { Me } from './types';
+import{Workspace} from './components/Workspace'
 
 type Props = {
   me: null | Me;
 };
 
-const { Sider, Content } = Layout;
+const { Footer, Content } = Layout;
 
 const Routes = ({ me }: Props): JSX.Element => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  const picture = me?.picture || null;
+  
+   const picture = me?.picture || null;
 
-  const [isCollapse, setIsCollapse] = useState(true);
 
   return (
     <Router>
       <Switch>
         <Route>
-          <Layout style={{ minHeight: '130vh', overflow: 'hidden' }}>
+          <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
             {isLoggedIn && (
               <>
-                <Sider
-                  onMouseEnter={() => setIsCollapse(false)}
-                  onMouseLeave={() => setIsCollapse(true)}
-                  style={{ overflow: 'hidden' }}
-                  collapsible
-                  collapsed={isCollapse}
-                  onCollapse={(collapse) => setIsCollapse(collapse)}
-                >
-                  <SideBar email={email} isAdmin={isAdmin} />
-                </Sider>
+                <SideBar email={email} isAdmin={isAdmin}/>
                 <Layout className="site-layout">
-                  <TopNavBar email={email} picture={picture} />
+                  <Header email={email} picture={picture} />
                   <Content
-                    style={{ padding: '0 24px' }}
-                    className={isLoggedIn ? 'flex flex-dir-c flex-ai-c' : 'flex flex-dir-c flex-jc-c flex-ai-c'}
+                    style={{ margin: '0 16px' }}
+                    // className={isLoggedIn ? 'flex flex-dir-c flex-ai-c' : 'flex flex-dir-c flex-jc-c flex-ai-c'}
                   >
                     <Switch>
                       {isLoggedIn && (
                         <>
-                          <Route path="/workspace" component={() => <div>Hello world</div>}></Route>
+                          <Route path="/workspace" component={Workspace}></Route>
                           <Redirect to="/workspace" />
                         </>
                       )}
                     </Switch>
                   </Content>
+                  <Footer style={{ textAlign: 'center' }}>wReflect ©2022</Footer>
                 </Layout>
               </>
             )}
@@ -60,7 +52,7 @@ const Routes = ({ me }: Props): JSX.Element => {
             {/* <Header email={email} /> */}
             <Route path="/home">
               {/* <HomePage /> */}
-              <HomePage email={email} />
+              <HomePage email={email} picture={picture}/>
             </Route>
           </Layout>
         </Route>
