@@ -1,22 +1,45 @@
-// const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_RESPONSE_TYPE, SERVER_BASE_URL, REDIRECT_URI } = window.test2;
-// const config = {
-//   AUTH0_WEBAUTH_CONFIG: {
-//     domain: AUTH0_DOMAIN,
-//     clientID: AUTH0_CLIENT_ID,
-//     responseType: AUTH0_RESPONSE_TYPE,
-//     redirectUri: REDIRECT_URI,
-//   },
-//   SERVER_BASE_URL: SERVER_BASE_URL,
-// };
+import dotenv from 'dotenv';
+dotenv.config();
 
-const config = {
-  AUTH0_WEBAUTH_CONFIG: {
-    domain: 'dev-m0ubghav.us.auth0.com',
-    clientID: '0zjlxvwKZX46iUQYc0ArIqE29oqvHuSL',
-    responseType: 'code',
-    redirectUri: 'https://localhost:3000/home',
-  },
-  SERVER_BASE_URL: 'http://localhost:4000',
+const parseString = (key: string): string => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`${key} is not present`);
+  }
+  return value;
 };
 
-export default config;
+const parseNumber = (key: string): number => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`${key} is not present`);
+  }
+  const parsed = parseInt(value);
+  if (isNaN(parsed)) {
+    throw new Error(`${key} should be a number`);
+  }
+  return parsed;
+};
+
+const parseBoolean = (key: string): boolean => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`${key} is not present`);
+  }
+  if (value === 'TRUE' || value === 'true') {
+    return true;
+  } else if (value === 'FALSE' || value === 'false') {
+    return false;
+  }
+  throw new Error(`${key} should be TRUE or true or FALSE or false`);
+};
+
+export default {
+  AUTH0_WEBAUTH_CONFIG: {
+    domain: parseString('REACT_APP_AUTH0_DOMAIN'),
+    clientID: parseString('REACT_APP_AUTH0_CLIENT_ID'),
+    responseType: parseString('REACT_APP_AUTH0_RESPONSE_TYPE'),
+    redirectUri: parseString('REACT_APP_REDIRECT_URI'),
+  },
+  SERVER_BASE_URL: parseString('REACT_APP_SERVER_BASE_URL'),
+};

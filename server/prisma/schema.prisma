@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
 }
 
 generator dbml {
@@ -22,27 +23,32 @@ model Session {
 	user			User	 	@relation(fields: [userId], references: [id])
 
 	@@index([expiresAt])
-	@@index([userId])
 }
 
-// model WorkSpace {
-// 	id 				Int 		@id @default(autoincrement())
-// 	name 			String 
-// 	description 	String
-// 	owner			Owner?
-// }
+model Team {
+	id				Int			@id @default(autoincrement())
+	name 			String
+	description		String?
+	startDate		DateTime	
+	endDate			DateTime	
+	status			String		@default("Doing")
+	picture 		String		
+	numOfMember		Int?		@default(0)
+	members			Member[]	
 
-// model Team {
-// 	id				Int			@id @default(autoincrement())
-// 	title			String
-	
-// }
+}
 
-// model Manager {
-// 	id				Int			@id @default(autoincrement())
-// 	userId			Int
-//   	user         User           @relation(fields: [userId], references: [id])
-// }
+model Member {
+	user			User 		@relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+	team			Team		@relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+	isOwner			Boolean		@default(false)
+	userId			Int
+	teamId 			Int
+ 	joinedAt		DateTime @default(now())
+ 	assignedBy 		String
+
+	@@unique([userId, teamId])
+}
 
 model User {
 	id				Int			@id @default(autoincrement())
@@ -53,26 +59,20 @@ model User {
 	updateAt		DateTime 	@updatedAt
 	isAdmin			Boolean	 	@default(false)
 	status 			String		@default("NotInitiated")
-	// owner			Owner?
-	// profile			Profile?	 	
-	session			Session[]		
-	// manager			Manager[]
+	session			Session?
+	members			Member[]
+	profile			Profile?
 
  	 @@index([email])
 }
 
-// model Owner {
-// 	id				Int 		@id @default(autoincrement())
-// 	workSpaceId 	Int
-// 	userId			Int
-// 	createAt		DateTime
-// 	updateAt		DateTime	@updatedAt
-// 	workSpace		WorkSpace 	@relation(fields: [workSpaceId], references: [id])
-// 	user			User		@relation(fields: [userId], references:[id])
-// }
+enum UserState {
+	NOTINITIALTED
+	INITIALTED
+}
 
-// model Profile {
-//   id   				Int		 	@id @default(autoincrement())
-//   userId			Int
-//   User 				User		@relation(fields: [userId], references: [id])
-// }
+model Profile {
+  id   				Int		 	@id @default(autoincrement())
+  User 				User		@relation(fields: [userId], references: [id])
+  userId			Int
+}

@@ -41,7 +41,7 @@ const Header = ({ email,picture }: Props) => {
     <div className="topNavBar" style={{ backgroundColor: '#fff' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
         <div style={{ flexGrow: 1 }}>
-          <img height="50px" src="/logo.png" alt="wReflect Logo" />{' '}
+          <img height="50px" src="/images/logo.png" alt="wReflect Logo" />{' '}
         </div>
         <div style={{ flexGrow: 1, textAlign: 'right' }}>
           <LoginSection email={email} picture={picture}/>

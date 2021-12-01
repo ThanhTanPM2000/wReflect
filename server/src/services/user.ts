@@ -9,7 +9,7 @@ export const findOrCreateUserByEmail = async (email: string, picture?: string) =
       create: {
         email,
         name: 'anonymous',
-        picture
+        picture,
       },
     });
     return user;
@@ -18,3 +18,24 @@ export const findOrCreateUserByEmail = async (email: string, picture?: string) =
     throw error;
   }
 };
+
+export const getUserById = async (userId: number) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    return user;
+  } catch (error) {
+    logger.info('Error in getUserById service');
+    throw error;
+  }
+};
+
+type UpdateUserAttributes = {
+  name: String;
+  picture: String;
+};
+
+export const updateUser = async (userId: number, attributes: UpdateUserAttributes) => {};

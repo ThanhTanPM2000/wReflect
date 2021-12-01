@@ -1,6 +1,6 @@
 import React from 'react';
-
 import { Modal } from 'antd';
+
 import { auth } from '../../apis';
 
 type Props = {
@@ -14,8 +14,9 @@ function Logout({ children }: Props): JSX.Element {
       centered: true,
       okText: 'Sign Out',
       cancelText: 'Cancel',
-      onOk: () => {
+      onOk: async () => {
         auth.logout();
+        window.location.reload();
       },
     });
   };
