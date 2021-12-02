@@ -7,6 +7,7 @@ import { Header } from './components/Header';
 import { Me } from './types';
 import { Workspace } from './components/Workspace';
 import { TopNavBar } from './components/TopNavBar';
+import TeamDetail from './components/TeamDetail/teamDetail'
 
 type Props = {
   me: null | Me;
@@ -34,7 +35,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                   <Content
                     style={{ margin: '0 16px', height: '100%' }}
                     // className={isLoggedIn ? 'flex flex-dir-c flex-ai-c' : 'flex flex-dir-c flex-jc-c flex-ai-c'}
-                  >
+                  >  
                     <Switch>
                       {isLoggedIn && (
                         <>
@@ -43,6 +44,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                         </>
                       )}
                     </Switch>
+                    <Route path="/team-detail" component={TeamDetail} />
                   </Content>
                   <Footer style={{ textAlign: 'center' }}>wReflect ©2022</Footer>
                 </Layout>

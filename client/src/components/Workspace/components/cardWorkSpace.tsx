@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import { Card, Avatar, Col, Row, Skeleton, Pagination, Empty } from 'antd';
+import TeamDetail from '../../TeamDetail/teamDetail';
 
 const style = { margin: '0px 0px 0px 5px', padding: '8px 0' };
 const { Meta } = Card;
@@ -60,6 +62,11 @@ export const InfoCard = [
 const CardWorkSpace = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const history = useHistory();
+
+  const redirect = () => {
+    history.push('/team-detail')
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -93,7 +100,7 @@ const CardWorkSpace = () => {
           <div style={style}>
             <Card
               hoverable
-              onClick={() => console.log('TNT')}
+              onClick={redirect}
               loading={loading}
               actions={[
                 <SettingOutlined key="setting" />,
