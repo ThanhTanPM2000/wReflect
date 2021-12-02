@@ -6,8 +6,9 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "build": "tsc --build tsconfig.json",
-    "generate-prisma-migration": "prisma migrate dev --name",
+    "start": "node dist/app.js",
+    "build": "yarn run generate-prisma-migration 'test' && prisma migrate deploy && prisma generate  && tsc --build tsconfig.json",
+    "generate-prisma-migration": "prisma db push --preview-feature",
     "deploy-prisma-migrations": "prisma migrate deploy",
     "generate-prisma-client": "prisma generate"
   },

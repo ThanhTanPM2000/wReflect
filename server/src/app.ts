@@ -22,7 +22,7 @@ app.use(expressFileUpload());
 app.use(
   cors({
     credentials: true,
-    origin: config.CLIENT_URL,
+    origin: [config.CLIENT_URL, 'http://localhost:3000'],
   }),
 );
 
@@ -50,6 +50,7 @@ app.use(
   }),
 );
 
-app.listen(config.SERVER_PORT, () => {
-  logger.info(`server is listening on http://${config.SERVER_URL}:${config.SERVER_PORT}`);
+const port = config.PORT || 4000;
+app.listen(port, () => {
+  logger.info(`server is listening on http://${config.SERVER_URL}:${port}`);
 });
