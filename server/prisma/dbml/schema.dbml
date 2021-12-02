@@ -13,6 +13,32 @@ Table Session {
   user User [not null]
 }
 
+Table Team {
+  id Int [pk, increment]
+  name String [not null]
+  description String
+  startDate DateTime [not null]
+  endDate DateTime [not null]
+  status String [not null, default: 'Doing']
+  picture String [not null]
+  numOfMember Int [default: 0]
+  members Member [not null]
+}
+
+Table Member {
+  user User [not null]
+  team Team [not null]
+  isOwner Boolean [not null, default: false]
+  userId Int [not null]
+  teamId Int [not null]
+  joinedAt DateTime [default: `now()`, not null]
+  assignedBy String [not null]
+
+  indexes {
+    (userId, teamId) [unique]
+  }
+}
+
 Table User {
   id Int [pk, increment]
   name String [not null]
@@ -23,6 +49,25 @@ Table User {
   isAdmin Boolean [not null, default: false]
   status String [not null, default: 'NotInitiated']
   session Session [not null]
+  members Member [not null]
+  profile Profile
+}
+
+Table Profile {
+  id Int [pk, increment]
+  User User [not null]
+  userId Int [not null]
+}
+
+Enum UserState {
+  NOTINITIALTED
+  INITIALTED
 }
 
 Ref: Session.userId > User.id
+
+Ref: Member.userId > User.id
+
+Ref: Member.teamId > Team.id
+
+Ref: Profile.userId - User.id

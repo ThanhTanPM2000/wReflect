@@ -37,7 +37,6 @@ const handleLogin = async (
   const indexOfSearchParams = location.href.indexOf('&code');
   const clearedUrl = indexOfSearchParams !== -1 ? location.href.substring(0, indexOfSearchParams) : location.href;
   window.history.replaceState({}, '', clearedUrl);
-  const { isAdmin } = await user.me();
 };
 
 const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {

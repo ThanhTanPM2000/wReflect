@@ -5,7 +5,8 @@ import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { Header } from './components/Header';
 import { Me } from './types';
-import{Workspace} from './components/Workspace'
+import { Workspace } from './components/Workspace';
+import { TopNavBar } from './components/TopNavBar';
 
 type Props = {
   me: null | Me;
@@ -17,9 +18,8 @@ const Routes = ({ me }: Props): JSX.Element => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  
-   const picture = me?.picture || null;
 
+  const picture = me?.picture || null;
 
   return (
     <Router>
@@ -28,11 +28,11 @@ const Routes = ({ me }: Props): JSX.Element => {
           <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
             {isLoggedIn && (
               <>
-                <SideBar email={email} isAdmin={isAdmin}/>
+                <SideBar email={email} isAdmin={isAdmin} />
                 <Layout className="site-layout">
-                  <Header email={email} picture={picture} />
+                  <TopNavBar email={email} picture={picture} />
                   <Content
-                    style={{ margin: '0 16px' }}
+                    style={{ margin: '0 16px', height: '100%' }}
                     // className={isLoggedIn ? 'flex flex-dir-c flex-ai-c' : 'flex flex-dir-c flex-jc-c flex-ai-c'}
                   >
                     <Switch>
@@ -52,7 +52,7 @@ const Routes = ({ me }: Props): JSX.Element => {
             {/* <Header email={email} /> */}
             <Route path="/home">
               {/* <HomePage /> */}
-              <HomePage email={email} picture={picture}/>
+              <HomePage email={email} picture={picture} />
             </Route>
           </Layout>
         </Route>

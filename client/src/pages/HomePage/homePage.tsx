@@ -12,8 +12,8 @@ const HomePage = ({ email,picture }: Props) => {
     <>
       <Header email={email} picture={picture}/>
       <div className="flex flex-jc-sa flex-ai-sa">
-        <Image preview={false} src="/homePageMale.png" alt="image" />
-        <Image preview={false} src="/homePageFemale.png" alt="image" />
+        <Image preview={false} src="/images/homePageMale.png" alt="image" />
+        <Image preview={false} src="/images/homePageFemale.png" alt="image" />
       </div>
     </>
   );

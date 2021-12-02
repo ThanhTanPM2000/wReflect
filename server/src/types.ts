@@ -12,7 +12,6 @@ export interface RequestWithUserInfo extends Request {
 }
 
 export type UserStatus = 'NotInitiated' | 'Initiated' | 'Completed';
-
 export enum UserStatusEnum {
   NotInitiated = 'NotInitiated',
   Initiated = 'Initiated',
