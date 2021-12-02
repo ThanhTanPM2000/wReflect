@@ -63,9 +63,6 @@ CREATE TABLE "Profile" (
 CREATE INDEX "Session.expiresAt_index" ON "Session"("expiresAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Session_userId_unique" ON "Session"("userId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Member.userId_teamId_unique" ON "Member"("userId", "teamId");
 
 -- CreateIndex

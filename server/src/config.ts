@@ -41,7 +41,7 @@ export default {
   AUTH0_DOMAIN: parseString('AUTH0_DOMAIN'),
   PORT: parseNumber('PORT'),
   NODE_ENV: parseString('NODE_ENV'),
-  SERVER_PORT: parseNumber('SERVER_PORT'),
+  // SERVER_PORT: parseNumber('SERVER_PORT'),
   SERVER_URL: parseString('SERVER_URL'),
   CLIENT_URL: parseString('CLIENT_URL'),
   REDIS_SERVER_URL: parseString('REDIS_SERVER_URL'),
