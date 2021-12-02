@@ -14,6 +14,7 @@ import {
   CarryOutOutlined,
   HomeOutlined,
   CalendarOutlined,
+  RollbackOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -41,9 +42,19 @@ const SideBar = ({ email, isAdmin }: Props) => {
         >
           <div className="logo" />
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item icon={<HomeOutlined />} key="/WorkSpace">
-              <span>Home</span>
-            </Menu.Item>
+            {location.pathname === '/team-detail' ? (
+              <Menu.Item icon={<RollbackOutlined />} key="/WorkSpace">
+                <a href="/">
+                  <span>Back</span>
+                </a>
+              </Menu.Item>
+            ) : (
+              <Menu.Item icon={<HomeOutlined />} key="/WorkSpace">
+                <a href="/">
+                  <span>Home</span>
+                </a>
+              </Menu.Item>
+            )}
             <SubMenu key="sub1" icon={<TeamOutlined />} title="Team">
               <Menu.Item key="3" icon={<PieChartOutlined />}>
                 Board
@@ -64,7 +75,7 @@ const SideBar = ({ email, isAdmin }: Props) => {
             <Menu.Item key="2" icon={<SettingOutlined />}>
               Settings
             </Menu.Item>
-            <Menu.Item style={{ alignContent: "end"}} key="7" icon={<LogoutOutlined />}>
+            <Menu.Item style={{ alignContent: 'end' }} key="7" icon={<LogoutOutlined />}>
               <Logout>
                 <>Sign out</>
               </Logout>
