@@ -116,7 +116,7 @@ const TeamDetail = () => {
           </Tabs>
           <div className="btn-new-team">
             <Button icon={<PlusCircleOutlined />} size="large" onClick={showModal}>
-              New Team
+              New Member
             </Button>
             <Modal title="Thêm thành viên mới" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
               <Input placeholder="Vui lòng nhập tên hoặc email" />
