@@ -19,3 +19,22 @@ export enum UserStatusEnum {
 }
 
 export const apiPaths = ['/api', '/graphql'];
+
+export type createTeamType = {
+  name: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  picture?: string;
+};
+
+export type updateTeamType = {
+  id: number;
+  name?: string;
+  ownerEmail?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  picture?: string;
+  description?: string;
+};

@@ -1,21 +1,41 @@
 import logger from '../logger';
-import { number } from 'zod';
-import Prisma from './../prisma';
+import prisma from './../prisma';
+import { createTeamType, updateTeamType } from '../types';
 import { Team } from '.prisma/client';
 
-export const getListTeams = async (userId: number, isGettingAll = false, page = 1, size = 10, search = '') => {
+export const getListTeams = async (userId?: number, isGettingAll = false, page = 1, size = 10, search = '') => {
   try {
-    const teams = await Prisma.team.findMany({
-      where: {
-        members: {
-          every: {
-            userId,
-          },
+    const where = {
+      members: {
+        every: {
+          userId,
         },
       },
+      AND: {
+        name: {
+          contains: search,
+        },
+      },
+    };
+
+    const teams = await prisma.team.findMany({
+      where: { ...where },
+      ...(!isGettingAll && { skip: (page - 1) * size }),
+      ...(!isGettingAll && { take: size }),
+      include: {
+        members: true,
+      },
+      orderBy: {},
     });
 
-    return teams;
+    const total = await prisma.team.count({
+      where: { ...where },
+    });
+
+    return {
+      teams,
+      total,
+    };
   } catch (error) {
     logger.error('Error in getListTeams service');
     throw error;
@@ -24,7 +44,7 @@ export const getListTeams = async (userId: number, isGettingAll = false, page = 
 
 export const findTeam = async (userId: number, teamId: number) => {
   try {
-    const team = await Prisma.team.findFirst({
+    const team = await prisma.team.findFirst({
       where: {
         id: teamId,
         members: {
@@ -42,20 +62,27 @@ export const findTeam = async (userId: number, teamId: number) => {
   }
 };
 
-export const updateTeam = async (team: Team): Promise<Team | null> => {
+export const createTeam = async (data: createTeamType) => {
   try {
-    const newTeam = Prisma.team.update({
-      where: {
-        id: team.id,
-      },
+    const startDate = data.startDate ? new Date(+data.startDate) : new Date();
+    const endDate = data.endDate ? new Date(+data.endDate) : new Date();
+
+    const newTeam = await prisma.team.create({
+      data: { ...data, startDate, endDate },
+    });
+    return newTeam;
+  } catch (error) {
+    logger.error('Error in createTeam');
+    throw error;
+  }
+};
+
+export const updateTeam = async (data: updateTeamType): Promise<Team | null> => {
+  try {
+    const newTeam = prisma.team.update({
+      where: { id: data.id },
       data: {
-        name: team.name,
-        picture: team.picture,
-        status: team.status,
-        description: team?.description,
-        numOfMember: team?.numOfMember,
-        startDate: team.startDate,
-        endDate: team.endDate,
+        ...data,
       },
     });
     return newTeam;
@@ -67,12 +94,11 @@ export const updateTeam = async (team: Team): Promise<Team | null> => {
 
 export const deleteTeam = async (teamId: number) => {
   try {
-    await Prisma.team.delete({
+    return await prisma.team.delete({
       where: {
         id: teamId,
       },
     });
-    return true;
   } catch (error) {
     logger.error('Error in deleteTeam service');
     throw error;

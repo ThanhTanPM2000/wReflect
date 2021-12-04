@@ -16,12 +16,13 @@ Table Session {
 Table Team {
   id Int [pk, increment]
   name String [not null]
-  description String
+  ownerEmail String
   startDate DateTime [not null]
   endDate DateTime [not null]
   status String [not null, default: 'Doing']
-  picture String [not null]
-  numOfMember Int [default: 0]
+  picture String [not null, default: 'https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_']
+  numOfMember Int [not null, default: 1]
+  description String
   members Member [not null]
 }
 
@@ -57,11 +58,6 @@ Table Profile {
   id Int [pk, increment]
   User User [not null]
   userId Int [not null]
-}
-
-Enum UserState {
-  NOTINITIALTED
-  INITIALTED
 }
 
 Ref: Session.userId > User.id

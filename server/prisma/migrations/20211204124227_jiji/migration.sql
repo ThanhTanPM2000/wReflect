@@ -1,6 +1,3 @@
--- CreateEnum
-CREATE TYPE "UserState" AS ENUM ('NOTINITIALTED', 'INITIALTED');
-
 -- CreateTable
 CREATE TABLE "Session" (
     "id" SERIAL NOT NULL,
@@ -18,12 +15,13 @@ CREATE TABLE "Session" (
 CREATE TABLE "Team" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT,
+    "ownerEmail" TEXT,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
     "status" TEXT NOT NULL DEFAULT E'Doing',
-    "picture" TEXT NOT NULL,
-    "numOfMember" INTEGER DEFAULT 0,
+    "picture" TEXT NOT NULL DEFAULT E'https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_',
+    "numOfMember" INTEGER NOT NULL DEFAULT 1,
+    "description" TEXT,
 
     PRIMARY KEY ("id")
 );

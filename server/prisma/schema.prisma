@@ -28,14 +28,14 @@ model Session {
 model Team {
 	id				Int			@id @default(autoincrement())
 	name 			String
-	description		String?
-	startDate		DateTime	
-	endDate			DateTime	
+	ownerEmail		String?	
+	startDate		DateTime
+	endDate			DateTime
 	status			String		@default("Doing")
-	picture 		String		
-	numOfMember		Int?		@default(0)
+	picture 		String		@default("https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_")		
+	numOfMember		Int			@default(1)
+	description		String?
 	members			Member[]	
-
 }
 
 model Member {
@@ -44,7 +44,7 @@ model Member {
 	isOwner			Boolean		@default(false)
 	userId			Int
 	teamId 			Int
- 	joinedAt		DateTime @default(now())
+ 	joinedAt		DateTime 	@default(now())
  	assignedBy 		String
 
 	@@unique([userId, teamId])
@@ -64,11 +64,6 @@ model User {
 	profile			Profile?
 
  	 @@index([email])
-}
-
-enum UserState {
-	NOTINITIALTED
-	INITIALTED
 }
 
 model Profile {

@@ -47,6 +47,9 @@ app.use(
   graphqlHTTP({
     schema,
     graphiql: true,
+    customFormatErrorFn: (error: Error) => ({
+      message: error.message,
+    }),
   }),
 );
 
