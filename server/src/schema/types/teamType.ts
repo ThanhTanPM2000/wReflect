@@ -4,10 +4,11 @@ import { member } from '../../services';
 
 const TeamType = new GraphQLObjectType({
   name: 'Team',
-  fields: {
+  fields: () => ({
     id: { type: GraphQLInt },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
+    ownerEmail: { type: new GraphQLList(GraphQLString) },
     startDate: { type: GraphQLString },
     endDate: { type: GraphQLString },
     status: { type: GraphQLString },
@@ -16,11 +17,8 @@ const TeamType = new GraphQLObjectType({
     total: { type: GraphQLInt },
     members: {
       type: new GraphQLList(MemberType),
-      resolve: async () => {
-        return await member.getListMembers();
-      },
     },
-  },
+  }),
 });
 
 export default TeamType;

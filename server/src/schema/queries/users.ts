@@ -1,14 +1,14 @@
 import { getListData } from './../../types';
 import { GraphQLObjectType, GraphQLList, GraphQLBoolean, GraphQLString, GraphQLInt } from 'graphql';
-import { TeamType } from '../types';
-import { team } from '../../services';
+import { UserType } from '../types';
+import { user } from '../../services';
 import { RequestWithUserInfo } from '../../types';
 
 export default {
   type: new GraphQLObjectType({
-    name: 'FindListTeams',
+    name: 'GetListUsers',
     fields: {
-      data: { type: new GraphQLList(TeamType) },
+      data: { type: new GraphQLList(UserType) },
       total: { type: GraphQLInt },
     },
   }),
@@ -19,9 +19,10 @@ export default {
     size: { type: GraphQLInt },
   },
   resolve: async (_, args: getListData, request: RequestWithUserInfo) => {
-    const { id, isAdmin } = request.user;
+    const { isAdmin } = request.user;
+    // if (!isAdmin) throw new Error('User dont have permission');
     const { isGettingAll, search, page, size } = args;
-    const { data, total } = await team.getListTeams(isAdmin ? undefined : id, !!isGettingAll, page, size, search);
+    const { data, total } = await user.getListUsers(search, !!isGettingAll, page, size);
     return { data, total };
   },
 };

@@ -1,6 +1,6 @@
 import { GraphQLString, GraphQLNonNull } from 'graphql';
 import { TeamType } from '../types';
-import { createTeamType } from '../../types';
+import { createTeamType, RequestWithUserInfo } from '../../types';
 
 import { team } from '../../services';
 
@@ -13,7 +13,8 @@ export default {
     endDate: { type: new GraphQLNonNull(GraphQLString) },
     picture: { type: GraphQLString },
   },
-  resolve: async (_, args: createTeamType) => {
-    return await team.createTeam(args);
+  resolve: async (_, args: createTeamType, request: RequestWithUserInfo) => {
+    const { email } = request.user;
+    return await team.createTeam(email, args);
   },
 };

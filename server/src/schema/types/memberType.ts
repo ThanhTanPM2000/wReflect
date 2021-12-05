@@ -2,13 +2,13 @@ import { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLInt } from 'gr
 
 const MemberType = new GraphQLObjectType({
   name: 'Member',
-  fields: {
+  fields: () => ({
     isOwner: { type: GraphQLBoolean },
     userId: { type: GraphQLInt },
     teamId: { type: GraphQLInt },
     joinAt: { type: GraphQLString },
     assignedBy: { type: GraphQLString },
-  },
+  }),
 });
 
 export default MemberType;

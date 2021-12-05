@@ -28,12 +28,14 @@ model Session {
 model Team {
 	id				Int			@id @default(autoincrement())
 	name 			String
-	ownerEmail		String?	
+	ownerEmail		String[]
+	createdAt 		DateTime 	@default(now())
 	startDate		DateTime
 	endDate			DateTime
 	status			String		@default("Doing")
 	picture 		String		@default("https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_")		
 	numOfMember		Int			@default(1)
+	isPublic 		Boolean		@default(true)
 	description		String?
 	members			Member[]	
 }
@@ -52,22 +54,29 @@ model Member {
 
 model User {
 	id				Int			@id @default(autoincrement())
-	name			String
 	email			String		@unique
+	picture			String
 	createAt 		DateTime 	@default(now())
-	picture			String?	
-	updateAt		DateTime 	@updatedAt
+	updateAt 		DateTime	@updatedAt
 	isAdmin			Boolean	 	@default(false)
 	status 			String		@default("NotInitiated")
 	session			Session[]
+	profile			UserProfile?
 	members			Member[]
-	profile			Profile?
 
  	 @@index([email])
 }
 
-model Profile {
-  id   				Int		 	@id @default(autoincrement())
-  User 				User		@relation(fields: [userId], references: [id])
-  userId			Int
+model UserProfile {
+	id					Int			@id @default(autoincrement())
+ 	User 				User		@relation(fields: [userId], references: [id])
+	userId				Int
+	introduction 		String?
+	name				String
+	talents				String[]
+	interests			String[]
+	updateAt			DateTime	@updatedAt
+
+	@@unique([userId])
+
 }

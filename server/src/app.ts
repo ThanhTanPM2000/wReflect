@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import expressFileUpload from 'express-fileupload';
 import { graphqlHTTP } from 'express-graphql';
 import proxy from 'express-http-proxy';
+import StatusCodes from 'http-status-codes';
 
 import sessionManager from './middleware/sessionManager';
 import './prisma'; // eager load to test connection
@@ -47,9 +48,9 @@ app.use(
   graphqlHTTP({
     schema,
     graphiql: true,
-    customFormatErrorFn: (error: Error) => ({
-      message: error.message,
-    }),
+    customFormatErrorFn: (error: Error) => {
+      return { message: error.message };
+    },
   }),
 );
 

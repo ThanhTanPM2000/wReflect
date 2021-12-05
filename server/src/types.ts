@@ -1,10 +1,11 @@
+import { getListTeams } from './services/team';
 import { Request } from 'express';
 
 export type SanitizedUser = {
   id: number;
   email: string;
   isAdmin: boolean;
-  picture: string | null;
+  picture: string;
 };
 
 export interface RequestWithUserInfo extends Request {
@@ -37,4 +38,28 @@ export type updateTeamType = {
   status?: string;
   picture?: string;
   description?: string;
+};
+
+export type updateUserType = {
+  name?: string;
+  picture?: string;
+};
+
+export type updateProfileType = {
+  introduction?: string;
+  talents?: string[];
+  interests?: string[];
+  name?: string;
+};
+
+export type addMemberToTeamType = {
+  userId: number;
+  teamId: number;
+};
+
+export type getListData = {
+  isGettingAll: boolean;
+  search: string;
+  page: number;
+  size: number;
 };
