@@ -8,7 +8,7 @@ import { Me } from './types';
 import { Workspace } from './components/Workspace';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './components/TeamDetail/teamDetail'
-
+import {ProfileUser} from './components/ProfileUser'
 type Props = {
   me: null | Me;
 };
@@ -44,7 +44,10 @@ const Routes = ({ me }: Props): JSX.Element => {
                         </>
                       )}
                     </Switch>
-                    <Route path="/team-detail" component={TeamDetail} />
+                    <Route path="/team-detail" component={TeamDetail}  />
+                    <Route path="/profileUser" component={ProfileUser}>
+                      <ProfileUser email={email} picture={picture}/>
+                    </Route>
                   </Content>
                   <Footer style={{ textAlign: 'center' }}>wReflect ©2022</Footer>
                 </Layout>

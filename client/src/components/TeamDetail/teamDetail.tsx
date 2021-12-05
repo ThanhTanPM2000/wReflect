@@ -87,6 +87,7 @@ const TeamDetail = () => {
 
   return (
     <Tabs className="tab" defaultActiveKey="1" style={{ height: '100%' }}>
+
       <TabPane tab="Team Detail" key="1" style={{ height: '100%' }}>
         <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
           <Tabs className="tab-inner" defaultActiveKey="1" style={{ height: '90%' }}>
