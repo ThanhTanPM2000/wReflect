@@ -1,17 +1,22 @@
-import { GraphQLInt } from 'graphql';
-import { MemberType } from '../types';
+import { GraphQLInt, GraphQLList, GraphQLString, GraphQLObjectType } from 'graphql';
 import { RequestWithUserInfo, addMemberToTeamType } from '../../types';
 
 import { member } from '../../services';
 
 export default {
-  type: MemberType,
+  type: new GraphQLObjectType({
+    name: 'AddMemberStatus',
+    fields: {
+      success: { type: new GraphQLList(GraphQLString) },
+      errors: { type: new GraphQLList(GraphQLString) },
+    },
+  }),
   args: {
-    userId: { type: GraphQLInt },
+    emailUsers: { type: new GraphQLList(GraphQLString) },
     teamId: { type: GraphQLInt },
   },
   resolve: async (_, args: addMemberToTeamType, request: RequestWithUserInfo) => {
     const { email } = request.user;
-    return await member.addMemberToTeam(email, args);
+    return await member.addMembersToTeam(email, args);
   },
 };

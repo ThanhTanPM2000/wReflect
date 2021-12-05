@@ -1,25 +1,29 @@
 import nodemailer from 'nodemailer';
+import logger from '../../logger';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  secure: false,
-  auth: {
-    user: 'wreflectteam@gmail.com',
-    pass: 'Domaybiet!23',
-  },
-});
+export const sendMail = (receiverEmail: string, subject: string, content: string) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'wreflectteam@gmail.com',
+      pass: 'Domaybiet!23',
+    },
+  });
 
-const options = {
-  from: 'wreflectteam@gmail.com',
-  to: 'tan.187pm20569@vanlanguni.vn',
-  subject: 'testing and testing',
-  text: 'Your account was hacked, sorry u must follow this link to validate',
+  const options = {
+    from: 'wreflectteam@gmail.com',
+    to: `${receiverEmail}`,
+    subject: `${subject}`,
+    text: `${content}`,
+  };
+
+  transporter.sendMail(options, (err, data) => {
+    if (err) {
+      logger.error(`Error when send Mail to ${receiverEmail}`);
+      return false;
+    } else {
+      logger.info(`Send mail successfully to ${receiverEmail}`);
+      return true;
+    }
+  });
 };
-
-transporter.sendMail(options, (err, data) => {
-  if (err) {
-    console.log('have error');
-  } else {
-    console.log('send mail successfully', data);
-  }
-});

@@ -1,7 +1,10 @@
 import { addMemberToTeamType } from '../types';
 import logger from '../logger';
 import prisma from '../prisma';
-import { create } from 'lodash';
+import _ from 'lodash';
+import { eachMonthOfInterval } from 'date-fns';
+
+import { sendMail } from './nodemailer/sentMail';
 
 export const getListMembers = async (teamId: number) => {
   try {
@@ -17,9 +20,9 @@ export const getListMembers = async (teamId: number) => {
   }
 };
 
-export const addMemberToTeam = async (assignedBy: string, data: addMemberToTeamType) => {
+export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeamType) => {
   try {
-    const team = prisma.team.findFirst({
+    const team = await prisma.team.findFirst({
       where: {
         ownerEmail: {
           has: assignedBy,
@@ -30,39 +33,56 @@ export const addMemberToTeam = async (assignedBy: string, data: addMemberToTeamT
 
     if (!team) throw new Error(`You are not the owner of Team ${data.teamId}`);
 
-    let member = await prisma.member.findUnique({
+    const currentUsers = await prisma.user.findMany({
       where: {
-        userId_teamId: {
-          ...data,
+        email: {
+          in: data.emailUsers,
         },
       },
     });
 
-    if (member) throw new Error(`This member already joined in Team`);
+    const currentMailsUser = currentUsers.map((user) => user.email);
 
-    member = await prisma.member.create({
-      data: {
-        assignedBy,
-        ...data,
-      },
-    });
+    const success = [] as string[];
+    const errors = [] as string[];
+    const newEmail = _.filter(data.emailUsers, (email) => !currentMailsUser.includes(email));
+    if (newEmail.length > 0) {
+      await Promise.all(
+        newEmail.map((email) => {
+          sendMail(email, `Invite to team ${data.teamId}`, `Someone invite you to team ${team.name} - ${team.id}`);
+          success.push(`We have sent email invite to ${email}`);
+        }),
+      );
+    }
+    if (currentUsers.length > 0) {
+      for (let idx = 0; idx < currentUsers.length; idx++) {
+        const member = await prisma.member.findUnique({
+          where: {
+            userId_teamId: {
+              teamId: data.teamId,
+              userId: currentUsers[idx].id,
+            },
+          },
+        });
+        if (member) {
+          errors.push(`${currentUsers[idx].email} already exists in this team`);
+        } else {
+          await prisma.member.create({
+            data: {
+              assignedBy,
+              userId: currentUsers[idx].id,
+              teamId: data.teamId,
+            },
+          });
+          success.push(`${currentUsers[idx].email} added in this team`);
+        }
+      }
+    }
 
-    // const member = await prisma.member.upsert({
-    //   where: {
-    //     userId_teamId: {
-    //       ...data,
-    //     },
-    //   },
-    //   update: {
-    //     assignedBy,
-    //   },
-    //   create: {
-    //     ...data,
-    //     assignedBy,
-    //   },
-    // });
-
-    return member;
+    return {
+      success,
+      errors,
+    };
   } catch (error) {
     logger.error('Error at addMemberToTeam');
     throw error;

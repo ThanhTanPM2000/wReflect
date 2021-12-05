@@ -53,7 +53,7 @@ export type updateProfileType = {
 };
 
 export type addMemberToTeamType = {
-  userId: number;
+  emailUsers: string[];
   teamId: number;
 };
 
