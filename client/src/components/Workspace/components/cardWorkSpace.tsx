@@ -2,71 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-import { Card, Avatar, Col, Row, Skeleton, Pagination, Empty } from 'antd';
-import TeamDetail from '../../TeamDetail/teamDetail';
+import { Card, Avatar, Col, Row, Skeleton, Pagination, Empty, Modal } from 'antd';
+
+import { useQuery } from '@apollo/client';
+import { getTeams } from '../../../grapql-client/queries';
 
 const style = { margin: '0px 0px 0px 5px', padding: '8px 0' };
 const { Meta } = Card;
 
-export const InfoCard = [
-  {
-    name: 'Team 1',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 2',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 3',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 4',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 4',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 4',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 4',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-  {
-    name: 'Team 4',
-    img: <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />,
-    avatar: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-    desc: 'This is the description',
-  },
-];
-
 const CardWorkSpace = () => {
-  const [data, setData] = useState([]);
+  const { error, data } = useQuery(getTeams);
+  const getAllTeam = data?.teams?.data;
+  console.log(getAllTeam);
+
+  const [base, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const history = useHistory();
 
   const redirect = () => {
-    history.push('/team-detail')
-  }
+    history.push('/team-detail');
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -83,6 +38,10 @@ const CardWorkSpace = () => {
       });
   }, []);
 
+  const hadleSetting = () => {
+    return <Modal></Modal>;
+  };
+
   const listTeamCard = (loading: boolean) => {
     if (loading) {
       const arrayTeam = [];
@@ -94,8 +53,8 @@ const CardWorkSpace = () => {
         );
       }
       return arrayTeam;
-    } else
-      return InfoCard.map((info: any, idx: number) => (
+    } else {
+      return getAllTeam.map((info: any, idx: number) => (
         <Col key={idx} className="gutter-row" span={6}>
           <div style={style}>
             <Card
@@ -103,18 +62,19 @@ const CardWorkSpace = () => {
               onClick={redirect}
               loading={loading}
               actions={[
-                <SettingOutlined key="setting" />,
+                <SettingOutlined onClick={hadleSetting} key="setting" />,
                 <EditOutlined key="edit" />,
                 <EllipsisOutlined key="ellipsis" />,
               ]}
             >
               <Skeleton loading={loading} avatar active>
-                <Meta avatar={info.avatar} title={info.name} description={info.desc}></Meta>
+                <Meta avatar={info.picture} title={info.name} description={info.description}></Meta>
               </Skeleton>
             </Card>
           </div>
         </Col>
       ));
+    }
   };
 
   return (
@@ -123,7 +83,7 @@ const CardWorkSpace = () => {
       {/* <Empty /> */}
       {/* ) : ( */}
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-        {[...listTeamCard(loading)]}
+        {/* {[...listTeamCard(loading)]} */}
         <div className="flex flex-jc-c" style={{ width: '100%', marginTop: '14px' }}>
           <Pagination defaultCurrent={1} total={50} />
         </div>
