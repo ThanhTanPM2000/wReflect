@@ -57,6 +57,12 @@ export type addMemberToTeamType = {
   teamId: number;
 };
 
+export type setRoleMemberType = {
+  userId: number;
+  teamId: number;
+  isRoleAdmin: boolean;
+};
+
 export type getListData = {
   isGettingAll: boolean;
   search: string;

@@ -34,7 +34,7 @@ CREATE TABLE "Member" (
     "userId" INTEGER NOT NULL,
     "teamId" INTEGER NOT NULL,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "assignedBy" TEXT NOT NULL
+    "assignedBy" TEXT
 );
 
 -- CreateTable

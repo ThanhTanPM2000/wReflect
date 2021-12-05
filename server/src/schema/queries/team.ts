@@ -16,6 +16,6 @@ export default {
   },
   resolve: async (_, args: argument, request: RequestWithUserInfo) => {
     const { id, isAdmin } = request.user;
-    return await team.findTeam(id, args.teamId);
+    return await team.findTeam(args.teamId, isAdmin ? undefined : id);
   },
 };

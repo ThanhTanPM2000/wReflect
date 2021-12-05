@@ -14,7 +14,6 @@ export default {
     picture: { type: GraphQLString },
   },
   resolve: async (_, args: createTeamType, request: RequestWithUserInfo) => {
-    const { email } = request.user;
-    return await team.createTeam(email, args);
+    return await team.createTeam(request, args);
   },
 };

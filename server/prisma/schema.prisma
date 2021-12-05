@@ -47,7 +47,7 @@ model Member {
 	userId			Int
 	teamId 			Int
  	joinedAt		DateTime 	@default(now())
- 	assignedBy 		String
+ 	assignedBy 		String?
 
 	@@unique([userId, teamId])
 }

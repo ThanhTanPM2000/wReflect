@@ -1,22 +1,26 @@
 import logger from '../logger';
 import prisma from './../prisma';
-import { createTeamType, updateTeamType } from '../types';
+import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
 import { Team } from '.prisma/client';
 import { includes } from 'lodash';
 
 export const getListTeams = async (userId?: number, isGettingAll = false, page = 1, size = 10, search = '') => {
   try {
     const where = {
-      members: {
-        every: {
-          userId,
+      OR: [
+        {
+          members: {
+            some: {
+              userId,
+            },
+          },
         },
-      },
-      AND: {
-        name: {
-          contains: search,
+        {
+          name: {
+            contains: search,
+          },
         },
-      },
+      ],
     };
 
     const data = await prisma.team.findMany({
@@ -43,16 +47,21 @@ export const getListTeams = async (userId?: number, isGettingAll = false, page =
   }
 };
 
-export const findTeam = async (userId: number, teamId: number) => {
+export const findTeam = async (teamId: number, userId?: number) => {
   try {
+    const where = userId
+      ? {
+          id: teamId,
+          members: {
+            some: {
+              userId,
+            },
+          },
+        }
+      : undefined;
     const team = await prisma.team.findFirst({
       where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
+        ...where,
       },
     });
 
@@ -63,14 +72,25 @@ export const findTeam = async (userId: number, teamId: number) => {
   }
 };
 
-export const createTeam = async (ownerEmail: string, data: createTeamType) => {
+export const createTeam = async (request: RequestWithUserInfo, data: createTeamType) => {
   try {
+    const { email, id } = request.user;
+
     const startDate = data.startDate ? new Date(+data.startDate) : new Date();
     const endDate = data.endDate ? new Date(+data.endDate) : new Date();
 
     const newTeam = await prisma.team.create({
-      data: { ...data, startDate, endDate, ownerEmail: [ownerEmail] },
+      data: { ...data, startDate, endDate, ownerEmail: [email] },
     });
+
+    await prisma.member.create({
+      data: {
+        isOwner: true,
+        userId: id,
+        teamId: newTeam.id,
+      },
+    });
+
     return newTeam;
   } catch (error) {
     logger.error('Error in createTeam');

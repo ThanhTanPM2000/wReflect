@@ -35,7 +35,7 @@ Table Member {
   userId Int [not null]
   teamId Int [not null]
   joinedAt DateTime [default: `now()`, not null]
-  assignedBy String [not null]
+  assignedBy String
 
   indexes {
     (userId, teamId) [unique]

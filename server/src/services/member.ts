@@ -1,4 +1,4 @@
-import { addMemberToTeamType } from '../types';
+import { addMemberToTeamType, setRoleMemberType } from '../types';
 import logger from '../logger';
 import prisma from '../prisma';
 import _ from 'lodash';
@@ -89,6 +89,39 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
   }
 };
 
-// export const setRoleMember = (data: addMemberToTeamType) => {
+export const setRoleMember = async (ownerEmail: string, data: setRoleMemberType) => {
+  try {
+    const team = await prisma.team.findFirst({
+      where: {
+        ownerEmail: {
+          has: ownerEmail,
+        },
+        id: data.teamId,
+      },
+    });
 
-// };
+    if (!team) throw new Error(`You are not the owner of Team ${data.teamId}`);
+
+    const member = await prisma.member.update({
+      where: {
+        userId_teamId: {
+          teamId: data.teamId,
+          userId: data.userId,
+        },
+      },
+      data: {
+        isOwner: data.isRoleAdmin,
+      },
+      include: {
+        team: true,
+        user: true,
+      },
+    });
+
+    if (!member) throw new Error('Bad request');
+    return member;
+  } catch (error) {
+    logger.error('Error at setRoleMember');
+    throw error;
+  }
+};

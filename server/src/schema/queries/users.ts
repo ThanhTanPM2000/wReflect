@@ -20,7 +20,7 @@ export default {
   },
   resolve: async (_, args: getListData, request: RequestWithUserInfo) => {
     const { isAdmin } = request.user;
-    // if (!isAdmin) throw new Error('User dont have permission');
+    if (!isAdmin) throw new Error('User dont have permission');
     const { isGettingAll, search, page, size } = args;
     const { data, total } = await user.getListUsers(search, !!isGettingAll, page, size);
     return { data, total };

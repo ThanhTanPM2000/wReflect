@@ -66,6 +66,9 @@ export const getUserById = async (userId: number) => {
         id: userId,
       },
     });
+
+    if (!user) throw new Error('User not found in system');
+
     return user;
   } catch (error) {
     logger.info('Error in getUserById service');
