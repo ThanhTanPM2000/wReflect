@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Menu, Tabs, Layout } from 'antd';
 import { useLocation } from 'react-router-dom';
-
+import { useHistory } from 'react-router';
 import { Logout } from '../Logout';
 
 import {
-  BarChartOutlined,
   SettingOutlined,
   LogoutOutlined,
   PieChartOutlined,
@@ -14,7 +13,8 @@ import {
   CarryOutOutlined,
   HomeOutlined,
   CalendarOutlined,
-  RollbackOutlined,
+  WifiOutlined,
+  UsergroupDeleteOutlined
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -29,6 +29,13 @@ type Props = {
 const SideBar = ({ email, isAdmin }: Props) => {
   const location = useLocation();
   const [isCollapse, setIsCollapse] = useState(true);
+  const history = useHistory();
+  const dashboard = () => {
+    history.push('/dashboard')
+  }
+  const userManagements = () => {
+    history.push('/user-Managements')
+  }
 
   return (
     <>
@@ -42,20 +49,26 @@ const SideBar = ({ email, isAdmin }: Props) => {
         >
           <div className="logo" />
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            {location.pathname === '/team-detail' ? (
+          <Menu.Item icon={<HomeOutlined />} style={{marginTop:100}} key="/WorkSpace">
+                <a href="/">
+                  <span>Home</span>
+                </a>
+              </Menu.Item>
+            {/* {location.pathname === '/team-detail' ? (
               <Menu.Item icon={<RollbackOutlined />} key="/WorkSpace">
                 <a href="/">
                   <span>Back</span>
                 </a>
               </Menu.Item>
             ) : (
-              <Menu.Item icon={<HomeOutlined />} key="/WorkSpace">
+              <Menu.Item icon={<HomeOutlined />} style={{marginTop:100}} key="/WorkSpace">
                 <a href="/">
                   <span>Home</span>
                 </a>
               </Menu.Item>
-            )}
-            <SubMenu key="sub1" icon={<TeamOutlined />} title="Team">
+            )} */}
+            
+            <SubMenu  style={{marginTop:50}} key="sub1" icon={<TeamOutlined />} title="Team">
               <Menu.Item key="3" icon={<PieChartOutlined />}>
                 Board
               </Menu.Item>
@@ -69,13 +82,20 @@ const SideBar = ({ email, isAdmin }: Props) => {
                 Manager
               </Menu.Item>
             </SubMenu>
-            <Menu.Item key="1" icon={<BarChartOutlined />}>
-              Analyst
+
+            <Menu.Item key="7" icon={<WifiOutlined />} onClick={dashboard}>
+                  Dashboard
             </Menu.Item>
-            <Menu.Item key="2" icon={<SettingOutlined />}>
+
+            <Menu.Item key="8" icon={<UsergroupDeleteOutlined />} onClick={userManagements}>
+              User Managements 
+              </Menu.Item>
+
+            <Menu.Item key="9" icon={<SettingOutlined />}>
               Settings
             </Menu.Item>
-            <Menu.Item style={{ alignContent: 'end' }} key="7" icon={<LogoutOutlined />}>
+
+            <Menu.Item style={{ }} key="10" icon={<LogoutOutlined />}>
               <Logout>
                 <>Sign out</>
               </Logout>

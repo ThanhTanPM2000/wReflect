@@ -98,7 +98,9 @@ const Workspace = () => {
         </div>
       </TabPane>
       <TabPane tab="My Portfolio" key="2" style={{ height: '100%' }}>
-        <div>TNT</div>
+        <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
+        
+        </div>
       </TabPane>
     </Tabs>
   );
