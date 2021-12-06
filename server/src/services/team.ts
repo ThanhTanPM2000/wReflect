@@ -2,29 +2,36 @@ import logger from '../logger';
 import prisma from './../prisma';
 import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
 import { Team } from '.prisma/client';
-import { includes } from 'lodash';
 
-export const getListTeams = async (userId?: number, isGettingAll = false, page = 1, size = 10, search = '') => {
+export const getListTeams = async (
+  userId?: number,
+  status?: string,
+  isGettingAll = false,
+  page = 1,
+  size = 8,
+  search = '',
+) => {
   try {
     const where = {
-      OR: [
-        {
-          members: {
-            some: {
-              userId,
-            },
-          },
+      members: {
+        some: {
+          userId,
         },
-        {
-          name: {
-            contains: search,
-          },
-        },
-      ],
+      },
     };
 
     const data = await prisma.team.findMany({
-      where: { ...where },
+      where: {
+        ...where,
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+        status: {
+          contains: status,
+          mode: 'insensitive',
+        },
+      },
       ...(!isGettingAll && { skip: (page - 1) * size }),
       ...(!isGettingAll && { take: size }),
       include: {
@@ -34,7 +41,17 @@ export const getListTeams = async (userId?: number, isGettingAll = false, page =
     });
 
     const total = await prisma.team.count({
-      where: { ...where },
+      where: {
+        ...where,
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+        status: {
+          contains: status,
+          mode: 'insensitive',
+        },
+      },
     });
 
     return {
@@ -76,8 +93,8 @@ export const createTeam = async (request: RequestWithUserInfo, data: createTeamT
   try {
     const { email, id } = request.user;
 
-    const startDate = data.startDate ? new Date(+data.startDate) : new Date();
-    const endDate = data.endDate ? new Date(+data.endDate) : new Date();
+    const startDate = data.startDate ? new Date(data.startDate) : new Date();
+    const endDate = data.endDate ? new Date(data.endDate) : new Date();
 
     const newTeam = await prisma.team.create({
       data: { ...data, startDate, endDate, ownerEmail: [email] },

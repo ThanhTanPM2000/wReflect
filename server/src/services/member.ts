@@ -74,6 +74,16 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
               teamId: data.teamId,
             },
           });
+          prisma.team.update({
+            where: {
+              id: team.id,
+            },
+            data: {
+              numOfMember: {
+                increment: 1,
+              },
+            },
+          });
           success.push(`${currentUsers[idx].email} added in this team`);
         }
       }

@@ -12,6 +12,7 @@ const UserType = new GraphQLObjectType({
     isAdmin: { type: GraphQLBoolean },
     status: { type: GraphQLString },
     members: { type: new GraphQLList(MemberType) },
+    picture: { type: GraphQLString },
     profile: { type: ProfileType },
   }),
 });

@@ -116,6 +116,9 @@ const TeamDetail = () => {
             </TabPane>
           </Tabs>
           <div className="btn-new-team">
+          <Button className="btn-delete-team" style={{ margin: '0px 10px 0px 0px'}} icon={<PlusCircleOutlined />} size="large">
+              Delete Team
+            </Button>
             <Button icon={<PlusCircleOutlined />} size="large" onClick={showModal}>
               New Member
             </Button>
