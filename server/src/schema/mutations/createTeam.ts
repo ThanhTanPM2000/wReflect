@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLNonNull } from 'graphql';
+import { GraphQLString, GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import { TeamType } from '../types';
 import { createTeamType, RequestWithUserInfo } from '../../types';
 
@@ -11,6 +11,7 @@ export default {
     description: { type: GraphQLString },
     startDate: { type: new GraphQLNonNull(GraphQLString) },
     endDate: { type: new GraphQLNonNull(GraphQLString) },
+    isPublic: { type: GraphQLBoolean },
     picture: { type: GraphQLString },
   },
   resolve: async (_, args: createTeamType, request: RequestWithUserInfo) => {

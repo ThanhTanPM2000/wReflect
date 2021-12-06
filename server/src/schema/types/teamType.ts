@@ -17,6 +17,9 @@ const TeamType = new GraphQLObjectType({
     total: { type: GraphQLInt },
     members: {
       type: new GraphQLList(MemberType),
+      resolve: async (_) => {
+        return await member.getListMembers(_.id);
+      },
     },
   }),
 });

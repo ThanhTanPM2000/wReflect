@@ -13,6 +13,7 @@ export default {
     },
   }),
   args: {
+    status: { type: GraphQLString },
     isGettingAll: { type: GraphQLBoolean },
     search: { type: GraphQLString },
     page: { type: GraphQLInt },
@@ -20,8 +21,15 @@ export default {
   },
   resolve: async (_, args: getListData, request: RequestWithUserInfo) => {
     const { id, isAdmin } = request.user;
-    const { isGettingAll, search, page, size } = args;
-    const { data, total } = await team.getListTeams(isAdmin ? undefined : id, !!isGettingAll, page, size, search);
+    const { status, isGettingAll, search, page, size } = args;
+    const { data, total } = await team.getListTeams(
+      isAdmin ? undefined : id,
+      status,
+      !!isGettingAll,
+      page,
+      size,
+      search,
+    );
     return { data, total };
   },
 };

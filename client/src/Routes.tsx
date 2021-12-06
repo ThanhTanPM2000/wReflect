@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Layout } from 'antd';
 import { BrowserRouter as Router, Switch, Redirect, Route } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { Header } from './components/Header';
 import { Me } from './types';
-import { Workspace } from './components/Workspace';
+import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
-import TeamDetail from './components/TeamDetail/teamDetail'
-import {ProfileUser} from './components/ProfileUser'
-import {DashBoard} from './components/DashBoard'
-import {UserManagements} from './components/UserManagements'
+import TeamDetail from './components/TeamDetail/teamDetail';
+import { ProfileUser } from './components/ProfileUser';
+import { DashBoard } from './components/DashBoard';
+import { UserManagements } from './components/UserManagements';
 type Props = {
   me: null | Me;
 };
@@ -37,21 +37,21 @@ const Routes = ({ me }: Props): JSX.Element => {
                   <Content
                     style={{ margin: '0 16px', height: '100%' }}
                     // className={isLoggedIn ? 'flex flex-dir-c flex-ai-c' : 'flex flex-dir-c flex-jc-c flex-ai-c'}
-                  >  
+                  >
                     <Switch>
                       {isLoggedIn && (
                         <>
-                          <Route path="/workspace" component={Workspace}></Route>
+                          <Route path="/workspace" component={Team}></Route>
                           <Redirect to="/workspace" />
                         </>
                       )}
                     </Switch>
-                    <Route path="/team-detail" component={TeamDetail}/>
+                    <Route path="/team-detail" component={TeamDetail} />
                     <Route path="/profileUser" component={ProfileUser}>
-                      <ProfileUser email={email} picture={picture}/>
+                      <ProfileUser email={email} picture={picture} />
                     </Route>
-                    <Route path="/dashboard" component={DashBoard}/>
-                    <Route path="/user-Managements" component={UserManagements}/>
+                    <Route path="/dashboard" component={DashBoard} />
+                    <Route path="/user-Managements" component={UserManagements} />
                   </Content>
                   <Footer style={{ textAlign: 'center' }}>wReflect ©2022</Footer>
                 </Layout>

@@ -25,6 +25,7 @@ export type createTeamType = {
   name: string;
   startDate: string;
   endDate: string;
+  isPublic: boolean;
   description?: string;
   picture?: string;
 };
@@ -64,8 +65,9 @@ export type setRoleMemberType = {
 };
 
 export type getListData = {
-  isGettingAll: boolean;
-  search: string;
-  page: number;
-  size: number;
+  status?: string;
+  isGettingAll?: boolean;
+  search?: string;
+  page?: number;
+  size?: number;
 };

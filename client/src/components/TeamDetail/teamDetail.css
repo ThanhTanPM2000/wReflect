@@ -5,7 +5,6 @@ div#rc-tabs-2-panel-1 {
   -webkit-box-pack: normal !important;
       -ms-flex-pack: normal !important;
           justify-content: normal !important;
-  display: block;
 }
 
 ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
