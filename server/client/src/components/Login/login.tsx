@@ -34,8 +34,9 @@ const handleLogin = async (
   }
 
   //Clear search params
-  const indexOfSearchParams = location.href.indexOf('&code');
-  const clearedUrl = indexOfSearchParams !== -1 ? location.href.substring(0, indexOfSearchParams) : location.href;
+  const indexOfSearchParams = window.location.href.indexOf('&code');
+  const clearedUrl =
+    indexOfSearchParams !== -1 ? window.location.href.substring(0, indexOfSearchParams) : window.location.href;
   window.history.replaceState({}, '', clearedUrl);
 };
 
@@ -43,7 +44,7 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
   const history = useHistory();
   const [email, setEmail] = useState<null | string>(null);
   const [needsEmailVerification, setNeedsEmailVerification] = useState<null | boolean>(null);
-  const params = new URLSearchParams(location.search);
+  const params = new URLSearchParams(window.location.search);
   const authConfig: AuthOptions = config.AUTH0_WEBAUTH_CONFIG;
   if (redirectUri) {
     authConfig.redirectUri = redirectUri;

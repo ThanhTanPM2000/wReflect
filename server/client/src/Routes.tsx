@@ -45,7 +45,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                     </Switch>
                     <Route exact path="/teams/:id" render={({ match }) => <TeamDetail teamId={match.params.id} />} />
                     <Route path="/profileUser" component={ProfileUser}>
-                      <ProfileUser email={email} picture={picture} name={name}/>
+                      <ProfileUser email={email} picture={picture} name={name} />
                     </Route>
                     <Route path="/dashboard" component={DashBoard} />
                     <Route path="/user-Managements" component={UserManagements} />

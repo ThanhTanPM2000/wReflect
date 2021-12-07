@@ -17,6 +17,7 @@ import { apiPaths } from './types';
 import config from './config';
 import schema from './schema';
 import apiRouter from './apiRouter';
+import path from 'path';
 
 const app = express();
 app.use(expressFileUpload());
@@ -54,7 +55,16 @@ app.use(
   }),
 );
 
-const port = config.PORT || 4000;
+if (process.env.NODE_ENV === 'production') {
+  // Serve any static files
+  app.use(express.static(path.join(__dirname, 'client/build')));
+  // Handle React routing, return all requests to React app
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+  });
+}
+
+const port = config.PORT || 3000;
 app.listen(port, () => {
   logger.info(`server is listening on http://${config.SERVER_URL}:${port}`);
 });

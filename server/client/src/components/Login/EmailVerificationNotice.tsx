@@ -28,7 +28,7 @@ function EmailVerificationNotice({ email, needsEmailVerification, webAuth }: Ema
   return (
     <div className="emailVerificationNotice-scene">
       Welcome, {email}!
-      {location.pathname.includes('workspace') ? (
+      {window.location.pathname.includes('workspace') ? (
         <>
           {' '}
           <a

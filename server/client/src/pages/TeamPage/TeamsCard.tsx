@@ -131,7 +131,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                                   return <Avatar size="small" key={member.userId} src={member.user.picture} />;
                                 })}
                               </div>
-                              <div>{`${team.members.length}`} members</div>
+                              <div style={{ marginLeft: '40px' }}>{`${team.members.length}`} members</div>
                             </div>
                           </div>
                         </Card>

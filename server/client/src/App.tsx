@@ -10,7 +10,7 @@ import Routes from './Routes';
 import { setUpdateLoginState, user } from './apis';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:4000/graphql',
+  uri: `${config.SERVER_BASE_URL}/graphql`,
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {

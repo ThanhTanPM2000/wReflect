@@ -10,7 +10,8 @@
       "name": "Debug WhatsApp Server",
       "program": "${workspaceFolder}/src/app.ts",
       "outputCapture": "std",
-      "preLaunchTask": "tsc: build - tsconfig.json",
+      // "preLaunchTask": "tsc: build - tsconfig.json",
+      "preLaunchTask": "npm: build",
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     }
   ]
