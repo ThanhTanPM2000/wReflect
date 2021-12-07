@@ -4,6 +4,7 @@ import { onError } from '@apollo/client/link/error';
 import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from } from '@apollo/client';
 
 import { Me } from './types';
+import { notification } from 'antd';
 import config from './config';
 import Routes from './Routes';
 import { setUpdateLoginState, user } from './apis';
@@ -14,16 +15,27 @@ const httpLink = new HttpLink({
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
-    );
+    graphQLErrors.forEach(({ message }) => {
+      notification.error({
+        message: `Notification`,
+        description: message,
+        placement: 'bottomLeft',
+      });
+    });
 
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
 const client = new ApolloClient({
   uri: `${config.SERVER_BASE_URL}/graphql`,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    addTypename: true,
+    typePolicies: {
+      teams: {
+        keyFields: ['id'],
+      },
+    },
+  }),
   link: from([errorLink, httpLink]),
 });
 

@@ -3,7 +3,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans','Droid Sans', 'Helvetica Neue';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh; }
+  min-height: 100vh;
+  overflow: hidden; }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Couries New', monospace; }
@@ -35,9 +36,11 @@ code {
   .flex-dir-r {
     flex-direction: row; }
 
-.ant-btn-small {
-  font-size: 10px !important;
-  height: 18px !important; }
+.ant-btn {
+  border-radius: 10px; }
+  .ant-btn-small {
+    font-size: 10px !important;
+    height: 18px !important; }
 
 .ant-card-body {
   max-height: 80%; }
@@ -45,6 +48,17 @@ code {
 .ant-empty {
   height: 100%;
   width: 100%; }
+
+.ant-modal-content {
+  overflow: auto;
+  border-radius: 24px; }
+
+.ant-input {
+  border-radius: 10px; }
+
+.ant-tabs-tabpane {
+  max-height: 600px;
+  overflow: auto; }
 
 .mb-10 {
   margin-bottom: 10px; }
@@ -115,3 +129,13 @@ span.ant-tabs-separator {
 
 .ant-tabs-content {
   height: 100%; }
+
+div#rc-tabs-2-panel-1 {
+  align-items: normal !important;
+  justify-content: normal !important; }
+
+ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
+  display: none !important; }
+
+ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
+  margin: 20px 0px 0px 0px; }

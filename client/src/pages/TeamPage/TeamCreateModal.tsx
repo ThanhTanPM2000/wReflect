@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
-import { Modal, Form, Input, DatePicker, Upload, Button, Select } from 'antd';
+import { Modal, Space, Form, Input, DatePicker, Upload, Button, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
 
-import { AddNewTeam } from '../../grapql-client/mutations';
-import { getTeams } from '../../grapql-client/queries';
+import { TeamMutations } from '../../grapql-client/mutations';
+import { TeamQueries } from '../../grapql-client/queries';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -16,14 +16,14 @@ type Props = {
 };
 
 const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
-  const [addNewTeam, { error, loading }] = useMutation(AddNewTeam, {
+  const [form] = Form.useForm();
+
+  const [addNewTeam, { error, loading }] = useMutation(TeamMutations.AddNewTeam, {
     refetchQueries: [
-      getTeams, // DocumentNode object parsed with gql
+      TeamQueries.getTeams, // DocumentNode object parsed with gql
       'teams', // Query name
     ],
   });
-
-  const [form] = Form.useForm();
 
   const normFile = (e: any) => {
     console.log('Upload event:', e);
@@ -31,17 +31,6 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
       return e;
     }
     return e && e.fileList;
-  };
-
-  const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 6 },
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 14 },
-    },
   };
 
   const onFinish = () => {
@@ -52,12 +41,6 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
       const teamDescription = values['teamDescription'];
       const isPublic = values['select'] === 'public' ? true : false;
 
-      // console.log(startDate);
-      // console.log(endDate);
-      // console.log(teamName);
-      // console.log(teamDescription);
-      // console.log(isPublic);
-
       addNewTeam({
         variables: { startDate, endDate, name: teamName, description: teamDescription, isPublic: isPublic },
       });
@@ -66,15 +49,24 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
   };
 
   return (
-    <Modal title="Create Your Team" visible={isVisible} onOk={onFinish} onCancel={() => setIsVisible(false)}>
-      <Form form={form} {...formItemLayout}>
+    <Modal
+      destroyOnClose={true}
+      closable
+      centered
+      title="Create Your Team"
+      visible={isVisible}
+      okText="Create"
+      onOk={onFinish}
+      onCancel={() => setIsVisible(false)}
+    >
+      <Form form={form} layout="vertical">
         <Form.Item
           name="teamName"
           hasFeedback
           label="Team Name"
           rules={[{ required: true, message: 'Please input your name' }]}
         >
-          <Input placeholder="Input team name" type="text" name="name" />
+          <Input bordered placeholder="Input team name" type="text" name="name" />
         </Form.Item>
         <Form.Item
           name="teamDescription"
@@ -82,7 +74,7 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
           label="Description"
           rules={[{ required: true, message: 'Please input your name' }]}
         >
-          <TextArea placeholder="Description of the team" rows={4} name="description" />
+          <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
         <Form.Item name="upload" label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
           <Upload name="logo" action="/upload.do" listType="picture">
@@ -93,7 +85,7 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
           <RangePicker />
         </Form.Item>
         <Form.Item name="select" label="Select">
-          <Select>
+          <Select defaultValue="public">
             <Select.Option value="private">Private</Select.Option>
             <Select.Option value="public">Public</Select.Option>
           </Select>

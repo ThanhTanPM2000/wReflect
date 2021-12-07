@@ -12,13 +12,15 @@ export const getListTeams = async (
   search = '',
 ) => {
   try {
-    const where = {
-      members: {
-        some: {
-          userId,
-        },
-      },
-    };
+    const where = userId
+      ? {
+          members: {
+            some: {
+              userId,
+            },
+          },
+        }
+      : undefined;
 
     const data = await prisma.team.findMany({
       where: {

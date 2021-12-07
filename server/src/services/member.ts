@@ -1,19 +1,56 @@
-import { addMemberToTeamType, setRoleMemberType } from '../types';
+import { addMemberToTeamType, setRoleMemberType, getListMembersType } from '../types';
 import logger from '../logger';
 import prisma from '../prisma';
 import _ from 'lodash';
-import { eachMonthOfInterval } from 'date-fns';
 
 import { sendMail } from './nodemailer/sentMail';
+import { Member } from '.prisma/client';
 
-export const getListMembers = async (teamId: number) => {
+export const getListMembers = async (data: getListMembersType, userId?: number) => {
   try {
-    const members = await prisma.member.findMany({
+    const where = userId
+      ? {
+          OR: [
+            {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+            {
+              isPublic: true,
+            },
+          ],
+        }
+      : undefined;
+
+    const team = await prisma.team.findFirst({
       where: {
-        teamId,
+        ...where,
+        id: data.teamId,
+      },
+      select: {
+        isPublic: true,
+        members: true,
       },
     });
-    return members;
+
+    if (!team) throw new Error('Team not found');
+
+    const membersRoleOwner = <Member[]>[],
+      membersRoleNormal = <Member[]>[];
+    await Promise.all(
+      team.members.map((member) => {
+        if (member.isOwner) {
+          membersRoleOwner.push(member);
+        } else {
+          membersRoleNormal.push(member);
+        }
+      }),
+    );
+
+    return team.members;
   } catch (error) {
     logger.error('Error at getListMembers Service');
     throw error;

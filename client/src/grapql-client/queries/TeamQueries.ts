@@ -9,6 +9,7 @@ const getTeams = gql`
         description
         picture
         members {
+          userId
           isOwner
           userId
           user {

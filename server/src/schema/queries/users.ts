@@ -1,4 +1,4 @@
-import { getListData } from './../../types';
+import { getListDataType } from './../../types';
 import { GraphQLObjectType, GraphQLList, GraphQLBoolean, GraphQLString, GraphQLInt } from 'graphql';
 import { UserType } from '../types';
 import { user } from '../../services';
@@ -18,7 +18,7 @@ export default {
     page: { type: GraphQLInt },
     size: { type: GraphQLInt },
   },
-  resolve: async (_, args: getListData, request: RequestWithUserInfo) => {
+  resolve: async (_, args: getListDataType, request: RequestWithUserInfo) => {
     const { isAdmin } = request.user;
     if (!isAdmin) throw new Error('User dont have permission');
     const { isGettingAll, search, page, size } = args;

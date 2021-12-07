@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, Tabs, Layout } from 'antd';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { Logout } from '../Logout';
 
@@ -14,7 +14,7 @@ import {
   HomeOutlined,
   CalendarOutlined,
   WifiOutlined,
-  UsergroupDeleteOutlined
+  UsergroupDeleteOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -31,11 +31,11 @@ const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
   const history = useHistory();
   const dashboard = () => {
-    history.push('/dashboard')
-  }
+    history.push('/dashboard');
+  };
   const userManagements = () => {
-    history.push('/user-Managements')
-  }
+    history.push('/user-Managements');
+  };
 
   return (
     <>
@@ -49,11 +49,9 @@ const SideBar = ({ email, isAdmin }: Props) => {
         >
           <div className="logo" />
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item icon={<HomeOutlined />} style={{marginTop:100}} key="/WorkSpace">
-                <a href="/">
-                  <span>Home</span>
-                </a>
-              </Menu.Item>
+            <Menu.Item icon={<HomeOutlined />} style={{ marginTop: 100 }} key="/WorkSpace">
+              <Link to="/workspace">Home</Link>
+            </Menu.Item>
             {/* {location.pathname === '/team-detail' ? (
               <Menu.Item icon={<RollbackOutlined />} key="/WorkSpace">
                 <a href="/">
@@ -67,8 +65,8 @@ const SideBar = ({ email, isAdmin }: Props) => {
                 </a>
               </Menu.Item>
             )} */}
-            
-            <SubMenu  style={{marginTop:50}} key="sub1" icon={<TeamOutlined />} title="Team">
+
+            <SubMenu style={{ marginTop: 50 }} key="sub1" icon={<TeamOutlined />} title="Team">
               <Menu.Item key="3" icon={<PieChartOutlined />}>
                 Board
               </Menu.Item>
@@ -84,18 +82,18 @@ const SideBar = ({ email, isAdmin }: Props) => {
             </SubMenu>
 
             <Menu.Item key="7" icon={<WifiOutlined />} onClick={dashboard}>
-                  Dashboard
+              Dashboard
             </Menu.Item>
 
             <Menu.Item key="8" icon={<UsergroupDeleteOutlined />} onClick={userManagements}>
-              User Managements 
-              </Menu.Item>
+              User Managements
+            </Menu.Item>
 
             <Menu.Item key="9" icon={<SettingOutlined />}>
               Settings
             </Menu.Item>
 
-            <Menu.Item style={{ }} key="10" icon={<LogoutOutlined />}>
+            <Menu.Item style={{}} key="10" icon={<LogoutOutlined />}>
               <Logout>
                 <>Sign out</>
               </Logout>

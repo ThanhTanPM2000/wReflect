@@ -3,9 +3,9 @@ import { useHistory } from 'react-router';
 import { Card, Col, Avatar, Row, Pagination, Skeleton, notification, Empty } from 'antd';
 
 import { useQuery } from '@apollo/client';
-import { getTeams } from '../../grapql-client/queries';
-import { SettingOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons';
-import SearchBar from '../../components/SearchBar/SearchBar';
+import { TeamQueries } from '../../grapql-client/queries';
+import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
+import AddMembersModal from './AddMembersModal';
 
 const { Meta } = Card;
 
@@ -21,12 +21,17 @@ type Props = {
 
 const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoading }: Props) => {
   const history = useHistory();
-  const redirect = () => {
-    history.push('/team-detail');
+  const [isVisibleAddModal, setVisibleModal] = useState(false);
+
+  const redirect = (value: number) => {
+    history.push(`/teams/${value}`);
   };
 
-  const { error, data, loading, refetch } = useQuery(getTeams, {
+  const { error, data, loading, refetch } = useQuery(TeamQueries.getTeams, {
     variables: { status, isGettingAll: false, search: searchText, page, size },
+    fetchPolicy: 'cache-and-network', // Used for first execution
+    nextFetchPolicy: 'cache-first', // Used for subsequent executions
+    errorPolicy: 'all',
   });
 
   useEffect(() => {
@@ -37,23 +42,16 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
     refetch();
   }, [searchText, page, size]);
 
-  if (error)
-    return (
-      <>
-        {notification.error({
-          message: `Notification`,
-          description: `Something wrong`,
-          placement: 'bottomLeft',
-        })}
-      </>
-    );
+  const onAddMember = () => {
+    setVisibleModal(true);
+  };
 
-  if (loading)
+  if (loading || error)
     return (
       <>
         <Card style={{ width: 300, marginTop: 16 }} loading={true}>
           <Meta
-            avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+            avatar={<Avatar key="k1" src="https://joeschmoe.io/api/v1/random" />}
             title="Card title"
             description="This is the description"
           />
@@ -62,13 +60,13 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
           style={{ width: 300, marginTop: 16 }}
           actions={[
             <SettingOutlined key="setting" />,
-            <EditOutlined key="edit" />,
+            <UsergroupAddOutlined key="edit" />,
             <EllipsisOutlined key="ellipsis" />,
           ]}
         >
           <Skeleton loading={true} avatar active>
             <Meta
-              avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+              avatar={<Avatar key="key2" src="https://joeschmoe.io/api/v1/random" />}
               title="Card title"
               description="This is the description"
             />
@@ -84,6 +82,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
 
   return (
     <>
+      <AddMembersModal isVisible={isVisibleAddModal} setVisible={setVisibleModal} />
       <div className="flex flex-dir-c flex-ai-c flex-jc-c " style={{ flex: 1 }}>
         {!data.teams || data.teams.data.length == 0 ? (
           <div className="flex flex-ai-c flex-jc-c" style={{ flex: 1, height: '100%' }}>
@@ -112,26 +111,28 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                         <Card
                           hoverable
                           key={team.id}
-                          onClick={() => redirect()}
                           size="small"
                           loading={loading}
                           actions={[
                             <SettingOutlined key="setting" />,
-                            <EditOutlined key="edit" />,
+                            <UsergroupAddOutlined key="edit" onClick={() => onAddMember()} />,
                             <EllipsisOutlined key="ellipsis" />,
                           ]}
                         >
-                          <Meta
-                            title={team.name}
-                            avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
-                          ></Meta>
-                          <div className="flex flex-dir-r" style={{ marginTop: '30px' }}>
-                            <div style={{ flex: 1 }}>
-                              {team.members.map((member: any) => {
-                                return <Avatar size="small" key={member.id} src={member.user.picture} />;
-                              })}
+                          <div onClick={() => redirect(team.id)}>
+                            <Meta
+                              key={team.name}
+                              title={team.name}
+                              avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
+                            ></Meta>
+                            <div className="flex flex-dir-r" style={{ marginTop: '30px' }}>
+                              <div style={{ flex: 1 }}>
+                                {team.members.map((member: any) => {
+                                  return <Avatar size="small" key={member.userId} src={member.user.picture} />;
+                                })}
+                              </div>
+                              <div>{`${team.members.length}`} members</div>
                             </div>
-                            <div>{`${team.members.length}`} members</div>
                           </div>
                         </Card>
                       </Col>

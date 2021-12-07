@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import 'antd/dist/antd.css';
-import { Row, Col, Button, Tabs } from 'antd';
+import { Button, Tabs } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import TeamsCard from './TeamsCard';
 
@@ -11,6 +10,7 @@ const { TabPane } = Tabs;
 
 const Team = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [activeKey, setActiveKey] = useState('1');
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(8);
@@ -18,11 +18,8 @@ const Team = () => {
 
   const onHandleSearch = (searchText: string) => {
     setSearchText(searchText);
+    setActiveKey('1');
     setPage(1);
-  };
-
-  const onHandleTabChange = (activeKey: string) => {
-    setSearchText('');
   };
 
   const operations = (
@@ -38,14 +35,18 @@ const Team = () => {
 
   return (
     <Tabs className="tab" defaultActiveKey="1" style={{ height: '100%' }}>
-      <TabPane tab="WorkSpace" key="1" style={{ height: '100%' }}>
+      <TabPane tab="WorkSpace" key="1">
         <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
           <Tabs
-            onChange={onHandleTabChange}
+            type="card"
             className="tab-inner"
-            defaultActiveKey="1"
+            activeKey={activeKey}
             style={{ height: '90%' }}
             tabBarExtraContent={operations}
+            onChange={(key: string) => {
+              console.log(typeof key);
+              setActiveKey(key);
+            }}
           >
             <TabPane tab="All" key="1" className="flex flex-ai-c flex-jc-c flex-dir-c">
               <TeamsCard

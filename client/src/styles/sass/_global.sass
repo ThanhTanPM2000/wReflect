@@ -4,6 +4,7 @@ body
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
   min-height: 100vh
+  overflow: hidden
 
 code
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Couries New', monospace
@@ -47,6 +48,7 @@ code
 		flex-direction: row
 
 .ant-btn
+	border-radius: 10px
 	&-small
 		font-size: 10px !important
 		height: 18px !important
@@ -57,6 +59,17 @@ code
 .ant-empty
 	height: 100%
 	width: 100%
+
+.ant-modal-content
+	overflow: auto
+	border-radius: 24px
+
+.ant-input
+	border-radius: 10px
+
+.ant-tabs-tabpane
+	max-height: 600px
+	overflow: auto
 
 .mb
 	&-10

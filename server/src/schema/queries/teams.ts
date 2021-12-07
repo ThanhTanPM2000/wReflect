@@ -1,4 +1,4 @@
-import { getListData } from './../../types';
+import { getListDataType } from './../../types';
 import { GraphQLObjectType, GraphQLList, GraphQLBoolean, GraphQLString, GraphQLInt } from 'graphql';
 import { TeamType } from '../types';
 import { team } from '../../services';
@@ -19,7 +19,7 @@ export default {
     page: { type: GraphQLInt },
     size: { type: GraphQLInt },
   },
-  resolve: async (_, args: getListData, request: RequestWithUserInfo) => {
+  resolve: async (_, args: getListDataType, request: RequestWithUserInfo) => {
     const { id, isAdmin } = request.user;
     const { status, isGettingAll, search, page, size } = args;
     const { data, total } = await team.getListTeams(

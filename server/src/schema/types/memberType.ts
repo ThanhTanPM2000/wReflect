@@ -8,7 +8,7 @@ const MemberType = new GraphQLObjectType({
     isOwner: { type: GraphQLBoolean },
     userId: { type: GraphQLInt },
     teamId: { type: GraphQLInt },
-    joinAt: { type: GraphQLString },
+    joinedAt: { type: GraphQLString },
     assignedBy: { type: GraphQLString },
     user: {
       type: UserType,

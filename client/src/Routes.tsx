@@ -7,7 +7,7 @@ import { Header } from './components/Header';
 import { Me } from './types';
 import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
-import TeamDetail from './components/TeamDetail/teamDetail';
+import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { ProfileUser } from './components/ProfileUser';
 import { DashBoard } from './components/DashBoard';
 import { UserManagements } from './components/UserManagements';
@@ -34,10 +34,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                 <SideBar email={email} isAdmin={isAdmin} />
                 <Layout className="site-layout">
                   <TopNavBar email={email} picture={picture} />
-                  <Content
-                    style={{ margin: '0 16px', height: '100%' }}
-                    // className={isLoggedIn ? 'flex flex-dir-c flex-ai-c' : 'flex flex-dir-c flex-jc-c flex-ai-c'}
-                  >
+                  <Content style={{ margin: '0 16px', height: '100%', overflow: 'auto' }}>
                     <Switch>
                       {isLoggedIn && (
                         <>
@@ -46,7 +43,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                         </>
                       )}
                     </Switch>
-                    <Route path="/team-detail" component={TeamDetail} />
+                    <Route exact path="/teams/:id" render={({ match }) => <TeamDetail teamId={match.params.id} />} />
                     <Route path="/profileUser" component={ProfileUser}>
                       <ProfileUser email={email} picture={picture} />
                     </Route>

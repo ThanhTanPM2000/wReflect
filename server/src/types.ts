@@ -64,10 +64,14 @@ export type setRoleMemberType = {
   isRoleAdmin: boolean;
 };
 
-export type getListData = {
+export type getListDataType = {
   status?: string;
   isGettingAll?: boolean;
   search?: string;
   page?: number;
   size?: number;
+};
+
+export type getListMembersType = {
+  teamId: number;
 };
