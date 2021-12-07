@@ -21,7 +21,7 @@ const Routes = ({ me }: Props): JSX.Element => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-
+  const name = me?.name || null;
   const picture = me?.picture || null;
 
   return (
@@ -45,12 +45,12 @@ const Routes = ({ me }: Props): JSX.Element => {
                     </Switch>
                     <Route exact path="/teams/:id" render={({ match }) => <TeamDetail teamId={match.params.id} />} />
                     <Route path="/profileUser" component={ProfileUser}>
-                      <ProfileUser email={email} picture={picture} />
+                      <ProfileUser email={email} picture={picture} name={name}/>
                     </Route>
                     <Route path="/dashboard" component={DashBoard} />
                     <Route path="/user-Managements" component={UserManagements} />
                   </Content>
-                  <Footer style={{ textAlign: 'center' }}>wReflect ©2022</Footer>
+                  <Footer style={{ textAlign: 'center', height: '50px' }}>wReflect ©2022</Footer>
                 </Layout>
               </>
             )}
