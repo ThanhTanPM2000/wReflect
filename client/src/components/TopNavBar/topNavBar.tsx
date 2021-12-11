@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Layout, PageHeader } from 'antd';
+import { Avatar, Layout } from 'antd';
 import DropDown from './components/DropDown';
 type Props = {
   email: string | null;

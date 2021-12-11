@@ -5,7 +5,6 @@ import { Card, Col, Avatar, Row, Pagination, Skeleton, notification, Empty } fro
 import { useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
-import AddMembersModal from './AddMembersModal';
 
 const { Meta } = Card;
 
@@ -82,7 +81,6 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
 
   return (
     <>
-      <AddMembersModal isVisible={isVisibleAddModal} setVisible={setVisibleModal} />
       <div className="flex flex-dir-c flex-ai-c flex-jc-c " style={{ flex: 1 }}>
         {!data.teams || data.teams.data.length == 0 ? (
           <div className="flex flex-ai-c flex-jc-c" style={{ flex: 1, height: '100%' }}>
@@ -128,10 +126,17 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                             <div className="flex flex-dir-r" style={{ marginTop: '30px' }}>
                               <div style={{ flex: 1 }}>
                                 {team.members.map((member: any) => {
-                                  return <Avatar size="small" key={member.userId} src={member.user.picture} />;
+                                  return (
+                                    <Avatar
+                                      style={{ marginRight: '3px' }}
+                                      size="small"
+                                      key={member.userId}
+                                      src={member.user.picture}
+                                    />
+                                  );
                                 })}
                               </div>
-                              <div>{`${team.members.length}`} members</div>
+                              <div style={{ marginLeft: 'auto' }}>{`${team.members.length}`} members</div>
                             </div>
                           </div>
                         </Card>

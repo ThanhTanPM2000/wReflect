@@ -34,23 +34,35 @@ const Routes = ({ me }: Props): JSX.Element => {
                 <SideBar email={email} isAdmin={isAdmin} />
                 <Layout className="site-layout">
                   <TopNavBar email={email} picture={picture} />
-                  <Content style={{ margin: '0 16px', height: '100%', overflow: 'auto' }}>
+                  <Content style={{ margin: '10px 16px', height: '100%', overflow: 'auto' }}>
                     <Switch>
                       {isLoggedIn && (
                         <>
-                          <Route path="/workspace" component={Team}></Route>
-                          <Redirect to="/workspace" />
+                          {isAdmin ? (
+                            <>
+                              <Route path="/dashboard" component={DashBoard} />
+                              <Route path="/user-managements" component={UserManagements} />
+                              <Redirect to="/user-managements" />
+                            </>
+                          ) : (
+                            <>
+                              <Route path="/workspace" component={Team}></Route>
+                              <Redirect to="/workspace" />
+                              <Route
+                                exact
+                                path="/teams/:id"
+                                render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
+                              />
+                              <Route path="/profileUser" component={ProfileUser}>
+                                <ProfileUser email={email} picture={picture} name={name} />
+                              </Route>
+                            </>
+                          )}
                         </>
                       )}
                     </Switch>
-                    <Route exact path="/teams/:id" render={({ match }) => <TeamDetail teamId={match.params.id} />} />
-                    <Route path="/profileUser" component={ProfileUser}>
-                      <ProfileUser email={email} picture={picture} name={name}/>
-                    </Route>
-                    <Route path="/dashboard" component={DashBoard} />
-                    <Route path="/user-Managements" component={UserManagements} />
                   </Content>
-                  <Footer style={{ textAlign: 'center', height: '50px' }}>wReflect ©2022</Footer>
+                  <Footer style={{ textAlign: 'center', padding: '0 0' }}>wReflect ©2022</Footer>
                 </Layout>
               </>
             )}

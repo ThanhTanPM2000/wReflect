@@ -9,7 +9,7 @@ export default {
   args: {
     userId: { type: new GraphQLNonNull(GraphQLInt) },
     teamId: { type: new GraphQLNonNull(GraphQLInt) },
-    isRoleAdmin: { type: new GraphQLNonNull(GraphQLBoolean) },
+    isOwner: { type: new GraphQLNonNull(GraphQLBoolean) },
   },
   resolve: async (_, args: setRoleMemberType, request: RequestWithUserInfo) => {
     const { email } = request.user;

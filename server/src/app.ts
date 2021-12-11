@@ -27,19 +27,8 @@ app.use(
   }),
 );
 
-if (config.NODE_ENV === 'development') {
-  // proxy requests to development frontend
-  app.use(unlessStartsWith(apiPaths, proxy(config.CLIENT_URL)));
-} else {
-  // STATIC_DIR gets populated in a whatsapp-self-serve build
-  // It comes from the built react folder
-  // TODO: build both dashboard and server and test the routing
-  app.use(unlessStartsWith(apiPaths, express.static(config.STATIC_DIR)));
-}
-
 app.use(cookieParser());
 app.use(bodyParser.json({ type: 'application/json' }));
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(sessionManager);
 app.use('/api', apiRouter());

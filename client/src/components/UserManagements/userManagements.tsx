@@ -1,81 +1,103 @@
-import React from 'react'
-import{Tabs, Table, Row, Space,Input, Button} from 'antd'
-import { DownloadOutlined,UploadOutlined } from '@ant-design/icons';
-const { TabPane } = Tabs;
+import React, { useState, useEffect } from 'react';
+import { Tabs, Table, Row, Skeleton, Pagination, Button, Avatar } from 'antd';
+import { format } from 'date-fns';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import { useQuery } from '@apollo/client';
+import { UserQueries } from '../../grapql-client/queries';
+import SearchBar from '../../components/SearchBar/SearchBar';
 
-const UserManagements =()=>{
-    const { Search } = Input;
-    const onSearch = (value: any) => console.log(value);
-    const dataSource = [
-        {
-          key: '1',
-          NAME: 'TNT',
-          EMAIL: "TNT@gmail.com",
-          REGISTRATIONDATE: '05/12/2021',
-          MANAGEMENT:"Acitve"
-        },
-        {
-            key: '2',
-            NAME: 'TNT1',
-            EMAIL: "TNT123@gmail.com",
-            REGISTRATIONDATE: '22/01/2021',
-            MANAGEMENT:"Acitve"
-          },
-      ];
-      
-      const columns = [
-        {
-          title: 'NAME',
-          dataIndex: 'NAME',
-          key: 'NAME    ',
+const UserManagements = () => {
+  const [searchText, setSearchText] = useState('');
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(8);
 
-        },
-        {
-          title: 'EMAIL',
-          dataIndex: 'EMAIL',
-          key: 'EMAIL',
-        },
-        {
-          title: 'REGISTRATION DATE',
-          dataIndex: 'REGISTRATIONDATE',
-          key: 'REGISTRATION DATE',
-        },
-        {
-            title: 'MANAGEMENT',
-            dataIndex: 'MANAGEMENT',
-            key: 'MANAGEMENT',
-          },
-      ];
-    return(
-        <Tabs key="0">
-        <TabPane key="1" tab="User Managements">
-        <div style={{background:"white",height:800}}>
-            <Row>
-            <Search placeholder="Search User" onSearch={onSearch} style={{ width: 473,marginLeft:300,marginTop:40 }} />
-            <div style={{marginTop:40, marginLeft:600}}>
-            <Button style={{borderRadius:8,marginRight:10}} type="primary" icon={<UploadOutlined />} >
-             Import
-            </Button>
-             <Button style={{borderRadius:8,marginRight:10}} type="primary" icon={<DownloadOutlined />} >
-             Export
-            </Button>
-            <Button style={{borderRadius:8}} type="primary" >Add Users</Button>
+  const { error, data, loading, refetch } = useQuery(UserQueries.getUsers, {
+    variables: { isGettingAll: false, search: searchText, page, size },
+  });
 
+  useEffect(() => {
+    refetch();
+  }, [searchText, page, size]);
+
+  const columns = [
+    {
+      title: 'Id',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: 'Avatar',
+      dataIndex: 'picture',
+      key: 'picture',
+      render: function Avater(picture: string) {
+        return <Avatar src={picture} />;
+      },
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Create At',
+      dataIndex: 'createAt',
+      key: 'createAt',
+      render: function createAt(createAt: string) {
+        if (!createAt) return;
+        return <>{format(new Date(+createAt), 'dd MM yyyy')}</>;
+      },
+    },
+  ];
+  const onHandleSearch = (searchText: string) => {
+    setSearchText(searchText);
+    setPage(1);
+  };
+
+  const onPaginationChanged = (page: number, pageSize: number | undefined) => {
+    setPage(page);
+    pageSize && setSize(pageSize);
+  };
+
+  return (
+    <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
+      <>
+        <>
+          <div className="flex flex-dir-r flex-jc-sb flex-ai-c features-box">
+            <div style={{ flex: 10, marginRight: 10 }}>
+              <SearchBar placeholder="What are you looking for ?" isLoading={loading} onHandleSearch={onHandleSearch} />
             </div>
-            </Row>
-            
-             <Tabs tabBarStyle={{marginLeft:20}} className="tab-inner" defaultActiveKey="1" style={{ height: '90%' }}>
-            <TabPane key="1" tab="All">
-            <Table dataSource={dataSource} columns={columns} />;
-            </TabPane>
-            <TabPane key="2" tab="Active">TNT</TabPane>
-            <TabPane key="3" tab="Banner">TNT</TabPane>
-
-            </Tabs>
+            <div style={{ flex: 1 }} className="flex flex-jc-c flex-ai-c">
+              <Button style={{ marginRight: 10 }} icon={<UploadOutlined />}>
+                Import
+              </Button>
+              <Button style={{ marginRight: 10 }} icon={<DownloadOutlined />}>
+                Export
+              </Button>
+              <Button>Add Users</Button>
+            </div>
+          </div>
+          <h4 style={{ margin: 20 }} className="flex flex-ai-c flex-jc-c">
+            Total {data?.users?.total}
+          </h4>
+        </>
+        <Table dataSource={data?.users?.data} columns={columns} />
+        <div className="flex flex-jc-c mt-12" style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <Pagination
+            defaultCurrent={1}
+            current={page}
+            total={data?.users?.total}
+            defaultPageSize={8}
+            pageSize={size}
+            onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
+          />
         </div>
-
-        </TabPane>
-        </Tabs>
-    )
-}
+      </>
+    </div>
+  );
+};
 export default UserManagements;

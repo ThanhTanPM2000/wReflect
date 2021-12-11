@@ -28,4 +28,22 @@ const AddNewTeam = gql`
     }
   }
 `;
-export { AddNewTeam };
+
+const deleteTeam = gql`
+  mutation deleteTeam($teamId: Int) {
+    deleteTeam(teamId: $teamId) {
+      id
+      name
+      ownerEmail
+      createAt
+      startDate
+      endDate
+      status
+      picture
+      numOfMember
+      isPublice
+      description
+    }
+  }
+`;
+export { AddNewTeam, deleteTeam };

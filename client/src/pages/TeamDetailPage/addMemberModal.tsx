@@ -67,7 +67,11 @@ const AddMembersModal = ({ isVisible, handleOk, handleCancel }: Props) => {
       centered
       title="Add new members to team"
       visible={isVisible}
-      onOk={() => handleOk(listEmails)}
+      onOk={() => {
+        const myListEmails = _.clone(listEmails);
+        handleOk(myListEmails);
+        setListEmails([]);
+      }}
       onCancel={handleDeleteData}
     >
       <Form onFinish={(value) => onAddEmail(value)} ref={formRef}>

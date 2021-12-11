@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment';
-import { Modal, Space, Form, Input, DatePicker, Upload, Button, Select } from 'antd';
+import { Modal, Form, Input, DatePicker, Upload, Button, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
 
@@ -18,7 +18,7 @@ type Props = {
 const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
 
-  const [addNewTeam, { error, loading }] = useMutation(TeamMutations.AddNewTeam, {
+  const [addNewTeam] = useMutation(TeamMutations.AddNewTeam, {
     refetchQueries: [
       TeamQueries.getTeams, // DocumentNode object parsed with gql
       'teams', // Query name
@@ -26,7 +26,6 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
   });
 
   const normFile = (e: any) => {
-    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -44,6 +43,7 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
       addNewTeam({
         variables: { startDate, endDate, name: teamName, description: teamDescription, isPublic: isPublic },
       });
+      form.resetFields();
       setIsVisible(false);
     });
   };

@@ -37,6 +37,7 @@ model Team {
 	numOfMember		Int			@default(1)
 	isPublic 		Boolean		@default(true)
 	description		String?
+	teamToken 		TeamToken[]
 	members			Member[]	
 }
 
@@ -67,15 +68,27 @@ model User {
  	 @@index([email])
 }
 
+model TeamToken {
+	id				Int 		@id @default(autoincrement())	
+	teamId			Int
+	inviteEmail 	String
+	value			String
+ 	expiresAt       DateTime
+  	usedAt          DateTime?
+  	createdAt       DateTime    @default(now())
+  	updatedAt       DateTime    @updatedAt
+	team			Team		@relation(fields: [teamId], references: [id])
+}
+
 model UserProfile {
-	id					Int			@id @default(autoincrement())
- 	User 				User		@relation(fields: [userId], references: [id])
-	userId				Int
-	introduction 		String?
-	name				String
-	talents				String[]
-	interests			String[]
-	updateAt			DateTime	@updatedAt
+	id				Int			@id @default(autoincrement())
+ 	User 			User		@relation(fields: [userId], references: [id])
+	userId			Int
+	introduction 	String?
+	name			String
+	talents			String[]
+	interests		String[]
+	updateAt		DateTime	@updatedAt
 
 	@@unique([userId])
 

@@ -5,6 +5,7 @@ import updateTeam from './mutations/updateTeam';
 import deleteTeam from './mutations/deleteTeam';
 
 import addMember from './mutations/addMember';
+import removeMember from './mutations/removeMember';
 import setRoleMember from './mutations/setRoleMember';
 
 const Mutation = new GraphQLObjectType({
@@ -14,7 +15,8 @@ const Mutation = new GraphQLObjectType({
     updateTeam,
     deleteTeam,
     addMember,
-    setRoleMember,
+    removeMember,
+    setRoleMember
   },
 });
 

@@ -34,62 +34,54 @@ const Team = () => {
   );
 
   return (
-    <Tabs className="tab" defaultActiveKey="1" style={{ height: '100%' }}>
-      <TabPane tab="WorkSpace" key="1">
-        <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
-          <Tabs
-            type="card"
-            className="tab-inner"
-            activeKey={activeKey}
-            style={{ height: '90%' }}
-            tabBarExtraContent={operations}
-            onChange={(key: string) => {
-              console.log(typeof key);
-              setActiveKey(key);
-            }}
-          >
-            <TabPane tab="All" key="1" className="flex flex-ai-c flex-jc-c flex-dir-c">
-              <TeamsCard
-                status=""
-                setIsLoading={setIsLoading}
-                searchText={searchText}
-                page={page}
-                size={size}
-                setSize={setSize}
-                setPage={setPage}
-              />
-            </TabPane>
-            <TabPane tab="Doing" key="2" className="flex flex-ai-c flex-jc-c flex-dir-c">
-              <TeamsCard
-                status="Doing"
-                setIsLoading={setIsLoading}
-                searchText={searchText}
-                page={page}
-                size={size}
-                setSize={setSize}
-                setPage={setPage}
-              />
-            </TabPane>
-            <TabPane tab="Done" key="3" className="flex flex-ai-c flex-jc-c flex-dir-c">
-              <TeamsCard
-                status="Done"
-                setIsLoading={setIsLoading}
-                searchText={searchText}
-                page={page}
-                size={size}
-                setSize={setSize}
-                setPage={setPage}
-              />
-            </TabPane>
-          </Tabs>
+    <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
+      <Tabs
+        type="card"
+        className="tab-inner"
+        activeKey={activeKey}
+        style={{ height: '90%' }}
+        tabBarExtraContent={operations}
+        onChange={(key: string) => {
+          setActiveKey(key);
+        }}
+      >
+        <TabPane tab="All" key="1" className="flex flex-ai-c flex-jc-c flex-dir-c">
+          <TeamsCard
+            status=""
+            setIsLoading={setIsLoading}
+            searchText={searchText}
+            page={page}
+            size={size}
+            setSize={setSize}
+            setPage={setPage}
+          />
+        </TabPane>
+        <TabPane tab="Doing" key="2" className="flex flex-ai-c flex-jc-c flex-dir-c">
+          <TeamsCard
+            status="Doing"
+            setIsLoading={setIsLoading}
+            searchText={searchText}
+            page={page}
+            size={size}
+            setSize={setSize}
+            setPage={setPage}
+          />
+        </TabPane>
+        <TabPane tab="Done" key="3" className="flex flex-ai-c flex-jc-c flex-dir-c">
+          <TeamsCard
+            status="Done"
+            setIsLoading={setIsLoading}
+            searchText={searchText}
+            page={page}
+            size={size}
+            setSize={setSize}
+            setPage={setPage}
+          />
+        </TabPane>
+      </Tabs>
 
-          <TeamCreateModal isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
-        </div>
-      </TabPane>
-      <TabPane tab="My Portfolio" key="2" style={{ height: '100%' }}>
-        <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}></div>
-      </TabPane>
-    </Tabs>
+      <TeamCreateModal isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
+    </div>
   );
 };
 export default Team;

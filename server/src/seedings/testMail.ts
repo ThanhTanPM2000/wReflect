@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 
 const options = {
   from: 'wreflectteam@gmail.com',
-  to: 'nguyentanmanh2323@gmail.com',
+  to: 'hihihsfkdjfksjfksnn@gmail.com',
   subject: 'testing and testing',
   html: '<h1>Your account was hacked, sorry u must follow this link to validate<h1>',
 };

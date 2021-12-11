@@ -1,5 +1,40 @@
 import { gql } from '@apollo/client';
 
+const getTeam = gql`
+  query getTeam($teamId: Int) {
+    team(teamId: $teamId) {
+      id
+      name
+      ownerEmail
+      createAt
+      startDate
+      endDate
+      status
+      picture
+      numOfMember
+      isPublice
+      description
+      members {
+        isOwner
+        userId
+        teamId
+        joinedAt
+        assignedBy
+        user {
+          id
+          name
+          email
+          createAt
+          updatedAt
+          isAdmin
+          status
+          picture
+        }
+      }
+    }
+  }
+`;
+
 const getTeams = gql`
   query teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
     teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
@@ -24,4 +59,4 @@ const getTeams = gql`
   }
 `;
 
-export { getTeams };
+export { getTeams, getTeam };

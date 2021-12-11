@@ -58,10 +58,15 @@ export type addMemberToTeamType = {
   teamId: number;
 };
 
+export type removeMemberType = {
+  userId: number;
+  teamId: number;
+};
+
 export type setRoleMemberType = {
   userId: number;
   teamId: number;
-  isRoleAdmin: boolean;
+  isOwner: boolean;
 };
 
 export type getListDataType = {

@@ -8,9 +8,11 @@ import { notification } from 'antd';
 import config from './config';
 import Routes from './Routes';
 import { setUpdateLoginState, user } from './apis';
+import SelfContext from './contexts/selfContext';
 
 const httpLink = new HttpLink({
   uri: 'http://localhost:4000/graphql',
+  credentials: 'include',
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -28,6 +30,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const client = new ApolloClient({
   uri: `${config.SERVER_BASE_URL}/graphql`,
+  credentials: 'include',
   cache: new InMemoryCache({
     addTypename: true,
     typePolicies: {
@@ -52,7 +55,9 @@ const App = (): JSX.Element => {
   }, []);
   return (
     <ApolloProvider client={client}>
-      <Routes me={me} />;
+      <SelfContext.Provider value={me}>
+        <Routes me={me} />;
+      </SelfContext.Provider>
     </ApolloProvider>
   );
 };

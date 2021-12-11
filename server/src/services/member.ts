@@ -1,4 +1,4 @@
-import { addMemberToTeamType, setRoleMemberType, getListMembersType } from '../types';
+import { addMemberToTeamType, setRoleMemberType, getListMembersType, removeMemberType } from '../types';
 import logger from '../logger';
 import prisma from '../prisma';
 import _ from 'lodash';
@@ -136,6 +136,31 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
   }
 };
 
+export const removeMember = async (ownerEmail: string, data: removeMemberType) => {
+  try {
+    const team = await prisma.team.findFirst({
+      where: {
+        ownerEmail: {
+          has: ownerEmail,
+        },
+        id: data.teamId,
+      },
+    });
+
+    if (!team) throw new Error(`You are not the owner of Team ${data.teamId}`);
+
+    const members = await prisma.member.delete({
+      where: {
+        userId_teamId: {
+          ...data,
+        },
+      },
+    });
+
+    return members;
+  } catch (error) {}
+};
+
 export const setRoleMember = async (ownerEmail: string, data: setRoleMemberType) => {
   try {
     const team = await prisma.team.findFirst({
@@ -157,11 +182,35 @@ export const setRoleMember = async (ownerEmail: string, data: setRoleMemberType)
         },
       },
       data: {
-        isOwner: data.isRoleAdmin,
+        isOwner: data.isOwner,
       },
       include: {
         team: true,
         user: true,
+      },
+    });
+
+    const index = team.ownerEmail.indexOf(member.user.email);
+    if (index > -1) {
+      team.ownerEmail.splice(index, 1);
+    }
+
+    const updateTeam = data.isOwner
+      ? {
+          ownerEmail: {
+            push: member.user.email,
+          },
+        }
+      : {
+          ownerEmail: team.ownerEmail,
+        };
+
+    await prisma.team.update({
+      where: {
+        id: data.teamId,
+      },
+      data: {
+        ...updateTeam,
       },
     });
 
