@@ -9,7 +9,7 @@ const TeamType = new GraphQLObjectType({
     id: { type: GraphQLInt },
     name: { type: GraphQLString },
     ownerEmail: { type: new GraphQLList(GraphQLString) },
-    createAt: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
     startDate: { type: GraphQLString },
     endDate: { type: GraphQLString },
     status: { type: GraphQLString },

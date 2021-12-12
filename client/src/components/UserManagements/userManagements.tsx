@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, Table, Row, Skeleton, Pagination, Button, Avatar } from 'antd';
+import { Table, Pagination, Button, Avatar } from 'antd';
 import { format } from 'date-fns';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useQuery } from '@apollo/client';
@@ -44,12 +44,12 @@ const UserManagements = () => {
       key: 'email',
     },
     {
-      title: 'Create At',
-      dataIndex: 'createAt',
-      key: 'createAt',
-      render: function createAt(createAt: string) {
-        if (!createAt) return;
-        return <>{format(new Date(+createAt), 'dd MM yyyy')}</>;
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: function createdAt(createdAt: string) {
+        if (!createdAt) return;
+        return <>{format(new Date(+createdAt), 'dd MM yyyy')}</>;
       },
     },
   ];

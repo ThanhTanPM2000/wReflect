@@ -6,7 +6,7 @@ const getTeam = gql`
       id
       name
       ownerEmail
-      createAt
+      createdAt
       startDate
       endDate
       status
@@ -24,7 +24,7 @@ const getTeam = gql`
           id
           name
           email
-          createAt
+          createdAt
           updatedAt
           isAdmin
           status

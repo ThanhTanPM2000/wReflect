@@ -24,7 +24,7 @@ const Team = () => {
 
   const operations = (
     <>
-      <div className="flex flex-ai-c flex-jc-c">
+      <div className="flex flex-dir-r flex-ai-c flex-jc-c">
         <Button className="mr-10" icon={<PlusCircleOutlined />} size="middle" onClick={() => setIsModalVisible(true)}>
           New Team
         </Button>
@@ -39,13 +39,13 @@ const Team = () => {
         type="card"
         className="tab-inner"
         activeKey={activeKey}
-        style={{ height: '90%' }}
+        style={{ height: '100%' }}
         tabBarExtraContent={operations}
         onChange={(key: string) => {
           setActiveKey(key);
         }}
       >
-        <TabPane tab="All" key="1" className="flex flex-ai-c flex-jc-c flex-dir-c">
+        <TabPane tab="All" key="1" className="flex flex-1 flex-dir-c">
           <TeamsCard
             status=""
             setIsLoading={setIsLoading}
@@ -56,7 +56,7 @@ const Team = () => {
             setPage={setPage}
           />
         </TabPane>
-        <TabPane tab="Doing" key="2" className="flex flex-ai-c flex-jc-c flex-dir-c">
+        <TabPane tab="Doing" key="2" className="flex flex-1 flex-dir-c">
           <TeamsCard
             status="Doing"
             setIsLoading={setIsLoading}
@@ -67,7 +67,7 @@ const Team = () => {
             setPage={setPage}
           />
         </TabPane>
-        <TabPane tab="Done" key="3" className="flex flex-ai-c flex-jc-c flex-dir-c">
+        <TabPane tab="Done" key="3" className="flex flex-1 flex-dir-c">
           <TeamsCard
             status="Done"
             setIsLoading={setIsLoading}

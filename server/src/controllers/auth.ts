@@ -22,7 +22,7 @@ export const login = async (req: Request, res: Response): Promise<void | Respons
     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;
     setCookie('email', email, oneDayInMilliseconds, res);
     setCookie('token', session.token, oneDayInMilliseconds, res);
-    return res.send({ id: user.id, email, isAdmin: user.isAdmin, picture });
+    return res.send({ id: user.id, email, isAdmin: user.isAdmin, picture, status: user.status });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(StatusCodes.BAD_REQUEST).send(error.errors);

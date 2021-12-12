@@ -64,7 +64,7 @@ const TeamDetail = ({ teamId }: Props) => {
 
   const operations = (
     <>
-      <div className="flex flex-ai-c flex-jc-c mb-10">
+      <div className="flex flex-dir-r flex-ai-c flex-jc-c mb-10">
         <Button
           className="btn-delete-team mr-10"
           icon={<DeleteOutlined />}
@@ -235,7 +235,7 @@ const TeamDetail = ({ teamId }: Props) => {
           setActiveKey(key);
         }}
       >
-        <TabPane tab="Member" key="1" className="flex flex-jc-c" style={{}}>
+        <TabPane tab="Member" key="1" className="flex" style={{}}>
           {loading ? (
             <Skeleton avatar paragraph={{ rows: 4 }} />
           ) : (
@@ -257,10 +257,10 @@ const TeamDetail = ({ teamId }: Props) => {
             </Menu>
           )}
         </TabPane>
-        <TabPane tab="Setting" key="2" className="flex flex-jc-c" style={{ overflow: 'auto' }}>
+        <TabPane tab="Setting" key="2" className="flex " style={{ overflow: 'auto' }}>
           <div>hello</div>
         </TabPane>
-        <TabPane tab="Analytics" key="3" className="flex flex-jc-c" style={{ overflow: 'auto' }}>
+        <TabPane tab="Analytics" key="3" className="flex " style={{ overflow: 'auto' }}>
           <div>Data</div>
         </TabPane>
       </Tabs>

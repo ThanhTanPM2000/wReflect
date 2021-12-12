@@ -10,11 +10,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Couries New', monospace; }
 
 .flex {
-  display: flex; }
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; }
   .flex-1 {
     flex: 1; }
   .flex-6 {
     flex: 6; }
+  .flex-11 {
+    flex: 11; }
   .flex-jc-sb {
     justify-content: space-between; }
   .flex-jc-sa {
@@ -42,9 +46,6 @@ code {
     font-size: 10px !important;
     height: 18px !important; }
 
-.ant-card-body {
-  max-height: 80%; }
-
 .ant-empty {
   height: 100%;
   width: 100%; }
@@ -58,6 +59,12 @@ code {
 
 .ant-tabs-tabpane {
   overflow: auto; }
+
+.ant-card {
+  border-radius: 10px; }
+
+.ant-card-actions {
+  border-radius: 10px; }
 
 .mb-10 {
   margin-bottom: 10px; }

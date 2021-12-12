@@ -8,15 +8,20 @@ import addMember from './mutations/addMember';
 import removeMember from './mutations/removeMember';
 import setRoleMember from './mutations/setRoleMember';
 
+import updateUser from './mutations/updateUser';
+
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
     createTeam,
     updateTeam,
     deleteTeam,
+
     addMember,
     removeMember,
-    setRoleMember
+    setRoleMember,
+
+    updateUser,
   },
 });
 

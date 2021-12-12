@@ -17,21 +17,21 @@ export const getUserProfile = async (userId: number) => {
   }
 };
 
-export const updateUserProfile = async (userId: number, data: updateProfileType) => {
-  try {
-    const updatedProfile = await prisma.userProfile.update({
-      where: {
-        userId,
-      },
-      data: {
-        ...data,
-      },
-      include: {
-        User: true,
-      },
-    });
-    return updatedProfile;
-  } catch (error) {
-    logger.error('Error in updateUserProfile');
-  }
-};
+// export const updateUserProfile = async (userId: number, data: updateProfileType) => {
+//   try {
+//     const updatedProfile = await prisma.userProfile.update({
+//       where: {
+//         userId,
+//       },
+//       data: {
+//         ...data,
+//       },
+//       include: {
+//         User: true,
+//       },
+//     });
+//     return updatedProfile;
+//   } catch (error) {
+//     logger.error('Error in updateUserProfile');
+//   }
+// };

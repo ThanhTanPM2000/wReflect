@@ -7,7 +7,7 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLInt },
     name: { type: GraphQLString },
     email: { type: GraphQLString },
-    createAt: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
     updatedAt: { type: GraphQLString },
     isAdmin: { type: GraphQLBoolean },
     status: { type: GraphQLString },

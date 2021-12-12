@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import logger from '../logger';
+import { updateUserType } from '../types';
 
 export const findOrCreateUserByEmail = async (email: string, picture: string) => {
   try {
@@ -9,6 +10,16 @@ export const findOrCreateUserByEmail = async (email: string, picture: string) =>
       create: {
         email,
         picture,
+        profile: {
+          create: {
+            firstName: 'firstName',
+            lastName: 'lastName',
+          },
+        },
+      },
+      include: {
+        profile: true,
+        members: true,
       },
     });
     return user;
@@ -36,7 +47,7 @@ export const getListUsers = async (search = '', isGettingAll = false, page = 1, 
       skip: (page - 1) * size,
       take: size,
       orderBy: {
-        createAt: 'asc',
+        createdAt: 'asc',
       },
     });
 
@@ -65,6 +76,10 @@ export const getUserById = async (userId: number) => {
       where: {
         id: userId,
       },
+      include: {
+        members: true,
+        profile: true,
+      },
     });
 
     if (!user) throw new Error('User not found in system');
@@ -74,4 +89,30 @@ export const getUserById = async (userId: number) => {
     logger.info('Error in getUserById service');
     throw error;
   }
+};
+
+export const updateUser = async (userId: number, args: updateUserType) => {
+  try {
+    const currentTime = new Date(Date.now());
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profile: {
+          update: {
+            ...args,
+            updatedAt: currentTime,
+          },
+        },
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!user) throw new Error('You dont have permission or user not found');
+
+    return user;
+  } catch (error) {}
 };

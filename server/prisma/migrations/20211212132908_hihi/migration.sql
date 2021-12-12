@@ -42,10 +42,24 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "picture" TEXT NOT NULL,
-    "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "status" TEXT NOT NULL DEFAULT E'NotInitiated',
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TeamToken" (
+    "id" SERIAL NOT NULL,
+    "teamId" INTEGER NOT NULL,
+    "inviteEmail" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "expiredAt" TIMESTAMP(3) NOT NULL,
+    "usedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -54,11 +68,19 @@ CREATE TABLE "User" (
 CREATE TABLE "UserProfile" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "gender" TEXT NOT NULL DEFAULT E'Unspecified',
+    "workplace" TEXT,
+    "userStatus" TEXT DEFAULT E'online',
+    "school" TEXT,
     "introduction" TEXT,
-    "name" TEXT NOT NULL,
-    "talents" TEXT[],
-    "interests" TEXT[],
-    "updateAt" TIMESTAMP(3) NOT NULL,
+    "phoneNumber" TEXT[],
+    "photos" TEXT[],
+    "talents" TEXT,
+    "interests" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -86,6 +108,9 @@ ALTER TABLE "Member" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELET
 
 -- AddForeignKey
 ALTER TABLE "Member" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TeamToken" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserProfile" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

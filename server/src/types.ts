@@ -6,6 +6,7 @@ export type SanitizedUser = {
   email: string;
   isAdmin: boolean;
   picture: string;
+  status: string;
 };
 
 export interface RequestWithUserInfo extends Request {
@@ -41,11 +42,6 @@ export type updateTeamType = {
   description?: string;
 };
 
-export type updateUserType = {
-  name?: string;
-  picture?: string;
-};
-
 export type updateProfileType = {
   introduction?: string;
   talents?: string[];
@@ -79,4 +75,18 @@ export type getListDataType = {
 
 export type getListMembersType = {
   teamId: number;
+};
+
+export type updateUserType = {
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  workplace?: string;
+  userStatus?: string;
+  school?: string;
+  introduction?: string;
+  phoneNumbers?: string[];
+  photos?: string[];
+  talents?: string;
+  interests?: string;
 };

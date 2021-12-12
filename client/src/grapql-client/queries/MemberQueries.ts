@@ -11,7 +11,7 @@ const getListMembers = gql`
       user {
         email
         name
-        createAt
+        createdAt
         updatedAt
         isAdmin
         status

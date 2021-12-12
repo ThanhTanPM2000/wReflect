@@ -7,15 +7,15 @@ type Props = {
   picture: string | null;
 };
 
-const HomePage = ({ email,picture }: Props) => {
+const HomePage = ({ email, picture }: Props) => {
   return (
-    <>
-      <Header email={email} picture={picture}/>
-      <div className="flex flex-jc-sa flex-ai-sa">
+    <div className="flex flex-1">
+      <Header email={email} picture={picture} />
+      <div className="flex flex-1 flex-dir-r flex-jc-sa flex-ai-c">
         <Image preview={false} src="/images/homePageMale.png" alt="image" />
         <Image preview={false} src="/images/homePageFemale.png" alt="image" />
       </div>
-    </>
+    </div>
   );
 };
 

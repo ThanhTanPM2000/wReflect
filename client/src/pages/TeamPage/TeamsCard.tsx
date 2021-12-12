@@ -81,80 +81,93 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
 
   return (
     <>
-      <div className="flex flex-dir-c flex-ai-c flex-jc-c " style={{ flex: 1 }}>
+      <div className="flex flex-1 flex-dir-c" style={{ padding: '10px' }}>
         {!data.teams || data.teams.data.length == 0 ? (
-          <div className="flex flex-ai-c flex-jc-c" style={{ flex: 1, height: '100%' }}>
+          <div className="flex" style={{ flex: 1, height: '100%', width: '100%' }}>
             <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
           </div>
         ) : (
           <>
-            <div className="flex flex-dir-c flex-ai-c flex-jc-c" style={{ flex: 1 }}>
-              <div style={{ flexGrow: 6, height: '100%' }} className="flex flex-ai-c flex-jc-c">
-                <Row key={`row`} gutter={[16, 16]}>
-                  {data.teams.data.map((team: any) => {
-                    return (
-                      <Col
-                        key={team.id}
-                        span={
-                          data.teams.data.length === 1
-                            ? 24
-                            : data.teams.data.length === 2
-                            ? 12
-                            : data.teams.data.length === 3
-                            ? 8
-                            : 6
+            <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
+              <Row className="flex flex-dir-r" style={{ height: '100%' }} key={`row`} gutter={[16, 16]}>
+                {data.teams.data.map((team: any) => {
+                  return (
+                    <Col
+                      key={team.id}
+                      className="flex"
+                      style={{ height: '100%', maxWidth: '500px', maxHeight: '230px' }}
+                      span={(() => {
+                        switch (data.teams.data.length) {
+                          case 1:
+                            return 24;
+                          case 2:
+                            return 12;
+                          case 3:
+                            return 8;
+                          default:
+                            return 6;
                         }
-                        // span={24}
+                      })()}
+                    >
+                      <Card
+                        // style={{ height: '100%' }}
+                        bodyStyle={{ display: 'flex', flex: 1 }}
+                        className="flex flex-1 flex-dir-c"
+                        hoverable
+                        key={team.id}
+                        size="small"
+                        loading={loading}
+                        actions={[
+                          <SettingOutlined key="setting" />,
+                          <UsergroupAddOutlined key="edit" onClick={() => onAddMember()} />,
+                          <EllipsisOutlined key="ellipsis" />,
+                        ]}
                       >
-                        <Card
-                          hoverable
-                          key={team.id}
-                          size="small"
-                          loading={loading}
-                          actions={[
-                            <SettingOutlined key="setting" />,
-                            <UsergroupAddOutlined key="edit" onClick={() => onAddMember()} />,
-                            <EllipsisOutlined key="ellipsis" />,
-                          ]}
-                        >
-                          <div onClick={() => redirect(team.id)}>
-                            <Meta
-                              key={team.name}
-                              title={team.name}
-                              avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
-                            ></Meta>
-                            <div className="flex flex-dir-r" style={{ marginTop: '30px' }}>
-                              <div style={{ flex: 1 }}>
-                                {team.members.map((member: any) => {
-                                  return (
-                                    <Avatar
-                                      style={{ marginRight: '3px' }}
-                                      size="small"
-                                      key={member.userId}
-                                      src={member.user.picture}
-                                    />
-                                  );
-                                })}
+                        <>
+                          <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team.id)}>
+                            <div className="flex">
+                              <Meta
+                                key={team.name}
+                                title={team.name}
+                                avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
+                              ></Meta>
+                            </div>
+                            <div>
+                              <div className="flex flex-dir-r flex-jc-sb">
+                                <div>
+                                  {team.members.map((member: any) => {
+                                    return (
+                                      <Avatar
+                                        style={{ marginRight: '3px' }}
+                                        size="small"
+                                        key={member.userId}
+                                        src={member.user.picture}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                                <div>
+                                  <span>{`${team.members.length}`} members</span>
+                                </div>
                               </div>
-                              <div style={{ marginLeft: 'auto' }}>{`${team.members.length}`} members</div>
                             </div>
                           </div>
-                        </Card>
-                      </Col>
-                    );
-                  })}
-                </Row>
-              </div>
-              <div className="flex flex-jc-c mt-12" style={{ flex: 1, justifyContent: 'flex-end' }}>
-                <Pagination
-                  defaultCurrent={1}
-                  current={page}
-                  total={data.teams.total}
-                  defaultPageSize={8}
-                  pageSize={size}
-                  onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
-                />
-              </div>
+                        </>
+                      </Card>
+                    </Col>
+                  );
+                })}
+              </Row>
+            </div>
+            <div className="flex flex-ai-c flex-jc-c mt-12">
+              <Pagination
+                defaultCurrent={1}
+                current={page}
+                total={data.teams.total}
+                defaultPageSize={8}
+                pageSize={size}
+                onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
+              />
             </div>
           </>
         )}

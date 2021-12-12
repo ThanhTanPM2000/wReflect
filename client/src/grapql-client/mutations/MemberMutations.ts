@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-const AddNewMember = gql`
+const addNewMember = gql`
   mutation addMembers($emailUsers: [String], $teamId: Int) {
     addMember(emailUsers: $emailUsers, teamId: $teamId) {
       success
@@ -9,7 +9,7 @@ const AddNewMember = gql`
   }
 `;
 
-const RemoveMember = gql`
+const removeMember = gql`
   mutation removeMember($userId: Int!, $teamId: Int!) {
     removeMember(userId: $userId, teamId: $teamId) {
       isOwner
@@ -21,7 +21,7 @@ const RemoveMember = gql`
   }
 `;
 
-const SetRoleMember = gql`
+const setRoleMember = gql`
   mutation setRoleMember($userId: Int!, $teamId: Int!, $isOwner: Boolean!) {
     setRoleMember(userId: $userId, teamId: $teamId, isOwner: $isOwner) {
       isOwner
@@ -33,4 +33,4 @@ const SetRoleMember = gql`
   }
 `;
 
-export { AddNewMember, RemoveMember, SetRoleMember };
+export { addNewMember as AddNewMember, removeMember as RemoveMember, setRoleMember as SetRoleMember };

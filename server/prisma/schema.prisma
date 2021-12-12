@@ -57,8 +57,8 @@ model User {
 	id				Int			@id @default(autoincrement())
 	email			String		@unique
 	picture			String
-	createAt 		DateTime 	@default(now())
-	updateAt 		DateTime	@updatedAt
+	createdAt 		DateTime 	@default(now())
+	updatedAt 		DateTime	@updatedAt
 	isAdmin			Boolean	 	@default(false)
 	status 			String		@default("NotInitiated")
 	session			Session[]
@@ -73,7 +73,7 @@ model TeamToken {
 	teamId			Int
 	inviteEmail 	String
 	value			String
- 	expiresAt       DateTime
+ 	expiredAt       DateTime
   	usedAt          DateTime?
   	createdAt       DateTime    @default(now())
   	updatedAt       DateTime    @updatedAt
@@ -84,12 +84,42 @@ model UserProfile {
 	id				Int			@id @default(autoincrement())
  	User 			User		@relation(fields: [userId], references: [id])
 	userId			Int
+	firstName		String
+	lastName		String
+	gender			String		@default("Unspecified")
+	workplace		String?
+	userStatus		String?		@default("online")
+	school			String?
 	introduction 	String?
-	name			String
-	talents			String[]
-	interests		String[]
-	updateAt		DateTime	@updatedAt
+	phoneNumber		String[]
+	photos			String[]
+	talents			String?
+	interests		String?
+	createdAt		DateTime	@default(now())
+	updatedAt		DateTime	@updatedAt
 
 	@@unique([userId])
-
 }
+
+// model Contact {
+// 	id				Int			@id	@default(autoincrement())
+// 	userProfileId	Int			
+// 	firstName		String
+// 	middleName		String
+// 	lastName		String
+// 	phoneNumbers	String[]		
+// 	email			String
+// }
+
+// model UserStatus {
+// 	id 				Int 		@id @default(autoincrement())
+// 	status 			String
+// 	updateTime 		DateTime	@updatedAt
+// }
+
+// model Gender {
+// 	id				Int			@id	@default(autoincrement())
+// 	type			String	
+
+// 	@@unique([type])
+// }

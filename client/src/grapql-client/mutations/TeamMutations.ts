@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-const AddNewTeam = gql`
+const addNewTeam = gql`
   mutation createTeam(
     $name: String!
     $startDate: String!
@@ -35,7 +35,7 @@ const deleteTeam = gql`
       id
       name
       ownerEmail
-      createAt
+      createdAt
       startDate
       endDate
       status
@@ -46,4 +46,4 @@ const deleteTeam = gql`
     }
   }
 `;
-export { AddNewTeam, deleteTeam };
+export { addNewTeam as AddNewTeam, deleteTeam };

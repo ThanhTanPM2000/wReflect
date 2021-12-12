@@ -75,7 +75,7 @@ const AddMembersModal = ({ isVisible, handleOk, handleCancel }: Props) => {
       onCancel={handleDeleteData}
     >
       <Form onFinish={(value) => onAddEmail(value)} ref={formRef}>
-        <div className="flex">
+        <div className="flex flex-dir-r">
           <Form.Item
             style={{ flex: 1 }}
             name="email"

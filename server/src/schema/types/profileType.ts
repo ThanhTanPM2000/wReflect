@@ -4,12 +4,20 @@ const ProfileType = new GraphQLObjectType({
   name: 'UserProfile',
   fields: () => ({
     id: { type: GraphQLInt },
-    name: { type: GraphQLString },
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString },
+    gender: { type: GraphQLString },
+    workplace: { type: GraphQLString },
+    userStatus: { type: GraphQLString },
+    school: { type: GraphQLString },
     introduction: { type: GraphQLString },
     userId: { type: GraphQLInt },
-    talents: { type: new GraphQLList(GraphQLString) },
-    interests: { type: new GraphQLList(GraphQLString) },
+    talents: { type: GraphQLString },
+    interests: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
     updatedAt: { type: GraphQLString },
+    phoneNumbers: { type: new GraphQLList(GraphQLString) },
+    photos: { type: new GraphQLList(GraphQLString) },
   }),
 });
 

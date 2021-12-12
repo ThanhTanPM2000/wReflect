@@ -41,6 +41,7 @@ export const me = async (req: RequestWithUserInfo, res: Response): Promise<void 
       id: sanitizedUser.id,
       isAdmin: sanitizedUser.isAdmin,
       picture: sanitizedUser.picture,
+      status: sanitizedUser.status,
     });
   } catch (err) {
     if (err instanceof ZodError) {
