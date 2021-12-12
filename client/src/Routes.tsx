@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { Header } from './components/Header';
 import { Me } from './types';
+import { newMember } from './pages/NewMember/newMember';
 import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
