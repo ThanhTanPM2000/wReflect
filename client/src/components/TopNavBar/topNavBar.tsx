@@ -31,7 +31,7 @@ const TopNavBar = ({ email, picture }: Props) => {
             <Avatar className="avatarSetting" src={`${picture}`} size="default" />
           </div>
           <div style={{ marginRight: 20 }}>
-            <DropDown />
+            <DropDown email={email} picture={picture}/>
           </div>
         </div>
       </Header>

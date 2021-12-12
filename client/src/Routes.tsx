@@ -1,16 +1,22 @@
 import React from 'react';
 import { Layout } from 'antd';
 import { BrowserRouter as Router, Switch, Redirect, Route } from 'react-router-dom';
+
+import { useQuery } from '@apollo/client';
+
 import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { Header } from './components/Header';
 import { Me } from './types';
+import { newMember } from './pages/NewMember/newMember';
 import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { ProfileUser } from './components/ProfileUser';
 import { DashBoard } from './components/DashBoard';
 import { UserManagements } from './components/UserManagements';
+import { getUsers } from './grapql-client/queries/UserQueries';
+
 type Props = {
   me: null | Me;
 };
@@ -24,6 +30,8 @@ const Routes = ({ me }: Props): JSX.Element => {
   const name = me?.name || null;
   const picture = me?.picture || null;
 
+  const { data } = useQuery(getUsers);
+
   return (
     <Router>
       <Switch>
@@ -36,7 +44,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                   <TopNavBar email={email} picture={picture} />
                   <Content style={{ margin: '10px 16px', height: '100%', overflow: 'auto' }}>
                     <Switch>
-                      {isLoggedIn && (
+                      {isLoggedIn &&  (
                         <>
                           {isAdmin ? (
                             <>
@@ -61,6 +69,12 @@ const Routes = ({ me }: Props): JSX.Element => {
                         </>
                       )}
                     </Switch>
+                    <Route exact path="/teams/:id" render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />} />
+                    <Route path="/profileUser" component={ProfileUser}>
+                      <ProfileUser email={email} picture={picture} name={name} />
+                    </Route>
+                    <Route path="/dashboard" component={DashBoard} />
+                    <Route path="/user-Managements" component={UserManagements} />
                   </Content>
                   <Footer style={{ textAlign: 'center', padding: '0 0' }}>wReflect ©2022</Footer>
                 </Layout>
