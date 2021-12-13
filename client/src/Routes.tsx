@@ -3,7 +3,6 @@ import { Layout } from 'antd';
 import { Router, Switch, Redirect, Route } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 
-
 import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { Header } from './components/Header';
@@ -15,7 +14,7 @@ import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { ProfileUser } from './components/ProfileUser';
 import { DashBoard } from './components/DashBoard';
 import { UserManagements } from './components/UserManagements';
-import { getUsers } from './grapql-client/queries/UserQueries';
+
 import workspaces from './store/workspaces';
 
 type Props = {

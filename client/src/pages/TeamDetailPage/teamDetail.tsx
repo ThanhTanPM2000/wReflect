@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { ColumnsType } from 'antd/lib/table';
 import { useMutation, useQuery } from '@apollo/client';
 
-import { DownOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { CaretDownFilled, PlusCircleOutlined } from '@ant-design/icons';
 import AddMembersModal from './addMemberModal';
 import { MemberQueries, TeamQueries } from '../../grapql-client/queries';
 import { MemberMutations, TeamMutations } from '../../grapql-client/mutations';
@@ -202,47 +202,91 @@ const TeamDetail = ({ teamId }: Props) => {
   }
 
   return (
-    <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
-      <Tabs
-        type="card"
-        className="tab-inner"
-        activeKey={activeKey}
-        style={{ height: '100%' }}
-        tabBarExtraContent={data?.team?.ownerEmail.includes(me?.email) && operations}
-        onChange={(key: string) => {
-          setActiveKey(key);
+    <div
+      className="teamDetails site-layout-background flex flex-1 flex-dir-r"
+      style={{ height: '100%', padding: '5px' }}
+    >
+      <div className="flex flex-2 flex-jc-sb" style={{ padding: 24, height: '100%' }}>
+        <div className="flex flex-ai-c flex-jc-sb">
+          <Avatar shape="square" size={250} src={data?.team?.picture}></Avatar>
+          <div className="nameTeam" style={{ marginTop: '25px' }}>
+            Team: {data?.team?.name}
+          </div>
+          <div>Description: {data?.team?.description}</div>
+          <div style={{ marginTop: '20px' }}>
+            {data?.team?.members.map((member: any) => {
+              return (
+                <Avatar style={{ marginRight: '3px' }} size="small" key={member.userId} src={member.user.picture} />
+              );
+            })}
+          </div>
+        </div>
+        <div className="flex flex-ai-c flex-jc-c">
+          <Button
+            type="primary"
+            shape="round"
+            icon={<EditFilled />}
+            size="large"
+            onClick={() => setIsVisibleEditDetails(true)}
+          >
+            Edit Details
+          </Button>
+        </div>
+      </div>
+      <div
+        className="flex-5 site-layout-background card-workspace"
+        style={{
+          padding: 24,
+          height: '100%',
+          boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
         }}
       >
-        <TabPane tab="Member" key="1" className="flex flex-1 ">
-          {loading ? (
-            <Skeleton avatar paragraph={{ rows: 4 }} />
-          ) : (
-            <Menu defaultSelectedKeys={['1']} mode="inline">
-              <SubMenu key="sub1" icon={<DownOutlined />} title="Owner">
-                <Table
-                  rowKey="id"
-                  dataSource={data?.team?.members.filter((member: any) => member.isOwner)}
-                  columns={columns}
-                />
-              </SubMenu>
-              <SubMenu key="sub2" icon={<DownOutlined />} title="Member">
-                <Table
-                  rowKey="id"
-                  dataSource={data?.team?.members.filter((member: any) => !member.isOwner)}
-                  columns={columns}
-                />
-              </SubMenu>
-            </Menu>
-          )}
-        </TabPane>
-        <TabPane tab="Setting" key="2" className="flex " style={{ overflow: 'auto' }}>
-          <div>hello</div>
-        </TabPane>
-        <TabPane tab="Analytics" key="3" className="flex " style={{ overflow: 'auto' }}>
-          <div>Data</div>
-        </TabPane>
-      </Tabs>
-      <AddMembersModal teamId={teamId} isVisible={isVisibleAddMemModal} setIsVisible={setIsVisibleAddMemModal} />
+        <Tabs
+          type="card"
+          className="tab-inner"
+          activeKey={activeKey}
+          style={{ height: '100%' }}
+          tabBarExtraContent={data?.team?.ownerEmail.includes(me?.email) && operations}
+          onChange={(key: string) => {
+            setActiveKey(key);
+          }}
+        >
+          <TabPane tab="Member" key="1" className="flex flex-1 ">
+            {loading ? (
+              <Skeleton avatar paragraph={{ rows: 4 }} />
+            ) : (
+              <Menu defaultSelectedKeys={['1']} mode="inline">
+                <SubMenu key="sub1" icon={<CaretDownFilled />} title="Owner">
+                  <Table
+                    rowKey={data?.team?.members.userId}
+                    dataSource={data?.team?.members.filter((member: any) => member.isOwner)}
+                    columns={columns}
+                  />
+                </SubMenu>
+                <SubMenu key="sub2" icon={<CaretDownFilled />} title="Member">
+                  <Table
+                    rowKey={data?.team?.members.userId}
+                    dataSource={data?.team?.members.filter((member: any) => !member.isOwner)}
+                    columns={columns}
+                  />
+                </SubMenu>
+              </Menu>
+            )}
+          </TabPane>
+          <TabPane tab="Setting" key="2" className="flex " style={{ overflow: 'auto' }}>
+            <div>hello</div>
+          </TabPane>
+          <TabPane tab="Analytics" key="3" className="flex " style={{ overflow: 'auto' }}>
+            <div>Data</div>
+          </TabPane>
+        </Tabs>
+        <AddMembersModal isVisible={isVisibleAddMemModal} teamId={teamId} setIsVisible={setIsVisibleAddMemModal} />
+        <EditTeamDetailModal
+          isVisible={isVisibleEditDetails}
+          teamData={data?.team}
+          setIsVisible={setIsVisibleEditDetails}
+        />
+      </div>
     </div>
   );
 };

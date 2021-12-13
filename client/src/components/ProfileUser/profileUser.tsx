@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { Row, Tabs, Avatar, Button, Input } from 'antd';
+import { Row, Tabs, Avatar, Button, Input, Modal, Upload, message, Card, Col } from 'antd';
 
 import { UserQueries } from '../../grapql-client/queries';
 import { UserMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
+
+import { UploadOutlined, EditFilled } from '@ant-design/icons';
 
 type Props = {
   email: string | null;
@@ -14,15 +16,30 @@ type Props = {
 const { TextArea, Search } = Input;
 const { TabPane } = Tabs;
 
-const ProfileUser = ({ email, picture, name }: Props) => {
-  const [disabled, setDisabled] = useState(true);
+const ProfileUser = ({ email, picture }: Props) => {
+  const me = useContext(SelfContext);
+  const { loading, data } = useQuery(UserQueries.getUser, {
+    variables: {
+      userId: me?.id,
+    },
+  });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const profile = data?.user?.profile;
+
+  const [disabled, setDisabled] = useState(false);
   const [desc, setDesc] = useState({
     introduction: '',
-    talents: '',
     interests: '',
+    talents: '',
+    firstName: '',
+    lastName: '',
+    gender: '',
+    workplace: '',
+    school: '',
+    phoneNumbers: '',
   });
-  const me = useContext(SelfContext);
-  const { introduction, talents, interests } = desc;
+  const { introduction, talents, interests, firstName, lastName, gender, workplace, school, phoneNumbers } = desc;
   const onInputChange = (event: any) => {
     setDesc({
       ...desc,
@@ -32,165 +49,258 @@ const ProfileUser = ({ email, picture, name }: Props) => {
   const [updateProfile] = useMutation(UserMutations.updateUser, {
     refetchQueries: [UserQueries.getUser],
   });
-  const onSearch = (value: any) => console.log(value);
-  const handleDisableInput = () => {
-    setDisabled(!disabled);
-  };
 
-  const { loading, data } = useQuery(UserQueries.getUser, {
-    variables: {
-      userId: me?.id,
-    },
-  });
-  const profile = data?.user?.profile;
-  console.log(profile);
-
-  const handleSave = () => {
+  const key = 'updatable';
+  const handleOk = (event: any) => {
     setDisabled(!disabled);
+    event?.preventDefault();
 
     updateProfile({
       variables: {
         introduction: introduction,
         talents: talents,
         interests: interests,
+        firstName: firstName,
+        lastName: lastName,
+        gender: gender,
+        workplace: workplace,
+        school: school,
+        phoneNumber: phoneNumbers,
       },
     });
+    setIsModalVisible(false);
+    message.loading({ content: 'Loading...', key });
+    setTimeout(() => {
+      message.success({ content: 'Update infomation successfully', key, duration: 2 });
+    }, 2000);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const props = {
+    name: 'file',
+    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info: any) {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
   };
 
   return (
-    <Row>
-      <Tabs style={{ flex: 1 }}>
+    <div
+      className="teamDetails site-layout-background flex flex-1 flex-dir-r"
+      style={{ height: '100%', padding: '5px' }}
+    >
+      <Tabs style={{ flex: 1 }} type="card" className="tab-inner">
         <TabPane style={{ textAlign: 'center', marginTop: 21 }} key="0">
           <div style={{ background: 'white', height: 800, marginRight: 20 }}>
-            <div>
-              <Avatar className="avatarSetting" src={`${picture}`} style={{ height: 150, width: 150, marginTop: 20 }} />
-            </div>
-            <div style={{ marginTop: 20, fontSize: 20 }}>
-              {name === null ? <p>Please help me edit user name</p> : `${profile.firstName}${profile.lastName}`}
-            </div>
-            <div
-              style={{ marginLeft: 10, display: 'inline-block', whiteSpace: 'nowrap', width: 490, overflow: 'hidden' }}
-            >
-              <div style={{ marginTop: 20, display: 'flex' }}>
-                <h2>Email</h2>
-                <p style={{ marginLeft: 100, fontSize: 20 }}>{`${email}`}</p>
-              </div>
-              {/* {loading && (
-                <div>
-                  <div style={{ display: 'flex' }}>
-                    <h2>School</h2>
-                    <p style={{ marginLeft: 87, fontSize: 20 }}>{profile.school}</p>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <h2>Work Place</h2>
-                    <p style={{ marginLeft: 46, fontSize: 20 }}>{profile?.workplace}</p>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <h2>Introduction</h2>
-                    <p style={{ marginLeft: 32, fontSize: 20 }}>{profile?.introduction}</p>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <h2>Talents</h2>
-                    <p style={{ marginLeft: 85, fontSize: 20 }}>{profile?.talents}</p>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <h2>Interesting</h2>
-                    <p style={{ marginLeft: 48, fontSize: 20 }}>{profile?.interests}</p>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <h2>Phone</h2>
-                    <p style={{ marginLeft: 90, fontSize: 20 }}>{profile?.phoneNumbers}</p>
-                  </div>
+            <div className="flex flex-2 flex-jc-sb" style={{ padding: 24, height: '100%' }}>
+              <div className="flex flex-ai-c flex-jc-sb">
+                <Avatar
+                  className="avatarSetting"
+                  src={`${picture}`}
+                  style={{ height: 150, width: 150, marginTop: 20 }}
+                />
+                <div style={{ marginTop: 20, fontSize: 20 }}>
+                  {profile?.firstName === 'firstName' || profile?.lastName === 'lastName' ? (
+                    <div>Please help me edit name</div>
+                  ) : (
+                    <div>
+                      {profile?.firstName} {profile?.lastName}
+                    </div>
+                  )}
+                  <div>{email}</div>
                 </div>
-              )} */}
+                <div style={{ fontSize: 18, right: '40%', marginTop: 20, position: 'relative', overflow: 'hidden' }}>
+                  <div>
+                    <p style={{ fontWeight: 'bold' }}>Work Palace</p>
+                    <p style={{ position: 'relative', left: 200 }}>{profile?.workplace}</p>
+                  </div>
+                  <hr style={{ width: 1000 }} />
+                  <div style={{ marginTop: 20 }}>
+                    <p style={{ fontWeight: 'bold', marginRight: '12px' }}>School</p>
+                    <p style={{ position: 'relative', left: 200 }}>{profile?.school}</p>
+                  </div>
+                  <hr style={{ width: 1000 }} />
+                  <div style={{ marginTop: 20 }}>
+                    <p style={{ fontWeight: 'bold', marginRight: '2px' }}>Gender</p>
+                    <p style={{ position: 'relative', left: 200 }}>{profile?.gender}</p>
+                  </div>
+                  <hr style={{ width: 1000 }} />
+                  <div style={{ marginTop: 20 }}>
+                    <p style={{ fontWeight: 'bold', marginLeft: '25px' }}>Phone Number</p>
+                    <p style={{ position: 'relative', left: 200 }}>{profile?.phoneNumbers}</p>
+                  </div>
+                  <hr style={{ width: 1000 }} />
+                </div>
+              </div>
+              <div className="flex flex-ai-c flex-jc-c">
+                <Button type="primary" onClick={showModal} shape="round" icon={<EditFilled />} size="large">
+                  Edit Detail
+                </Button>
+              </div>
             </div>
+            <Modal title="Edit Profile" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+              <div style={{ alignItems: 'center', flex: 1 }}>
+                <Avatar
+                  className="avatarSetting"
+                  src={`${picture}`}
+                  style={{ height: 100, width: 100, marginLeft: 180 }}
+                />
+              </div>
+              <Upload {...props}>
+                <Button style={{ marginLeft: 160, marginTop: 20 }} icon={<UploadOutlined />}>
+                  Upload image
+                </Button>
+              </Upload>
+              <div>
+                First Name
+                <Input
+                  placeholder="First Name..."
+                  onChange={onInputChange}
+                  value={firstName}
+                  name="firstName"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                Last Name
+                <Input
+                  placeholder="Last Name..."
+                  onChange={onInputChange}
+                  value={lastName}
+                  name="lastName"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10, display: 'grid' }}>
+                Gender
+                <Input
+                  placeholder="Gender..."
+                  onChange={onInputChange}
+                  value={gender}
+                  name="gender"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                Work Place
+                <Input
+                  placeholder="Work Place..."
+                  onChange={onInputChange}
+                  value={workplace}
+                  name="workplace"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                School
+                <Input
+                  placeholder="School..."
+                  onChange={onInputChange}
+                  value={school}
+                  name="school"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                Phone Number
+                <Input
+                  placeholder="Phone Number..."
+                  onChange={onInputChange}
+                  value={phoneNumbers}
+                  name="phoneNumbers"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                Introduction
+                <TextArea
+                  placeholder="Introduction..."
+                  onChange={onInputChange}
+                  value={introduction}
+                  name="introduction"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                Talents
+                <TextArea
+                  placeholder="Talents..."
+                  onChange={onInputChange}
+                  value={talents}
+                  name="talents"
+                  disabled={disabled}
+                />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                Interests
+                <TextArea
+                  placeholder="Interests..."
+                  onChange={onInputChange}
+                  value={interests}
+                  name="interests"
+                  disabled={disabled}
+                />
+              </div>
+            </Modal>
           </div>
         </TabPane>
       </Tabs>
-      <Tabs style={{ flex: 2 }}>
-        <TabPane tab="Introduction" key="1">
-          <div style={{ background: 'white', height: 800 }}>
-            <div style={{ padding: 10 }}>
-              <h1>
-                <u>My Introduction</u>
-              </h1>
-              <TextArea
-                style={{ marginTop: 10, marginLeft: 50, width: 1100, height: 150 }}
-                placeholder="Nhập thông tin giới thiệu"
-                rows={8}
-                disabled={disabled}
-                onChange={onInputChange}
-                value={introduction}
-                name="introduction"
-              />
-              <hr style={{ marginTop: 20, width: '70%' }} />
-
-              <h1>
-                <u>My Talents</u>
-              </h1>
-              <TextArea
-                style={{ marginTop: 10, marginLeft: 50, width: 1100, height: 150 }}
-                placeholder="Nhập tài năng của bạn"
-                rows={8}
-                disabled={disabled}
-                onChange={onInputChange}
-                value={talents}
-                name="talents"
-              />
-              <hr style={{ marginTop: 20, width: '70%' }} />
-              <h1>
-                <u>My Interesting</u>
-              </h1>
-              <TextArea
-                style={{ marginTop: 10, marginLeft: 50, width: 1100, height: 150 }}
-                placeholder="Nhập sở thích của bạn"
-                rows={8}
-                disabled={disabled}
-                onChange={onInputChange}
-                value={interests}
-                name="interests"
-              />
-              <Button
-                type="primary"
-                style={{
-                  marginTop: 40,
-                  marginRight: 30,
-                  width: 100,
-                  height: 40,
-                  borderRadius: 10,
-                  fontSize: 15,
-                  float: 'right',
-                }}
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-              <Button
-                type="default"
-                style={{
-                  marginTop: 40,
-                  marginRight: 30,
-                  width: 100,
-                  height: 40,
-                  borderRadius: 10,
-                  fontSize: 15,
-                  float: 'right',
-                }}
-                onClick={handleDisableInput}
-              >
-                Edit
-              </Button>
+      <div
+        className="flex-2 site-layout-background card-workspace"
+        style={{
+          padding: 24,
+          height: '100%',
+          boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
+        }}
+      >
+        <Tabs style={{ flex: 2 }} type="card" className="tab-inner">
+          <TabPane tab="Introduce" key="1" className="flex flex-1" style={{ overflow: 'hidden'}}>
+            <div>
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Card title="Introduction" bordered={false}>
+                    {profile?.introduction}
+                  </Card>
+                </Col>
+                <Col span={8}>
+                  <Card title="Talents" bordered={false}>
+                    {profile?.talents}
+                  </Card>
+                </Col>
+                <Col span={8}>
+                  <Card title="Interests" bordered={false}>
+                    {profile?.interests}
+                  </Card>
+                </Col>
+              </Row>
             </div>
-          </div>
-        </TabPane>
-        <TabPane tab="My Portfolio" key="2">
-          Portfolio
-        </TabPane>
-        <TabPane tab="Team" key="3">
-          Team
-        </TabPane>
-      </Tabs>
-    </Row>
+          </TabPane>
+          <TabPane tab="Portfolio" key="2" className="flex " style={{ overflow: 'auto' }}>
+            <div>Portfolio</div>
+          </TabPane>
+          <TabPane tab="Team" key="3" className="flex " style={{ overflow: 'auto' }}>
+            <div>Team</div>
+          </TabPane>
+        </Tabs>
+      </div>
+    </div>
   );
 };
 

@@ -11,7 +11,7 @@ const updateUser = gql`
     $introduction: String
     $phoneNumbers: [String]
     $photos: [String]
-    $talens: String
+    $talents: String
     $interests: String
   ) {
     updateUser(
@@ -24,7 +24,7 @@ const updateUser = gql`
       introduction: $introduction
       phoneNumbers: $phoneNumbers
       photos: $photos
-      talents: $talens
+      talents: $talents
       interests: $interests
     ) {
       id

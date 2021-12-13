@@ -81,7 +81,7 @@ const deleteTeam = gql`
       status
       picture
       numOfMember
-      isPublice
+      isPublish
       description
     }
   }
