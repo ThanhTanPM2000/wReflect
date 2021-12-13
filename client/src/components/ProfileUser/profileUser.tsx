@@ -1,6 +1,10 @@
-import React, {useState} from 'react';
-import { Row, Tabs, Avatar, Button, Input} from 'antd';
+import React, { useState, useContext } from 'react';
+import { useQuery, useMutation } from '@apollo/client';
+import { Row, Tabs, Avatar, Button, Input } from 'antd';
 
+import { UserQueries } from '../../grapql-client/queries';
+import { UserMutations } from '../../grapql-client/mutations';
+import SelfContext from '../../contexts/selfContext';
 
 type Props = {
   email: string | null;
@@ -11,14 +15,47 @@ const { TextArea, Search } = Input;
 const { TabPane } = Tabs;
 
 const ProfileUser = ({ email, picture, name }: Props) => {
-  const [disabled , setDisabled ] = useState(true)
+  const [disabled, setDisabled] = useState(true);
+  const [desc, setDesc] = useState({
+    introduction: '',
+    talents: '',
+    interests: '',
+  });
+  const me = useContext(SelfContext);
+  const { introduction, talents, interests } = desc;
+  const onInputChange = (event: any) => {
+    setDesc({
+      ...desc,
+      [event.target.name]: event?.target.value,
+    });
+  };
+  const [updateProfile] = useMutation(UserMutations.updateUser, {
+    refetchQueries: [UserQueries.getUser],
+  });
   const onSearch = (value: any) => console.log(value);
   const handleDisableInput = () => {
-    setDisabled(!disabled)
-  }
+    setDisabled(!disabled);
+  };
+
+  const { loading, data } = useQuery(UserQueries.getUser, {
+    variables: {
+      userId: me?.id,
+    },
+  });
+  const profile = data?.user?.profile;
+  console.log(profile);
+
   const handleSave = () => {
-    setDisabled(!disabled)
-  }
+    setDisabled(!disabled);
+
+    updateProfile({
+      variables: {
+        introduction: introduction,
+        talents: talents,
+        interests: interests,
+      },
+    });
+  };
 
   return (
     <Row>
@@ -29,7 +66,7 @@ const ProfileUser = ({ email, picture, name }: Props) => {
               <Avatar className="avatarSetting" src={`${picture}`} style={{ height: 150, width: 150, marginTop: 20 }} />
             </div>
             <div style={{ marginTop: 20, fontSize: 20 }}>
-              {name === null ? <p>Please help me edit user name</p> : name}
+              {name === null ? <p>Please help me edit user name</p> : `${profile.firstName}${profile.lastName}`}
             </div>
             <div
               style={{ marginLeft: 10, display: 'inline-block', whiteSpace: 'nowrap', width: 490, overflow: 'hidden' }}
@@ -38,22 +75,34 @@ const ProfileUser = ({ email, picture, name }: Props) => {
                 <h2>Email</h2>
                 <p style={{ marginLeft: 100, fontSize: 20 }}>{`${email}`}</p>
               </div>
-              <div style={{ display: 'flex' }}>
-                <h2>Introduction</h2>
-                <p style={{ marginLeft: 32, fontSize: 20 }}>Tôi có thể làm mọi thứ bạn muốn</p>
-              </div>
-              <div style={{ display: 'flex' }}>
-                <h2>Talents</h2>
-                <p style={{ marginLeft: 85, fontSize: 20 }}>Front-end</p>
-              </div>
-              <div style={{ display: 'flex' }}>
-                <h2>Interesting</h2>
-                <p style={{ marginLeft: 48, fontSize: 20 }}>Read Book, Sing, Football</p>
-              </div>
-              <div style={{ display: 'flex' }}>
-                <h2>Phone</h2>
-                <p style={{ marginLeft: 90, fontSize: 20 }}>Read Book, Sing, Football</p>
-              </div>
+              {/* {loading && (
+                <div>
+                  <div style={{ display: 'flex' }}>
+                    <h2>School</h2>
+                    <p style={{ marginLeft: 87, fontSize: 20 }}>{profile.school}</p>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <h2>Work Place</h2>
+                    <p style={{ marginLeft: 46, fontSize: 20 }}>{profile?.workplace}</p>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <h2>Introduction</h2>
+                    <p style={{ marginLeft: 32, fontSize: 20 }}>{profile?.introduction}</p>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <h2>Talents</h2>
+                    <p style={{ marginLeft: 85, fontSize: 20 }}>{profile?.talents}</p>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <h2>Interesting</h2>
+                    <p style={{ marginLeft: 48, fontSize: 20 }}>{profile?.interests}</p>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <h2>Phone</h2>
+                    <p style={{ marginLeft: 90, fontSize: 20 }}>{profile?.phoneNumbers}</p>
+                  </div>
+                </div>
+              )} */}
             </div>
           </div>
         </TabPane>
@@ -70,6 +119,9 @@ const ProfileUser = ({ email, picture, name }: Props) => {
                 placeholder="Nhập thông tin giới thiệu"
                 rows={8}
                 disabled={disabled}
+                onChange={onInputChange}
+                value={introduction}
+                name="introduction"
               />
               <hr style={{ marginTop: 20, width: '70%' }} />
 
@@ -81,6 +133,9 @@ const ProfileUser = ({ email, picture, name }: Props) => {
                 placeholder="Nhập tài năng của bạn"
                 rows={8}
                 disabled={disabled}
+                onChange={onInputChange}
+                value={talents}
+                name="talents"
               />
               <hr style={{ marginTop: 20, width: '70%' }} />
               <h1>
@@ -91,6 +146,9 @@ const ProfileUser = ({ email, picture, name }: Props) => {
                 placeholder="Nhập sở thích của bạn"
                 rows={8}
                 disabled={disabled}
+                onChange={onInputChange}
+                value={interests}
+                name="interests"
               />
               <Button
                 type="primary"

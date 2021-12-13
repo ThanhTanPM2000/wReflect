@@ -8,7 +8,6 @@ import { ColumnsType } from 'antd/lib/table';
 import { useMutation, useQuery } from '@apollo/client';
 
 import { DownOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import SearchBar from '../../components/SearchBar/SearchBar';
 import AddMembersModal from './addMemberModal';
 import { MemberQueries, TeamQueries } from '../../grapql-client/queries';
 import { MemberMutations, TeamMutations } from '../../grapql-client/mutations';
@@ -229,13 +228,13 @@ const TeamDetail = ({ teamId }: Props) => {
         type="card"
         className="tab-inner"
         activeKey={activeKey}
-        style={{ height: '90%' }}
+        style={{ height: '100%' }}
         tabBarExtraContent={data?.team?.ownerEmail.includes(me?.email) && operations}
         onChange={(key: string) => {
           setActiveKey(key);
         }}
       >
-        <TabPane tab="Member" key="1" className="flex" style={{}}>
+        <TabPane tab="Member" key="1" className="flex flex-1 ">
           {loading ? (
             <Skeleton avatar paragraph={{ rows: 4 }} />
           ) : (

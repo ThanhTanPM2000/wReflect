@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
-import { Menu, Dropdown, Modal, Input, Avatar, Upload, Button, message } from 'antd';
+import React, { useState, useContext } from 'react';
+import { useHistory } from 'react-router';
+import { useMutation, useQuery } from '@apollo/client';
+
+import { UserMutations } from '../../../../grapql-client/mutations';
+import { UserQueries } from '../../../../grapql-client/queries';
+
+import { Menu, Dropdown, Modal, Input, Avatar, Upload, Button, message, Select } from 'antd';
 import {
   DownOutlined,
   UserOutlined,
@@ -10,27 +16,63 @@ import {
   SmileOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { useHistory } from 'react-router';
 
 type Props = {
   email: string | null;
   picture: string | null;
 };
 
+
 const DropDown = ({ email, picture }: Props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [disabled , setDisabled ] = useState(false)
+  const [editUser] = useMutation(UserMutations.updateUser, {
+    refetchQueries: [
+      UserQueries.getUser
+    ]
+  })
+  const [updateUser, setUpdateUser] = useState({
+    firstName: '',
+    lastName: '',
+    gender: '',
+    workplace: '',
+    school: '',
+    phoneNumbers: '',
+  });
+
+  const { firstName, lastName, gender, workplace, school, phoneNumbers } = updateUser;
+  
+  const onInputChange = (event: any) => {
+    setUpdateUser({
+      ...updateUser,
+      [event.target.name]: event?.target.value,
+    });
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
   };
-  
+
   const key = 'updatable';
-  const handleOk = () => {
+  const handleOk = (event: any) => {
+    event?.preventDefault();
+    editUser({
+      variables :{
+        firstName: firstName ,
+        lastName: lastName,
+        gender: gender,
+        workplace: workplace,
+        school: school,
+        phoneNumber: phoneNumbers
+      }
+    })
+    setDisabled(!disabled)
+
     setIsModalVisible(false);
     message.loading({ content: 'Loading...', key });
     setTimeout(() => {
-      message.success({ content: 'Create new team successfully!', key, duration: 2 });
-    }, 1000);
+      message.success({ content: 'Update infomation successfully', key, duration: 2 });
+    }, 2000);
   };
 
   const handleCancel = () => {
@@ -72,7 +114,7 @@ const DropDown = ({ email, picture }: Props) => {
       <Menu.Item key="3" icon={<UserOutlined />} onClick={showModal}>
         Manage Acount
       </Menu.Item>
-      <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title="Manage Account" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div style={{ alignItems: 'center', flex: 1 }}>
           <Avatar className="avatarSetting" src={`${picture}`} style={{ height: 100, width: 100, marginLeft: 180 }} />
         </div>
@@ -82,16 +124,32 @@ const DropDown = ({ email, picture }: Props) => {
           </Button>
         </Upload>
         <div>
-          Name
-          <Input placeholder="User Name..." />
+          First Name
+          <Input placeholder="First Name..." onChange={onInputChange} value={firstName} name="firstName"  disabled={disabled}/>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          Last Name
+          <Input placeholder="Last Name..." onChange={onInputChange} value={lastName} name="lastName" disabled={disabled}/>
         </div>
         <div style={{ marginTop: 10 }}>
           Email
           <Input placeholder="Email User..." value={`${email}`} disabled />
         </div>
+        <div style={{ marginTop: 10, display: 'grid' }}>
+          Gender
+          <Input placeholder="Gender..." onChange={onInputChange} value={gender} name="gender" disabled={disabled}/>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          Work Place
+          <Input placeholder="Work Place..." onChange={onInputChange} value={workplace} name="workplace"disabled={disabled} />
+        </div>
+        <div style={{ marginTop: 10 }}>
+          School
+          <Input placeholder="School..." onChange={onInputChange} value={school} name="school" disabled={disabled}/>
+        </div>
         <div style={{ marginTop: 10 }}>
           Phone Number
-          <Input placeholder="Phone Number..." />
+          <Input placeholder="Phone Number..." onChange={onInputChange} value={phoneNumbers} name="phoneNumbers" disabled={disabled}/>
         </div>
       </Modal>
       <Menu.Divider />
