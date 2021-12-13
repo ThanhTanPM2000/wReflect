@@ -19,7 +19,7 @@ export const getListMembers = async (data: getListMembersType, userId?: number) 
               },
             },
             {
-              isPublic: true,
+              isPublish: true,
             },
           ],
         }
@@ -31,7 +31,7 @@ export const getListMembers = async (data: getListMembersType, userId?: number) 
         id: data.teamId,
       },
       select: {
-        isPublic: true,
+        isPublish: true,
         members: true,
       },
     });

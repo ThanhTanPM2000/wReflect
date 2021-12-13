@@ -7,7 +7,7 @@ import { UserQueries } from '../../../../grapql-client/queries';
 
 import { Menu, Dropdown, Modal, Input, Avatar, Upload, Button, message, Select } from 'antd';
 import {
-  DownOutlined,
+  CaretDownOutlined,
   UserOutlined,
   TeamOutlined,
   StockOutlined,
@@ -101,7 +101,7 @@ const DropDown = ({ email, picture }: Props) => {
   };
 
   const menu = (
-    <Menu>
+    <Menu style={{ marginTop: '20px' }}>
       <Menu.Item key="0" icon={<SmileOutlined />}>
         <a onClick={redirect}>My profile</a>
       </Menu.Item>
@@ -163,8 +163,8 @@ const DropDown = ({ email, picture }: Props) => {
   );
   return (
     <Dropdown overlay={menu} trigger={['click']}>
-      <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-        <DownOutlined />
+      <a className="ant-dropdown-link" style={{ color: 'black' }} onClick={(e) => e.preventDefault()}>
+        <CaretDownOutlined />
       </a>
     </Dropdown>
   );

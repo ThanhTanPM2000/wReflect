@@ -35,7 +35,7 @@ model Team {
 	status			String		@default("Doing")
 	picture 		String		@default("https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_")		
 	numOfMember		Int			@default(1)
-	isPublic 		Boolean		@default(true)
+	isPublish 		Boolean		@default(true)
 	description		String?
 	teamToken 		TeamToken[]
 	members			Member[]	

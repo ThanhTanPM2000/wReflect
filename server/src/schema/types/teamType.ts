@@ -1,5 +1,5 @@
 import { RequestWithUserInfo } from '../../types';
-import { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList, GraphQLBoolean } from 'graphql';
 import MemberType from './memberType';
 import { member } from '../../services';
 
@@ -15,7 +15,7 @@ const TeamType = new GraphQLObjectType({
     status: { type: GraphQLString },
     picture: { type: GraphQLString },
     numOfMember: { type: GraphQLInt },
-    isPublice: { type: GraphQLInt },
+    isPublish: { type: GraphQLBoolean },
     description: { type: GraphQLString },
     members: {
       type: new GraphQLList(MemberType),

@@ -15,10 +15,10 @@ type Props = {
   setIsVisible: (val: boolean) => void;
 };
 
-const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
+const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
 
-  const [addNewTeam] = useMutation(TeamMutations.AddNewTeam, {
+  const [addNewTeam] = useMutation(TeamMutations.addNewTeam, {
     refetchQueries: [
       TeamQueries.getTeams, // DocumentNode object parsed with gql
       'teams', // Query name
@@ -64,7 +64,7 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
           name="teamName"
           hasFeedback
           label="Team Name"
-          rules={[{ required: true, message: 'Please input your name' }]}
+          rules={[{ required: true, message: 'Please input your team name' }]}
         >
           <Input bordered placeholder="Input team name" type="text" name="name" />
         </Form.Item>
@@ -72,7 +72,7 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
           name="teamDescription"
           hasFeedback
           label="Description"
-          rules={[{ required: true, message: 'Please input your name' }]}
+          rules={[{ required: true, message: 'Please input your team description' }]}
         >
           <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
@@ -95,4 +95,4 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
   );
 };
 
-export default TeamCreateModal;
+export default CreateTeamModal;

@@ -3,7 +3,7 @@ import { Button, Tabs } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import TeamsCard from './TeamsCard';
 
-import TeamCreateModal from './TeamCreateModal';
+import CreateTeamModal from './createTeamModal';
 import SearchBar from '../../components/SearchBar/SearchBar';
 
 const { TabPane } = Tabs;
@@ -45,7 +45,7 @@ const Team = () => {
           setActiveKey(key);
         }}
       >
-        <TabPane tab="All" key="1" className="flex flex-1 flex-dir-c">
+        <TabPane tab="All" key="1" className="flex flex-1">
           <TeamsCard
             status=""
             setIsLoading={setIsLoading}
@@ -56,7 +56,7 @@ const Team = () => {
             setPage={setPage}
           />
         </TabPane>
-        <TabPane tab="Doing" key="2" className="flex flex-1 flex-dir-c">
+        <TabPane tab="Doing" key="2" className="flex flex-1">
           <TeamsCard
             status="Doing"
             setIsLoading={setIsLoading}
@@ -67,7 +67,7 @@ const Team = () => {
             setPage={setPage}
           />
         </TabPane>
-        <TabPane tab="Done" key="3" className="flex flex-1 flex-dir-c">
+        <TabPane tab="Done" key="3" className="flex flex-1">
           <TeamsCard
             status="Done"
             setIsLoading={setIsLoading}
@@ -80,7 +80,7 @@ const Team = () => {
         </TabPane>
       </Tabs>
 
-      <TeamCreateModal isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
+      <CreateTeamModal isVisible={isModalVisible} setIsVisible={setIsModalVisible} />
     </div>
   );
 };

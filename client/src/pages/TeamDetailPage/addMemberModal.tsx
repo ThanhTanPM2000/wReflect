@@ -1,20 +1,48 @@
 import React, { useState, useRef } from 'react';
 import { TweenOneGroup } from 'rc-tween-one';
 import { Form, notification, Button, FormInstance, Input, Tag, Modal } from 'antd';
+import { useMutation } from '@apollo/client';
+import { MemberMutations } from '../../grapql-client/mutations';
+import { MemberQueries, TeamQueries } from '../../grapql-client/queries';
 import _ from 'lodash';
 
 const validEmail = new RegExp('^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$');
 
 type Props = {
+  teamId: number;
   isVisible: boolean;
-  handleOk: (values: string[]) => void;
-  handleCancel: () => void;
+  setIsVisible: (isVisible: boolean) => void;
 };
 
-const AddMembersModal = ({ isVisible, handleOk, handleCancel }: Props) => {
+const showNotification = (data: any) => {
+  const { success, errors } = data;
+  success.map((suc: string) => {
+    notification.success({
+      message: 'Added Successfully',
+      description: suc,
+      placement: 'bottomLeft',
+    });
+  });
+  errors.map((error: string) => {
+    notification.error({
+      message: 'Added failed',
+      description: error,
+      placement: 'bottomLeft',
+    });
+  });
+};
+
+const AddMembersModal = ({ teamId, isVisible, setIsVisible }: Props) => {
   const [listEmails, setListEmails] = useState<string[]>([]);
   // const formRef = React.createRef<FormInstance<any>>();
   const formRef = useRef<FormInstance>(null);
+
+  const [addNewMember] = useMutation(MemberMutations.AddNewMember, {
+    refetchQueries: [
+      MemberQueries.getListMembers, // DocumentNode object parsed with gql
+      TeamQueries.getTeams,
+    ],
+  });
 
   const onAddEmail = (value: any) => {
     if (validEmail.test(value.email)) {
@@ -58,7 +86,17 @@ const AddMembersModal = ({ isVisible, handleOk, handleCancel }: Props) => {
 
   const handleDeleteData = () => {
     setListEmails([]);
-    handleCancel();
+    formRef.current?.resetFields();
+    setIsVisible(false);
+  };
+
+  const handleCreate = async () => {
+    const myListEmails = _.clone(listEmails);
+    setListEmails([]);
+    const { data } = await addNewMember({ variables: { emailUsers: myListEmails, teamId } });
+    showNotification(data.addMember);
+    formRef.current?.resetFields();
+    setIsVisible(false);
   };
 
   return (
@@ -67,11 +105,7 @@ const AddMembersModal = ({ isVisible, handleOk, handleCancel }: Props) => {
       centered
       title="Add new members to team"
       visible={isVisible}
-      onOk={() => {
-        const myListEmails = _.clone(listEmails);
-        handleOk(myListEmails);
-        setListEmails([]);
-      }}
+      onOk={handleCreate}
       onCancel={handleDeleteData}
     >
       <Form onFinish={(value) => onAddEmail(value)} ref={formRef}>

@@ -1,4 +1,5 @@
-import { GraphQLInt, GraphQLNonNull, GraphQLString } from 'graphql';
+import { RequestWithUserInfo } from './../../types';
+import { GraphQLInt, GraphQLNonNull, GraphQLString, GraphQLBoolean } from 'graphql';
 
 import { TeamType } from '../types';
 import { team } from '../../services';
@@ -14,9 +15,12 @@ export default {
     startDate: { type: GraphQLString },
     endDate: { type: GraphQLString },
     status: { type: GraphQLString },
+    isPublish: { type: GraphQLBoolean },
     picture: { type: GraphQLString },
+    description: { type: GraphQLString },
   },
-  resolve: async (_, args: updateTeamType) => {
-    return await team.updateTeam(args);
+  resolve: async (_, args: updateTeamType, request: RequestWithUserInfo) => {
+    const { email } = request.user;
+    return await team.updateTeam(email, args);
   },
 };

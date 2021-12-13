@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef } from 'react';
-import { Menu, Button, Tabs, Skeleton, Table, notification, Modal, Select } from 'antd';
-import { ExclamationCircleOutlined, UserDeleteOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Menu, Button, Tabs, Skeleton, Table, notification, Modal, Select, Avatar } from 'antd';
+import { ExclamationCircleOutlined, EditFilled, UserDeleteOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import { format } from 'date-fns';
@@ -12,6 +12,7 @@ import AddMembersModal from './addMemberModal';
 import { MemberQueries, TeamQueries } from '../../grapql-client/queries';
 import { MemberMutations, TeamMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
+import EditTeamDetailModal from './editTeamDetailModal';
 
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;
@@ -23,7 +24,8 @@ type Props = {
 };
 
 const TeamDetail = ({ teamId }: Props) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isVisibleAddMemModal, setIsVisibleAddMemModal] = useState(false);
+  const [isVisibleEditDetails, setIsVisibleEditDetails] = useState(false);
   const [activeKey, setActiveKey] = useState('1');
   const me = useContext(SelfContext);
   const history = useHistory();
@@ -32,34 +34,9 @@ const TeamDetail = ({ teamId }: Props) => {
     variables: { teamId },
   });
 
-  const [addNewMember] = useMutation(MemberMutations.AddNewMember, {
-    refetchQueries: [
-      MemberQueries.getListMembers, // DocumentNode object parsed with gql
-      TeamQueries.getTeams,
-    ],
-  });
-
   const [deleteTeam] = useMutation(TeamMutations.deleteTeam, {
     refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
   });
-
-  const showNotification = (data: any) => {
-    const { success, errors } = data;
-    success.map((suc: string) => {
-      notification.success({
-        message: 'Added Successfully',
-        description: suc,
-        placement: 'bottomLeft',
-      });
-    });
-    errors.map((error: string) => {
-      notification.error({
-        message: 'Added failed',
-        description: error,
-        placement: 'bottomLeft',
-      });
-    });
-  };
 
   const operations = (
     <>
@@ -74,9 +51,9 @@ const TeamDetail = ({ teamId }: Props) => {
               icon: <ExclamationCircleOutlined />,
               centered: true,
               okText: 'Delete',
-              onOk() {
-                deleteTeam({ variables: { teamId } });
-                history.push('/workspace');
+              onOk: async () => {
+                await deleteTeam({ variables: { teamId } });
+                history.push('/teams');
               },
               onCancel() {
                 console.log('Cancel');
@@ -86,25 +63,27 @@ const TeamDetail = ({ teamId }: Props) => {
         >
           Delete Team
         </Button>
-        <Button className="mr-10" icon={<PlusCircleOutlined />} size="middle" onClick={() => setIsModalVisible(true)}>
+        <Button
+          className="mr-10"
+          icon={<PlusCircleOutlined />}
+          size="middle"
+          onClick={() => setIsVisibleAddMemModal(true)}
+        >
           New Member
         </Button>
       </div>
     </>
   );
 
-  const handleOk = async (values: string[]) => {
-    console.log('my values', values);
-    const { data } = await addNewMember({ variables: { emailUsers: values, teamId } });
-    showNotification(data.addMember);
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
   const columns: ColumnsType<any> = [
+    {
+      title: 'Avatar',
+      dataIndex: 'user',
+      key: 'picture',
+      render: function UserPicture(user: any) {
+        return <Avatar src={user?.picture} />;
+      },
+    },
     {
       title: 'Name',
       dataIndex: 'user',
@@ -263,7 +242,7 @@ const TeamDetail = ({ teamId }: Props) => {
           <div>Data</div>
         </TabPane>
       </Tabs>
-      <AddMembersModal isVisible={isModalVisible} handleOk={handleOk} handleCancel={handleCancel} />
+      <AddMembersModal teamId={teamId} isVisible={isVisibleAddMemModal} setIsVisible={setIsVisibleAddMemModal} />
     </div>
   );
 };

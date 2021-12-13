@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, Layout } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 import DropDown from './components/DropDown';
 type Props = {
   email: string | null;
@@ -11,27 +12,17 @@ const { Header } = Layout;
 const TopNavBar = ({ email, picture }: Props) => {
   return (
     <>
-      {/* <div className="topNavBar">
-        <div style={{ display: 'flex', width: '100%' }}>
-          <div style={{ flexGrow: 1 }}>
-            <img height="50px" src="/logo.png" alt="wReflect Logo" />{' '}
-          </div>
-          <div style={{ flexGrow: 1, textAlign: 'right' }}>
-            <Avatar src={picture} size="large" />
-          </div>
-        </div>
-      </div> */}
-      <Header className="site-layout-background topNavBar" style={{ padding: 0, backgroundColor: '#fff' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div style={{ flexGrow: 1 }}>
-            <img height="50px" src="../../images/logo.png" alt="wReflect Logo" />{' '}
+      <Header className="topNavBar">
+        <div className="flex flex-1 flex-dir-r flex-jc-sa">
+          <div style={{ flexGrow: 1 }} className="titleLogo">
+            wReflect
           </div>
           <div style={{ flexGrow: 1, textAlign: 'right', marginRight: 10 }}>
             <span style={{ marginRight: '4px' }}>Hi, {`${email}`}</span>
             <Avatar className="avatarSetting" src={`${picture}`} size="default" />
           </div>
           <div style={{ marginRight: 20 }}>
-            <DropDown email={email} picture={picture}/>
+            <DropDown email={email} picture={picture} />
           </div>
         </div>
       </Header>

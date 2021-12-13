@@ -26,7 +26,7 @@ export type createTeamType = {
   name: string;
   startDate: string;
   endDate: string;
-  isPublic: boolean;
+  isPublish: boolean;
   description?: string;
   picture?: string;
 };
@@ -34,10 +34,10 @@ export type createTeamType = {
 export type updateTeamType = {
   id: number;
   name?: string;
-  ownerEmail?: string;
   startDate?: string;
   endDate?: string;
   status?: string;
+  isPublish?: boolean;
   picture?: string;
   description?: string;
 };

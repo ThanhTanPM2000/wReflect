@@ -91,10 +91,8 @@ export const findTeam = async (teamId: number, userId?: number) => {
   }
 };
 
-export const createTeam = async (request: RequestWithUserInfo, data: createTeamType) => {
+export const createTeam = async (email: string, userId: number, data: createTeamType) => {
   try {
-    const { email, id } = request.user;
-
     const startDate = data.startDate ? new Date(data.startDate) : new Date();
     const endDate = data.endDate ? new Date(data.endDate) : new Date();
 
@@ -105,7 +103,7 @@ export const createTeam = async (request: RequestWithUserInfo, data: createTeamT
     await prisma.member.create({
       data: {
         isOwner: true,
-        userId: id,
+        userId,
         teamId: newTeam.id,
       },
     });
@@ -117,14 +115,38 @@ export const createTeam = async (request: RequestWithUserInfo, data: createTeamT
   }
 };
 
-export const updateTeam = async (data: updateTeamType): Promise<Team | null> => {
+export const updateTeam = async (email: string, data: updateTeamType): Promise<Team | null> => {
   try {
-    const newTeam = prisma.team.update({
-      where: { id: data.id },
-      data: {
-        ...data,
+    const team = await prisma.team.findFirst({
+      where: {
+        ownerEmail: {
+          has: email,
+        },
+        id: data.id,
       },
     });
+
+    if (!team) throw new Error(`You are not the owner of Team ${data.id}`);
+
+    const startDate = data.startDate ? new Date(data.startDate) : undefined;
+    const endDate = data.endDate ? new Date(data.endDate) : undefined;
+
+    const newTeam = await prisma.team.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        description: data.description,
+        status: data.status,
+        isPublish: data.isPublish,
+        picture: data.picture,
+        startDate,
+        endDate,
+        ownerEmail: [email],
+      },
+    });
+
     return newTeam;
   } catch (error) {
     logger.error('Error in updateTeam service');

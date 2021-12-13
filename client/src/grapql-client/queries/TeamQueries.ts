@@ -12,7 +12,7 @@ const getTeam = gql`
       status
       picture
       numOfMember
-      isPublice
+      isPublish
       description
       members {
         isOwner
