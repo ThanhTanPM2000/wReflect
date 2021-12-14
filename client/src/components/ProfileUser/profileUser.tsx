@@ -126,29 +126,30 @@ const ProfileUser = ({ email, picture }: Props) => {
                   )}
                   <div>{email}</div>
                 </div>
-                <div style={{ fontSize: 18, right: '40%', marginTop: 20, position: 'relative', overflow: 'hidden' }}>
-                  <div>
-                    <p style={{ fontWeight: 'bold' }}>Work Palace</p>
-                    <p style={{ position: 'relative', left: 200 }}>{profile?.workplace}</p>
-                  </div>
-                  <hr style={{ width: 1000 }} />
-                  <div style={{ marginTop: 20 }}>
-                    <p style={{ fontWeight: 'bold', marginRight: '12px' }}>School</p>
-                    <p style={{ position: 'relative', left: 200 }}>{profile?.school}</p>
-                  </div>
-                  <hr style={{ width: 1000 }} />
-                  <div style={{ marginTop: 20 }}>
-                    <p style={{ fontWeight: 'bold', marginRight: '2px' }}>Gender</p>
-                    <p style={{ position: 'relative', left: 200 }}>{profile?.gender}</p>
-                  </div>
-                  <hr style={{ width: 1000 }} />
-                  <div style={{ marginTop: 20 }}>
-                    <p style={{ fontWeight: 'bold', marginLeft: '25px' }}>Phone Number</p>
-                    <p style={{ position: 'relative', left: 200 }}>{profile?.phoneNumbers}</p>
-                  </div>
-                  <hr style={{ width: 1000 }} />
-                </div>
               </div>
+              <Row gutter={16} style={{ fontWeight: 'bold' }}>
+                <Col span={12}>
+                  <Card title="Work Palace" bordered={false}>
+                    {profile?.workplace}
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card title="School" bordered={false} style={{ fontWeight: 'bold' }}>
+                    {profile?.school}
+                  </Card>
+                </Col>
+                <Col span={16}><hr style={{width: 540}}/></Col>
+                <Col span={12}>
+                  <Card title="Gender" bordered={false} style={{ fontWeight: 'bold' }}>
+                    {profile?.gender}
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card title="Phone Number" bordered={false} style={{ fontWeight: 'bold' }}>
+                    {profile?.phoneNumbers}
+                  </Card>
+                </Col>
+              </Row>
               <div className="flex flex-ai-c flex-jc-c">
                 <Button type="primary" onClick={showModal} shape="round" icon={<EditFilled />} size="large">
                   Edit Detail
@@ -271,20 +272,20 @@ const ProfileUser = ({ email, picture }: Props) => {
         }}
       >
         <Tabs style={{ flex: 2 }} type="card" className="tab-inner">
-          <TabPane tab="Introduce" key="1" className="flex flex-1" style={{ overflow: 'hidden'}}>
-            <div>
+          <TabPane tab="Introduce" key="1" className="flex flex-1">
+            <div style={{ overflowX: 'hidden', overflowY: 'scroll', height: 650 }}>
               <Row gutter={16}>
-                <Col span={8}>
+                <Col span={24}>
                   <Card title="Introduction" bordered={false}>
                     {profile?.introduction}
                   </Card>
                 </Col>
-                <Col span={8}>
+                <Col span={24}>
                   <Card title="Talents" bordered={false}>
                     {profile?.talents}
                   </Card>
                 </Col>
-                <Col span={8}>
+                <Col span={24}>
                   <Card title="Interests" bordered={false}>
                     {profile?.interests}
                   </Card>
