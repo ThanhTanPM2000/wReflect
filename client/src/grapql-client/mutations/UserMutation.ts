@@ -47,6 +47,7 @@ const updateUser = gql`
         interests
         createdAt
         updatedAt
+        phoneNumbers
       }
     }
   }

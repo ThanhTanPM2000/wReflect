@@ -209,7 +209,7 @@ const TeamDetail = ({ teamId }: Props) => {
       <div className="flex flex-2 flex-jc-sb" style={{ padding: 24, height: '100%' }}>
         <div className="flex flex-ai-c flex-jc-sb">
           <Avatar shape="square" size={250} src={data?.team?.picture}></Avatar>
-          <div className="nameTeam" style={{ marginTop: '25px' }}>
+          <div className="nameTeam" style={{ marginTop: '25px', height: 100, width: 500, overflow: 'hidden' }}>
             Team: {data?.team?.name}
           </div>
           <div>Description: {data?.team?.description}</div>

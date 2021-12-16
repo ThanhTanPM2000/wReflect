@@ -95,7 +95,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                     <Col
                       key={team.id}
                       className="flex"
-                      style={{ height: '100%', maxWidth: '500px', maxHeight: '200px' }}
+                      style={{ height: '100%', maxWidth: '500px', maxHeight: '200px', overflow: 'hidden' }}
                       span={(() => {
                         switch (data.teams.data.length) {
                           case 1:

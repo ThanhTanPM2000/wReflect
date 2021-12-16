@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
+import { Logout } from '../../../Logout';
 
 import { Menu, Dropdown, Modal, Input, Avatar, Upload, Button, message, Select } from 'antd';
 import {
@@ -86,13 +87,20 @@ const DropDown = ({ email, picture }: Props) => {
           Email
           <Input placeholder="Email User..." value={`${email}`} disabled />
         </div>
+        <div style={{ marginTop: 10 }}>
+          <a href="https://dev-m0ubghav.us.auth0.com/u/reset-password/request/Username-Password-Authentication?state=hKFo2SBrSEZsQ1lyTUxybV84UzVfQ0F4N0V0SC1mbGh3bF9SdKFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIG45WWFVelVyZmdDZjNDd3NHV3F0WnI2NldZNi1vNnY0o2NpZNkgMHpqbHh2d0taWDQ2aVVRWWMwQXJJcUUyOW9xdkh1U0w">
+            <Button>Change Password</Button>
+          </a>
+        </div>
       </Modal>
       <Menu.Divider />
       <Menu.Item key="4" icon={<SettingOutlined />}>
         Setting
       </Menu.Item>
       <Menu.Item key="5" icon={<LogoutOutlined />}>
-        LogOut
+        <Logout>
+          <>LogOut</>
+        </Logout>
       </Menu.Item>
     </Menu>
   );
