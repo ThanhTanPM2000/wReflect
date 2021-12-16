@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 const getTeam = gql`
-  query getTeam($teamId: Int) {
+  query getTeam($teamId: Int!, $searchText: String) {
     team(teamId: $teamId) {
       id
       name
@@ -14,7 +14,7 @@ const getTeam = gql`
       numOfMember
       isPublish
       description
-      members {
+      members(searchText: $searchText) {
         isOwner
         userId
         teamId
@@ -22,7 +22,7 @@ const getTeam = gql`
         assignedBy
         user {
           id
-          name
+          nickname
           email
           createdAt
           updatedAt

@@ -71,7 +71,11 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
           name="name"
           label="Team Name"
           initialValue={teamData?.name}
-          rules={[{ required: true, message: 'Please input team name' }]}
+          rules={[
+            { required: true, message: 'Please input your team name' },
+            { min: 5, message: 'Team name must be minimum 5 characters.' },
+            { max: 25, message: 'Team name must be maximum 25 characters.' },
+          ]}
         >
           <Input bordered placeholder="Input team name" type="text" name="name" defaultValue={teamData?.name} />
         </Form.Item>
@@ -80,7 +84,11 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
           hasFeedback
           label="Description"
           initialValue={teamData?.description}
-          rules={[{ required: true, message: 'Please input team description' }]}
+          rules={[
+            { required: true, message: 'Please input your team description' },
+            { min: 15, message: 'Team desciption must be minimum 15 characters.' },
+            { max: 100, message: 'Team name must be maximum 100 characters.' },
+          ]}
         >
           <TextArea
             bordered

@@ -33,15 +33,13 @@ const SearchBar = ({ searchTextDefault, placeholder, isLoading, onHandleSearch }
   return (
     <Search
       placeholder={placeholder}
-      enterButton="Search"
       bordered
-      autoFocus
       value={searchText}
       allowClear={true}
       loading={isLoading}
       onChange={(e) => handleOnChange(e)}
       onPressEnter={(e) => handleSearchChange(e.currentTarget.value)}
-      size="middle"
+      size="small"
       onSearch={handleSearchChange}
     />
   );

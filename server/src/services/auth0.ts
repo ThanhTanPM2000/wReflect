@@ -14,7 +14,7 @@ type DecodedJwt = {
   email: string;
   email_verified: boolean;
   name?: string;
-  nickname?: string;
+  nickname: string;
   sub: string;
   picture: string;
 };

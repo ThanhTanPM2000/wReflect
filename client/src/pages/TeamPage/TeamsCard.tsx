@@ -95,7 +95,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                     <Col
                       key={team.id}
                       className="flex"
-                      style={{ height: '100%', maxWidth: '500px', maxHeight: '200px', overflow: 'hidden' }}
+                      style={{ height: '100%', maxWidth: '500px', maxHeight: '200px' }}
                       span={(() => {
                         switch (data.teams.data.length) {
                           case 1:
@@ -127,7 +127,6 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                           <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team.id)}>
                             <div className="flex">
                               <Meta
-                                style={{ width: 400}}
                                 key={team.name}
                                 title={team.name}
                                 avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
@@ -141,8 +140,8 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                                       <Avatar
                                         style={{ marginRight: '3px' }}
                                         size="small"
-                                        key={member?.userId}
-                                        src={member?.user?.picture}
+                                        key={member.userId}
+                                        src={member.user.picture}
                                       />
                                     );
                                   })}

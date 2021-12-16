@@ -73,7 +73,11 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           name="teamName"
           hasFeedback
           label="Team Name"
-          rules={[{ required: true, message: 'Please input your team name' }]}
+          rules={[
+            { required: true, message: 'Please input your team name' },
+            { min: 5, message: 'Team name must be minimum 5 characters.' },
+            { max: 25, message: 'Team name must be maximum 25 characters.' },
+          ]}
         >
           <Input bordered placeholder="Input team name" type="text" name="name" />
         </Form.Item>
@@ -81,7 +85,11 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           name="teamDescription"
           hasFeedback
           label="Description"
-          rules={[{ required: true, message: 'Please input your team description' }]}
+          rules={[
+            { required: true, message: 'Please input your team description' },
+            { min: 15, message: 'Team desciption must be minimum 15 characters.' },
+            { max: 100, message: 'Team name must be maximum 100 characters.' },
+          ]}
         >
           <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>

@@ -22,7 +22,7 @@ export const login = async (req: Request, res: Response): Promise<void | Respons
     if (!isEmailVerified) {
       return res.send({ email, requiresEmailVerification: !isEmailVerified, picture });
     }
-    const user = await services.user.findOrCreateUserByEmail(email, picture);
+    const user = await services.user.findOrCreateUserByEmail(email, picture, nickname);
     const session = await services.session.createSession(user.id, config.SESSION_DURATION_MINUTES);
 
     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;

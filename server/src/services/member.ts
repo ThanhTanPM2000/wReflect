@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { sendMail } from './nodemailer/sentMail';
 import { Member } from '.prisma/client';
 
-export const getListMembers = async (data: getListMembersType, userId?: number) => {
+export const getListMembers = async (data: getListMembersType, searchText = '', userId?: number) => {
   try {
     const where = userId
       ? {
@@ -32,7 +32,27 @@ export const getListMembers = async (data: getListMembersType, userId?: number) 
       },
       select: {
         isPublish: true,
-        members: true,
+        members: {
+          where: {
+            user: {
+              OR: [
+                {
+                  email: {
+                    contains: searchText,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  nickname: {
+                    contains: searchText,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            },
+          },
+          orderBy: { isOwner: 'desc' },
+        },
       },
     });
 
@@ -85,9 +105,21 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
     const newEmail = _.filter(data.emailUsers, (email) => !currentMailsUser.includes(email));
     if (newEmail.length > 0) {
       await Promise.all(
-        newEmail.map((email) => {
+        newEmail.map(async (email) => {
           sendMail(email, `Invite to team ${data.teamId}`, `Someone invite you to team ${team.name} - ${team.id}`);
           success.push(`We have sent email invite to ${email}`);
+
+          const user = await prisma.user.create({
+            data: {
+              email: email,
+              nickname: 'Pending Invitation',
+              members: {
+                create: { teamId: team.id, assignedBy },
+              },
+            },
+          });
+
+          console.log(user);
         }),
       );
     }

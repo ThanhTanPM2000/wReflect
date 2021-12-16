@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { TweenOneGroup } from 'rc-tween-one';
-import { Form, notification, Button, FormInstance, Input, Tag, Modal } from 'antd';
+import { Form, notification, message, Button, FormInstance, Input, Tag, Modal } from 'antd';
 import { useMutation } from '@apollo/client';
 import { MemberMutations } from '../../grapql-client/mutations';
-import { MemberQueries, TeamQueries } from '../../grapql-client/queries';
+import { TeamQueries } from '../../grapql-client/queries';
 import _ from 'lodash';
 
 const validEmail = new RegExp('^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$');
@@ -17,18 +17,10 @@ type Props = {
 const showNotification = (data: any) => {
   const { success, errors } = data;
   success.map((suc: string) => {
-    notification.success({
-      message: 'Added Successfully',
-      description: suc,
-      placement: 'bottomLeft',
-    });
+    message.success(suc);
   });
   errors.map((error: string) => {
-    notification.error({
-      message: 'Added failed',
-      description: error,
-      placement: 'bottomLeft',
-    });
+    message.error(error);
   });
 };
 
@@ -38,10 +30,7 @@ const AddMembersModal = ({ teamId, isVisible, setIsVisible }: Props) => {
   const formRef = useRef<FormInstance>(null);
 
   const [addNewMember] = useMutation(MemberMutations.AddNewMember, {
-    refetchQueries: [
-      MemberQueries.getListMembers, // DocumentNode object parsed with gql
-      TeamQueries.getTeams,
-    ],
+    refetchQueries: [TeamQueries.getTeam],
   });
 
   const onAddEmail = (value: any) => {

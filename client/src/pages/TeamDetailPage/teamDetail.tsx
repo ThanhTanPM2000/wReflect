@@ -1,23 +1,22 @@
 import React, { useState, useContext, useRef } from 'react';
-import { Menu, Button, Tabs, Skeleton, Table, notification, Modal, Select, Avatar } from 'antd';
-import { ExclamationCircleOutlined, EditFilled, UserDeleteOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Menu, Button, Tabs, Skeleton, Dropdown, List, Modal, Avatar } from 'antd';
+import { ExclamationCircleOutlined, EditFilled, DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
-import { format } from 'date-fns';
-import { ColumnsType } from 'antd/lib/table';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useLazyQuery } from '@apollo/client';
 
-import { CaretDownFilled, PlusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, MoreOutlined } from '@ant-design/icons';
 import AddMembersModal from './addMemberModal';
-import { MemberQueries, TeamQueries } from '../../grapql-client/queries';
+import { TeamQueries } from '../../grapql-client/queries';
 import { MemberMutations, TeamMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
 import EditTeamDetailModal from './editTeamDetailModal';
 
+import ListMember from './listMember';
+import SearchBar from '../../components/SearchBar/SearchBar';
+
 const { TabPane } = Tabs;
-const { SubMenu } = Menu;
 const { confirm } = Modal;
-const { Option } = Select;
 
 type Props = {
   teamId: number;
@@ -26,6 +25,7 @@ type Props = {
 const TeamDetail = ({ teamId }: Props) => {
   const [isVisibleAddMemModal, setIsVisibleAddMemModal] = useState(false);
   const [isVisibleEditDetails, setIsVisibleEditDetails] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const [activeKey, setActiveKey] = useState('1');
   const me = useContext(SelfContext);
   const history = useHistory();
@@ -37,6 +37,10 @@ const TeamDetail = ({ teamId }: Props) => {
   const [deleteTeam] = useMutation(TeamMutations.deleteTeam, {
     refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
   });
+
+  const handleSearch = (searchText: string) => {
+    setSearchText(searchText);
+  };
 
   const operations = (
     <>
@@ -74,132 +78,6 @@ const TeamDetail = ({ teamId }: Props) => {
       </div>
     </>
   );
-
-  const columns: ColumnsType<any> = [
-    {
-      title: 'Avatar',
-      dataIndex: 'user',
-      key: 'picture',
-      render: function UserPicture(user: any) {
-        return <Avatar src={user?.picture} />;
-      },
-    },
-    {
-      title: 'Name',
-      dataIndex: 'user',
-      key: 'name',
-      render: (user: any) => {
-        return user.name;
-      },
-    },
-    {
-      title: 'Email',
-      align: 'center',
-      dataIndex: 'user',
-      key: 'email',
-      render: (user: any) => user.email,
-    },
-    {
-      title: 'Joined At',
-      dataIndex: 'joinedAt',
-      key: 'joinedAt',
-      render: function hello(joinedAt: any) {
-        return <>{format(new Date(+joinedAt), 'd MMM yyyy')}</>;
-      },
-    },
-    {
-      title: 'Assigned By',
-      dataIndex: 'assignedBy',
-      key: 'assignedBy',
-    },
-    {
-      title: 'Owner',
-      dataIndex: 'isOwner',
-      key: 'isOwner',
-      render: (isOwner: any) => {
-        return isOwner ? 'Yes' : 'No';
-      },
-    },
-  ];
-
-  if (data?.team?.ownerEmail.includes(me?.email)) {
-    columns.push({
-      title: '',
-      align: 'center',
-      key: 'tools',
-      render: (member: any) => {
-        const [isOwner, setIsOwner] = useState(member.isOwner);
-        const prevIsOwner = useRef(isOwner);
-
-        const [setRoleMember, { loading: setRoleLoading }] = useMutation(MemberMutations.SetRoleMember, {
-          refetchQueries: [TeamQueries.getTeam],
-        });
-
-        const [removeMember, { loading: removeLoading }] = useMutation(MemberMutations.RemoveMember, {
-          refetchQueries: [TeamQueries.getTeam],
-        });
-
-        const handleRemove = () => {
-          removeMember({
-            variables: { teamId, userId: member.user.id },
-          });
-        };
-
-        return (
-          <>
-            {member.isOwner && data.team.members.filter((member: any) => member.isOwner).length <= 1 ? (
-              <></>
-            ) : (
-              <>
-                <Select
-                  onSelect={(value: string) => setIsOwner(value === 'owner' ? true : false)}
-                  defaultValue={isOwner ? 'owner' : 'member'}
-                  style={{ width: 100, marginRight: '5px' }}
-                >
-                  <Option value="owner">Owner</Option>
-                  <Option value="member">Member</Option>
-                </Select>
-                <Button
-                  className="btn-delete-team mr-10"
-                  disabled={isOwner === prevIsOwner.current}
-                  loading={setRoleLoading}
-                  size="middle"
-                  onClick={() => {
-                    setRoleMember({ variables: { teamId, userId: member.user.id, isOwner } });
-                  }}
-                >
-                  Update
-                </Button>
-                <Button
-                  className="btn-delete-team mr-10"
-                  icon={<UserDeleteOutlined />}
-                  size="middle"
-                  loading={removeLoading}
-                  onClick={() => {
-                    confirm({
-                      title: 'Are you sure want to remove this member?',
-                      icon: <ExclamationCircleOutlined />,
-                      content: member.user.email,
-                      centered: true,
-                      okText: 'Remove',
-                      onOk() {
-                        handleRemove();
-                      },
-                      onCancel() {
-                        console.log('Cancel');
-                      },
-                    });
-                  }}
-                >
-                  Remove
-                </Button>
-              </>
-            )}
-          </>
-        );
-      },
-    });
-  }
 
   return (
     <div
@@ -255,22 +133,13 @@ const TeamDetail = ({ teamId }: Props) => {
             {loading ? (
               <Skeleton avatar paragraph={{ rows: 4 }} />
             ) : (
-              <Menu defaultSelectedKeys={['1']} mode="inline">
-                <SubMenu key="sub1" icon={<CaretDownFilled />} title="Owner">
-                  <Table
-                    rowKey={data?.team?.members.userId}
-                    dataSource={data?.team?.members.filter((member: any) => member.isOwner)}
-                    columns={columns}
-                  />
-                </SubMenu>
-                <SubMenu key="sub2" icon={<CaretDownFilled />} title="Member">
-                  <Table
-                    rowKey={data?.team?.members.userId}
-                    dataSource={data?.team?.members.filter((member: any) => !member.isOwner)}
-                    columns={columns}
-                  />
-                </SubMenu>
-              </Menu>
+              <>
+                <SearchBar onHandleSearch={handleSearch} isLoading={loading} placeholder="Find members" />
+                <ListMember
+                  team={data?.team}
+                  data={data?.team?.members.filter((member: any) => member?.user.email.includes(searchText))}
+                />
+              </>
             )}
           </TabPane>
           <TabPane tab="Setting" key="2" className="flex " style={{ overflow: 'auto' }}>

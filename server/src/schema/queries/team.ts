@@ -1,5 +1,5 @@
 import { RequestWithUserInfo } from './../../types';
-import { GraphQLInt } from 'graphql';
+import { GraphQLBoolean, GraphQLNonNull, GraphQLString, GraphQLInt } from 'graphql';
 import { TeamType } from '../types';
 import { team } from '../../services';
 
@@ -11,7 +11,7 @@ export default {
   type: TeamType,
   args: {
     teamId: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLInt),
     },
   },
   resolve: async (_, args: argument, request: RequestWithUserInfo) => {

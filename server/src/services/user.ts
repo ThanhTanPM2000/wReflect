@@ -2,14 +2,19 @@ import prisma from '../prisma';
 import logger from '../logger';
 import { updateUserType } from '../types';
 
-export const findOrCreateUserByEmail = async (email: string, picture: string) => {
+export const findOrCreateUserByEmail = async (email: string, picture: string, nickname: string) => {
   try {
     const user = await prisma.user.upsert({
       where: { email },
-      update: {},
+      update: {
+        email,
+        picture,
+        nickname,
+      },
       create: {
         email,
         picture,
+        nickname,
         profile: {
           create: {
             firstName: 'firstName',
