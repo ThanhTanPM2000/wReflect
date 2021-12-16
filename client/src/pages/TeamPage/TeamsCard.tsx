@@ -127,6 +127,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                           <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team.id)}>
                             <div className="flex">
                               <Meta
+                                style={{ width: 400}}
                                 key={team.name}
                                 title={team.name}
                                 avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
