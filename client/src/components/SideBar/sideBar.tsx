@@ -29,7 +29,6 @@ type Props = {
 const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
   const urlChangeIcon = window.location.pathname + window.location.search;
-  console.log(urlChangeIcon);
 
   return (
     <>
