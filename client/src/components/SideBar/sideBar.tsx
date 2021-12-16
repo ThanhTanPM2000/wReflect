@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { Menu, Layout } from 'antd';
 import { Link } from 'react-router-dom';
 import { Logout } from '../Logout';
@@ -14,6 +15,7 @@ import {
   CalendarOutlined,
   UsergroupDeleteOutlined,
   BarChartOutlined,
+  RollbackOutlined
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -26,6 +28,8 @@ type Props = {
 
 const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
+  const urlChangeIcon = window.location.pathname + window.location.search;
+  console.log(urlChangeIcon);
 
   return (
     <>
@@ -53,10 +57,16 @@ const SideBar = ({ email, isAdmin }: Props) => {
                   Settings
                 </Menu.Item>
               </>
-            ) : (
+            ) : urlChangeIcon === '/teams' ? (
               <>
                 <Menu.Item icon={<HomeOutlined />} style={{ marginTop: 20 }} key="/WorkSpace">
                   <Link to="/teams">Home</Link>
+                </Menu.Item>
+              </>
+            ) : (
+              <>
+                <Menu.Item icon={<RollbackOutlined />} style={{ marginTop: 20 }}>
+                  <Link to="/teams">Back</Link>
                 </Menu.Item>
                 <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
                   <Menu.Item key="3" icon={<PieChartOutlined />}>
