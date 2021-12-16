@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { Modal, Form, FormInstance, Input, DatePicker, Select, Button } from 'antd';
+import React, { useRef } from 'react';
+import { Modal, Avatar, Form, FormInstance, Upload, Input, DatePicker, Select, Button } from 'antd';
 import moment from 'moment';
 
 import { TeamMutations } from '../../grapql-client/mutations';
 import { TeamQueries } from '../../grapql-client/queries';
 import { useMutation } from '@apollo/client';
+
+import { UploadOutlined } from '@ant-design/icons';
 
 type Props = {
   teamData: any;
@@ -25,18 +27,16 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
 
   const handleFinish = () => {
     formRef.current?.validateFields().then(async (values: any) => {
-      console.log('????');
       const startDate = values['range-picker'] && values['range-picker'][0] ? values['range-picker'][0] : moment();
       const endDate = values['range-picker'] && values['range-picker'][1] ? values['range-picker'][1] : moment();
       const name = values['name'];
       const description = values['description'];
       const isPublish = values['select'] === 'public' ? true : false;
-      console.log(name, description);
+      const picture = values['upload']?.file?.response;
 
-      const { data } = await updateTeam({
-        variables: { id: teamData?.id, name, startDate, endDate, description, isPublish },
+      await updateTeam({
+        variables: { id: teamData?.id, name, picture, startDate, endDate, description, isPublish },
       });
-      console.log('my data is', data);
       setIsVisible(false);
     });
   };
@@ -53,7 +53,19 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
       }}
       onCancel={() => setIsVisible(false)}
     >
+      <Avatar shape="square" size={64} src={teamData?.picture} />
       <Form layout="vertical" ref={formRef}>
+        <Form.Item name="upload" label="Avatar" initialValue={teamData?.picture}>
+          <Upload
+            action="http://localhost:4000/api/upload"
+            name="photo"
+            multiple={false}
+            listType="picture"
+            maxCount={1}
+          >
+            <Button icon={<UploadOutlined />}>Upload</Button>
+          </Upload>
+        </Form.Item>
         <Form.Item
           hasFeedback
           name="name"

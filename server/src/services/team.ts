@@ -37,7 +37,11 @@ export const getListTeams = async (
       ...(!isGettingAll && { skip: (page - 1) * size }),
       ...(!isGettingAll && { take: size }),
       include: {
-        members: true,
+        members: {
+          include: {
+            user: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });

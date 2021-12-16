@@ -12,7 +12,13 @@ import { RequestWithUserInfo } from '../types';
 export const login = async (req: Request, res: Response): Promise<void | Response> => {
   try {
     const { body } = validators.login(req);
-    const { email, email_verified: isEmailVerified, picture } = await services.auth0.exchangeCodeForToken(body.code);
+    const {
+      email,
+      email_verified: isEmailVerified,
+      name,
+      nickname,
+      picture,
+    } = await services.auth0.exchangeCodeForToken(body.code);
     if (!isEmailVerified) {
       return res.send({ email, requiresEmailVerification: !isEmailVerified, picture });
     }
@@ -22,7 +28,8 @@ export const login = async (req: Request, res: Response): Promise<void | Respons
     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;
     setCookie('email', email, oneDayInMilliseconds, res);
     setCookie('token', session.token, oneDayInMilliseconds, res);
-    return res.send({ id: user.id, email, isAdmin: user.isAdmin, picture, status: user.status });
+    // return res.send({ id: user.id, email, isAdmin: user.isAdmin, picture, status: user.status });
+    return res.send(user);
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(StatusCodes.BAD_REQUEST).send(error.errors);

@@ -20,7 +20,7 @@ export const createSession = async (userId: number, sessionDurationMinutes: numb
 
 export const checkAndExtendSession = async (email: string, token: string): Promise<null | SanitizedUser> => {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { email },
     });
     if (!user) return null;

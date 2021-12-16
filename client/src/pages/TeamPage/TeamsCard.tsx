@@ -141,8 +141,8 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                                       <Avatar
                                         style={{ marginRight: '3px' }}
                                         size="small"
-                                        key={member.userId}
-                                        src={member.user.picture}
+                                        key={member?.userId}
+                                        src={member?.user?.picture}
                                       />
                                     );
                                   })}

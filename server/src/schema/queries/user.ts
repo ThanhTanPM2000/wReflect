@@ -1,4 +1,4 @@
-import { GraphQLInt } from 'graphql';
+import { GraphQLInt,  } from 'graphql';
 import { UserType } from '../types';
 import { user } from '../../services';
 
