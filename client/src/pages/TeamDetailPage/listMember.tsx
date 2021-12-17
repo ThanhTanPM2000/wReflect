@@ -28,7 +28,7 @@ export default function ListMember({ team, data }: Props) {
     refetchQueries: [TeamQueries.getTeam],
   });
   return (
-    <div>
+    <div style={{ overflowX: 'hidden', overflowY: 'scroll', height: 700}}>
       <List
         dataSource={data}
         renderItem={(member: any) => {

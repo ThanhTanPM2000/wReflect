@@ -184,36 +184,15 @@ ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
   display: none !important; }
 
 ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
-  margin: 20px 0px 0px 0px;
-  overflow-x: hidden;
-  overflow-y: auto; }
+  margin: 20px 0px 0px 0px; }
 
 .teamDetails .nameTeam {
   font-family: 'Poppins';
   font-size: 30px;
   font-style: "oblique"; }
 
-.profileUser .card-account {
-  background: #fff;
-  margin-top: 25px;
-  border-radius: 8px;
-  background-color: #fff;
-  padding: 24px; }
-
-.profileUser .bar, .profileUser .actions {
-  padding: 15px 2%;
-  border-top: 1px solid #e7eaea;
-  width: 60%; }
-
-.profileUser .actions {
-  position: relative; }
-
-.profileUser .ant-btn {
-  float: right;
-  width: auto; }
-
-.profileUser .ant-form-item {
-  margin-bottom: 0px; }
+.profileUser textarea {
+  resize: none !important; }
 
 .sidebar .ant-layout-logo {
   height: 32px;
