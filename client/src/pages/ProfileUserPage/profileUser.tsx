@@ -8,15 +8,10 @@ import SelfContext from '../../contexts/selfContext';
 
 import { UploadOutlined, EditFilled } from '@ant-design/icons';
 
-type Props = {
-  email: string | null;
-  picture: string | null;
-  name: string | null;
-};
 const { TextArea, Search } = Input;
 const { TabPane } = Tabs;
 
-const ProfileUser = ({ email, picture }: Props) => {
+const ProfileUser = () => {
   const me = useContext(SelfContext);
   const { loading, data } = useQuery(UserQueries.getUser, {
     variables: {
@@ -113,7 +108,7 @@ const ProfileUser = ({ email, picture }: Props) => {
               <div className="flex flex-ai-c flex-jc-sb">
                 <Avatar
                   className="avatarSetting"
-                  src={`${picture}`}
+                  src={`${me?.picture}`}
                   style={{ height: 150, width: 150, marginTop: 20 }}
                 />
                 <div style={{ marginTop: 20, fontSize: 20 }}>
@@ -124,7 +119,7 @@ const ProfileUser = ({ email, picture }: Props) => {
                       {profile?.firstName} {profile?.lastName}
                     </div>
                   )}
-                  <div>{email}</div>
+                  <div>{me?.email}</div>
                 </div>
               </div>
               <Row gutter={16} style={{ fontWeight: 'bold' }}>
@@ -162,7 +157,7 @@ const ProfileUser = ({ email, picture }: Props) => {
               <div style={{ alignItems: 'center', flex: 1 }}>
                 <Avatar
                   className="avatarSetting"
-                  src={`${picture}`}
+                  src={`${me?.picture}`}
                   style={{ height: 100, width: 100, marginLeft: 180 }}
                 />
               </div>

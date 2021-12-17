@@ -96,23 +96,14 @@ export const getUserById = async (userId: number) => {
   }
 };
 
-export const updateUser = async (userId: number, args: updateUserType) => {
+export const updateUser = async (userId: number, args: any) => {
   try {
-    const currentTime = new Date(Date.now());
     const user = await prisma.user.update({
       where: {
         id: userId,
       },
       data: {
-        profile: {
-          update: {
-            ...args,
-            updatedAt: currentTime,
-          },
-        },
-      },
-      include: {
-        profile: true,
+        picture: args?.picture,
       },
     });
 

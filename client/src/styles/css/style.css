@@ -1,7 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Poppins:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap");
 body {
   margin: 0;
-    margin-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans','Droid Sans', 'Helvetica Neue';
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
@@ -11,7 +12,8 @@ body, .ant-layout-sider {
   background-color: #ececec; }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Couries New', monospace; }
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased; }
 
 .flex {
   display: flex;
@@ -23,10 +25,14 @@ code {
     flex: 2; }
   .flex-3 {
     flex: 3; }
+  .flex-4 {
+    flex: 4; }
   .flex-5 {
     flex: 5; }
   .flex-6 {
     flex: 6; }
+  .flex-7 {
+    flex: 7; }
   .flex-11 {
     flex: 11; }
   .flex-jc-sb {
@@ -178,12 +184,36 @@ ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
   display: none !important; }
 
 ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
-  margin: 20px 0px 0px 0px; }
+  margin: 20px 0px 0px 0px;
+  overflow-x: hidden;
+  overflow-y: auto; }
 
 .teamDetails .nameTeam {
   font-family: 'Poppins';
   font-size: 30px;
   font-style: "oblique"; }
+
+.profileUser .card-account {
+  background: #fff;
+  margin-top: 25px;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 24px; }
+
+.profileUser .bar, .profileUser .actions {
+  padding: 15px 2%;
+  border-top: 1px solid #e7eaea;
+  width: 60%; }
+
+.profileUser .actions {
+  position: relative; }
+
+.profileUser .ant-btn {
+  float: right;
+  width: auto; }
+
+.profileUser .ant-form-item {
+  margin-bottom: 0px; }
 
 .sidebar .ant-layout-logo {
   height: 32px;

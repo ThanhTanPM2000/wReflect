@@ -31,6 +31,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 const client = new ApolloClient({
   uri: `${config.SERVER_BASE_URL}/graphql`,
   credentials: 'include',
+  connectToDevTools: true,
+  
   cache: new InMemoryCache({
     addTypename: true,
     typePolicies: {

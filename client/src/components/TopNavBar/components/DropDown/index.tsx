@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import { Logout } from '../../../Logout';
 
 import { Menu, Dropdown, Modal, Input, Avatar, Upload, Button, message, Select } from 'antd';
@@ -22,10 +23,6 @@ type Props = {
 const DropDown = ({ email, picture }: Props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
   const key = 'updatable';
   const handleOk = () => {
     setIsModalVisible(false);
@@ -40,7 +37,7 @@ const DropDown = ({ email, picture }: Props) => {
   };
   const history = useHistory();
   const redirect = () => {
-    history.push('/profileUser');
+    history.push('/me');
   };
   const props = {
     name: 'file',
@@ -63,16 +60,16 @@ const DropDown = ({ email, picture }: Props) => {
   const menu = (
     <Menu style={{ marginTop: '20px' }}>
       <Menu.Item key="0" icon={<SmileOutlined />}>
-        <a onClick={redirect}>My profile</a>
+        <Link to="/me">My Profile</Link>
       </Menu.Item>
       <Menu.Item key="1" icon={<TeamOutlined />}>
-        <a href="">My team</a>
+        <Link to="/">My team</Link>
       </Menu.Item>
       <Menu.Item key="2" icon={<StockOutlined />}>
         My Health Check
       </Menu.Item>
-      <Menu.Item key="3" icon={<UserOutlined />} onClick={showModal}>
-        Manage Acount
+      <Menu.Item key="3" icon={<UserOutlined />}>
+        <Link to="/account">Manage Acount</Link>
       </Menu.Item>
       <Modal title="Manage Account" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <div style={{ alignItems: 'center', flex: 1 }}>

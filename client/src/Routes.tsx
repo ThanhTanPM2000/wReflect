@@ -5,17 +5,15 @@ import { createBrowserHistory } from 'history';
 
 import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
-import { Header } from './components/Header';
 import { Me } from './types';
-import { newMember } from './pages/NewMember/newMember';
 import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
-import { ProfileUser } from './components/ProfileUser';
+import { AccountSetting } from './pages/AccountSettingPage';
 import { DashBoard } from './components/DashBoard';
 import { UserManagements } from './components/UserManagements';
-
-import workspaces from './store/workspaces';
+import { ProfileUser } from './pages/ProfileUserPage';
+import { NotFound } from './pages/NotFoundPage';
 
 type Props = {
   me: null | Me;
@@ -28,7 +26,6 @@ const Routes = ({ me }: Props): JSX.Element => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  const name = me?.name || null;
   const picture = me?.picture || null;
 
   return (
@@ -36,49 +33,44 @@ const Routes = ({ me }: Props): JSX.Element => {
       <Router history={customHistory}>
         <Switch>
           {!isLoggedIn ? (
-            <>
+            <Switch>
               <Route path="/" component={() => <HomePage email={email} picture={picture} />} />
-              {/* <HomePage /> */}
-              {/* </Route> */}
               <Redirect to="/" />
-            </>
+            </Switch>
           ) : (
-            <Route path="/">
+            <>
               <SideBar email={email} isAdmin={isAdmin} />
               <Layout className="site-layout">
                 <TopNavBar email={email} picture={picture} />
                 <Content style={{ margin: '10px 16px', height: '100%', overflow: 'auto' }}>
                   <Switch>
-                    <>
-                      {isAdmin ? (
-                        <>
-                          <Route path="/dashboard" component={DashBoard} />
-                          <Route path="/user-managements" component={UserManagements} />
-                          <Redirect to="/user-managements" />
-                        </>
-                      ) : (
-                        <>
-                          <Route exact path="/" component={Team} />
-                          <Route path="/teams" exact component={Team} />
-                          <Route
-                            path="/teams/:id"
-                            render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
-                          />
-                          <Route
-                            path="/profileUser"
-                            component={() => <ProfileUser email={email} picture={picture} name={name} />}
-                          />
-                          <Redirect from="/" exact to="/teams" />
-                        </>
-                      )}
-                    </>
+                    {/* <Route exact path="/" component={Team} /> */}
+                    {isAdmin ? (
+                      <Switch>
+                        <Route path="/dashboard" component={DashBoard} />
+                        <Route path="/user-managements" component={UserManagements} />
+                        <Redirect to="/user-managements" />
+                      </Switch>
+                    ) : (
+                      <Switch>
+                        <Route path="/teams" exact component={Team} />
+                        <Route
+                          path="/teams/:id"
+                          render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
+                        />
+                        <Route path="/me" component={ProfileUser} />
+                        <Route path="/account" component={AccountSetting} />
+                        <Redirect from="/" exact to="/teams" />
+                        <Route path="/not-found" component={NotFound} />
+                        <Redirect to="/not-found" />
+                      </Switch>
+                    )}
                   </Switch>
                 </Content>
                 <Footer style={{ textAlign: 'center', padding: '0 0' }}>wReflect ©2022</Footer>
               </Layout>
-            </Route>
+            </>
           )}
-          {/* <Header email={email} /> */}
         </Switch>
       </Router>
     </Layout>
