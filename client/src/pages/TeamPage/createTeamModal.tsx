@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { Modal, Form, Input, DatePicker, Upload, Button, Select } from 'antd';
+import { Modal, Form, Input, DatePicker, Upload, Button, Select, message, Space } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
 
@@ -15,10 +15,10 @@ type Props = {
   setIsVisible: (val: boolean) => void;
 };
 
-const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
+const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
 
-  const [addNewTeam] = useMutation(TeamMutations.AddNewTeam, {
+  const [addNewTeam] = useMutation(TeamMutations.addNewTeam, {
     refetchQueries: [
       TeamQueries.getTeams, // DocumentNode object parsed with gql
       'teams', // Query name
@@ -34,14 +34,23 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
 
   const onFinish = () => {
     form.validateFields().then(async (values: any) => {
+      console.log('all arguments ', values);
       const startDate = values['range-picker'] && values['range-picker'][0] ? values['range-picker'][0] : moment();
       const endDate = values['range-picker'] && values['range-picker'][1] ? values['range-picker'][1] : moment();
       const teamName = values['teamName'];
       const teamDescription = values['teamDescription'];
       const isPublic = values['select'] === 'public' ? true : false;
+      const picture = values['upload'][0]?.response;
 
       addNewTeam({
-        variables: { startDate, endDate, name: teamName, description: teamDescription, isPublic: isPublic },
+        variables: {
+          startDate,
+          endDate,
+          name: teamName,
+          description: teamDescription,
+          picture: picture,
+          isPublic: isPublic,
+        },
       });
       form.resetFields();
       setIsVisible(false);
@@ -64,7 +73,11 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
           name="teamName"
           hasFeedback
           label="Team Name"
-          rules={[{ required: true, message: 'Please input your name' }]}
+          rules={[
+            { required: true, message: 'Please input your team name' },
+            { min: 5, message: 'Team name must be minimum 5 characters.' },
+            { max: 25, message: 'Team name must be maximum 25 characters.' },
+          ]}
         >
           <Input bordered placeholder="Input team name" type="text" name="name" />
         </Form.Item>
@@ -72,13 +85,29 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
           name="teamDescription"
           hasFeedback
           label="Description"
-          rules={[{ required: true, message: 'Please input your name' }]}
+          rules={[
+            { required: true, message: 'Please input your team description' },
+            { min: 15, message: 'Team desciption must be minimum 15 characters.' },
+            { max: 100, message: 'Team name must be maximum 100 characters.' },
+          ]}
         >
           <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
-        <Form.Item name="upload" label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
-          <Upload name="logo" action="/upload.do" listType="picture">
-            <Button icon={<UploadOutlined />}>Click to upload</Button>
+        <Form.Item
+          rules={[{ required: true, message: 'Please input images' }]}
+          name="upload"
+          label="Upload"
+          valuePropName="file"
+          getValueFromEvent={normFile}
+        >
+          <Upload
+            action="http://localhost:4000/api/upload"
+            name="photo"
+            multiple={false}
+            listType="picture"
+            maxCount={1}
+          >
+            <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>
         </Form.Item>
         <Form.Item name="range-picker" label="RangePicker">
@@ -95,4 +124,4 @@ const TeamCreateModal = ({ isVisible, setIsVisible }: Props) => {
   );
 };
 
-export default TeamCreateModal;
+export default CreateTeamModal;

@@ -11,6 +11,6 @@ export default {
   },
   resolve: async (_, args: getListMembersType, request: RequestWithUserInfo) => {
     const { id, isAdmin } = request.user;
-    return await member.getListMembers(args, isAdmin ? undefined : id);
+    return await member.getListMembers(args, '', isAdmin ? undefined : id);
   },
 };

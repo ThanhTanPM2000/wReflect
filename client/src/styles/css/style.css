@@ -1,13 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Poppins:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap");
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans','Droid Sans', 'Helvetica Neue';
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow: hidden; }
 
+body, .ant-layout-sider {
+  background-color: #ececec; }
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Couries New', monospace; }
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased; }
 
 .flex {
   display: flex;
@@ -15,8 +21,18 @@ code {
   align-items: stretch; }
   .flex-1 {
     flex: 1; }
+  .flex-2 {
+    flex: 2; }
+  .flex-3 {
+    flex: 3; }
+  .flex-4 {
+    flex: 4; }
+  .flex-5 {
+    flex: 5; }
   .flex-6 {
     flex: 6; }
+  .flex-7 {
+    flex: 7; }
   .flex-11 {
     flex: 11; }
   .flex-jc-sb {
@@ -57,6 +73,10 @@ code {
 .ant-input {
   border-radius: 10px; }
 
+.ant-layout-header {
+  padding: 0 0 0 10px;
+  border-bottom-right-radius: 30px; }
+
 .ant-tabs-tabpane {
   overflow: auto; }
 
@@ -65,6 +85,22 @@ code {
 
 .ant-card-actions {
   border-radius: 10px; }
+
+.sider-trigger {
+  position: absolute;
+  top: 15px;
+  right: -25px;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  text-align: center;
+  color: #fff;
+  background: #404040;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer; }
+
+.anticon {
+  line-height: 25px; }
 
 .mb-10 {
   margin-bottom: 10px; }
@@ -111,11 +147,14 @@ code {
 .mr-12 {
   margin-right: 12px; }
 
-.ant-menu.ant-menu-dark .ant-menu-sub {
+.ant-menu.ant-menu-dark .ant-menu-sub, .ant-layout-sider-trigger {
   background: #a4a0f1; }
 
 .ant-layout-sider-children {
   background-color: #a4a0f1; }
+
+.ant-layout-sider-trigger {
+  border-bottom-right-radius: 30px; }
 
 span.ant-tabs-separator {
   display: none; }
@@ -125,9 +164,10 @@ span.ant-tabs-separator {
   margin-right: 15px; }
 
 .site-layout .site-layout-background {
-  background: #fff; }
+  background: #fff;
+  border-radius: 20px; }
 
-.ant-menu.ant-menu-dark {
+.ant-menu.ant-menu-dark, .ant-layout-sider-trigger {
   background-color: #a4a0f1; }
 
 .ant-upload.ant-upload-select.ant-upload-select-text {
@@ -144,4 +184,48 @@ ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
   display: none !important; }
 
 ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
-  margin: 20px 0px 0px 0px; }
+  margin: 20px 0px 0px 0px;
+  overflow-x: hidden;
+  overflow-y: auto; }
+
+.teamDetails .nameTeam {
+  font-family: 'Poppins';
+  font-size: 30px;
+  font-style: "oblique"; }
+
+.profileUser .card-account {
+  background: #fff;
+  margin-top: 25px;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 24px; }
+
+.profileUser .bar, .profileUser .actions {
+  padding: 15px 2%;
+  border-top: 1px solid #e7eaea;
+  width: 60%; }
+
+.profileUser .actions {
+  position: relative; }
+
+.profileUser .ant-btn {
+  float: right;
+  width: auto; }
+
+.profileUser .ant-form-item {
+  margin-bottom: 0px; }
+
+.sidebar .ant-layout-logo {
+  height: 32px;
+  background: #333;
+  border-radius: 6px;
+  margin: 16px; }
+
+.topNavBar {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  background-color: #fff; }
+  .topNavBar .titleLogo {
+    font-family: "Baloo Bhai";
+    font-size: 40px; }

@@ -22,7 +22,7 @@ export default {
   resolve: async (_, args: getListDataType, request: RequestWithUserInfo) => {
     const { id, isAdmin } = request.user;
     const { status, isGettingAll, search, page, size } = args;
-    const { data, total } = await team.getListTeams(
+  const { data, total } = await team.getListTeams(
       isAdmin ? undefined : id,
       status,
       !!isGettingAll,

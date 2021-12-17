@@ -11,10 +11,12 @@ export default {
     description: { type: GraphQLString },
     startDate: { type: new GraphQLNonNull(GraphQLString) },
     endDate: { type: new GraphQLNonNull(GraphQLString) },
-    isPublic: { type: GraphQLBoolean },
+    status: { type: GraphQLString },
+    isPublish: { type: GraphQLBoolean },
     picture: { type: GraphQLString },
   },
   resolve: async (_, args: createTeamType, request: RequestWithUserInfo) => {
-    return await team.createTeam(request, args);
+    const { email, id } = request.user;
+    return await team.createTeam(email, id, args);
   },
 };

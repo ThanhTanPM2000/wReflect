@@ -36,13 +36,7 @@ export const me = async (req: RequestWithUserInfo, res: Response): Promise<void 
     setCookie('email', email, oneDayInMilliseconds, res);
     setCookie('token', token, oneDayInMilliseconds, res);
 
-    return res.send({
-      email: sanitizedUser.email,
-      id: sanitizedUser.id,
-      isAdmin: sanitizedUser.isAdmin,
-      picture: sanitizedUser.picture,
-      status: sanitizedUser.status,
-    });
+    return res.send(sanitizedUser);
   } catch (err) {
     if (err instanceof ZodError) {
       return res.status(StatusCodes.BAD_REQUEST).send(err.errors);

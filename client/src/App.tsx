@@ -11,7 +11,7 @@ import { setUpdateLoginState, user } from './apis';
 import SelfContext from './contexts/selfContext';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:4000/graphql',
+  uri: `${config.SERVER_BASE_URL}/graphql`,
   credentials: 'include',
 });
 
@@ -31,6 +31,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 const client = new ApolloClient({
   uri: `${config.SERVER_BASE_URL}/graphql`,
   credentials: 'include',
+  connectToDevTools: true,
+  
   cache: new InMemoryCache({
     addTypename: true,
     typePolicies: {

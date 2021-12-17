@@ -22,7 +22,7 @@ CREATE TABLE "Team" (
     "status" TEXT NOT NULL DEFAULT E'Doing',
     "picture" TEXT NOT NULL DEFAULT E'https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_',
     "numOfMember" INTEGER NOT NULL DEFAULT 1,
-    "isPublic" BOOLEAN NOT NULL DEFAULT true,
+    "isPublish" BOOLEAN NOT NULL DEFAULT true,
     "description" TEXT,
 
     PRIMARY KEY ("id")

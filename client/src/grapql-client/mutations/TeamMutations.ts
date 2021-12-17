@@ -6,7 +6,7 @@ const addNewTeam = gql`
     $startDate: String!
     $endDate: String!
     $description: String
-    $isPublic: Boolean
+    $isPublish: Boolean
     $picture: String
   ) {
     createTeam(
@@ -14,7 +14,7 @@ const addNewTeam = gql`
       startDate: $startDate
       endDate: $endDate
       description: $description
-      isPublic: $isPublic
+      isPublish: $isPublish
       picture: $picture
     ) {
       id
@@ -25,6 +25,46 @@ const addNewTeam = gql`
       endDate
       status
       picture
+    }
+  }
+`;
+
+const updateTeam = gql`
+  mutation updateTeam(
+    $id: Int!
+    $name: String
+    $startDate: String
+    $endDate: String
+    $status: String
+    $picture: String
+    $description: String
+  ) {
+    updateTeam(
+      id: $id
+      name: $name
+      status: $status
+      startDate: $startDate
+      endDate: $endDate
+      picture: $picture
+      description: $description
+    ) {
+      id
+      name
+      ownerEmail
+      createdAt
+      startDate
+      endDate
+      status
+      picture
+      numOfMember
+      isPublish
+      description
+      members {
+        isOwner
+        userId
+        joinedAt
+        assignedBy
+      }
     }
   }
 `;
@@ -41,9 +81,9 @@ const deleteTeam = gql`
       status
       picture
       numOfMember
-      isPublice
+      isPublish
       description
     }
   }
 `;
-export { addNewTeam as AddNewTeam, deleteTeam };
+export { addNewTeam, updateTeam, deleteTeam };

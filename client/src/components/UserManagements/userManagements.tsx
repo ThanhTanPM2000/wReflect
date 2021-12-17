@@ -29,7 +29,7 @@ const UserManagements = () => {
       title: 'Avatar',
       dataIndex: 'picture',
       key: 'picture',
-      render: function Avater(picture: string) {
+      render: function UserPicture(picture: string) {
         return <Avatar src={picture} />;
       },
     },
