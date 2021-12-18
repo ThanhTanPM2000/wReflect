@@ -5,6 +5,7 @@ import { Card, Col, Avatar, Row, Pagination, Skeleton, notification, Empty } fro
 import { useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Member, Team } from '../../types';
 
 const { Meta } = Card;
 
@@ -90,7 +91,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
           <>
             <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
               <Row className="flex flex-dir-r" style={{ height: '100%' }} key={`row`} gutter={[16, 16]}>
-                {data.teams.data.map((team: any) => {
+                {data.teams.data.map((team: Team) => {
                   return (
                     <Col
                       key={team.id}
@@ -135,19 +136,19 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                             <div>
                               <div className="flex flex-dir-r flex-jc-sb">
                                 <div>
-                                  {team.members.map((member: any) => {
+                                  {team.members.map((member: Member) => {
                                     return (
                                       <Avatar
                                         style={{ marginRight: '3px' }}
                                         size="small"
-                                        key={member.userId}
-                                        src={member.user.picture}
+                                        key={member?.email}
+                                        src={member?.user?.profile?.picture}
                                       />
                                     );
                                   })}
                                 </div>
                                 <div>
-                                  <span>{`${team.members.length}`} members</span>
+                                  <span>{`${team?.members?.length}`} members</span>
                                 </div>
                               </div>
                             </div>

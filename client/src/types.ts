@@ -1,46 +1,71 @@
-export enum Status {
-  Done = 'Done',
-  InProgress = 'In Progress',
-  New = 'New',
-}
-
-export type WorkSpace = {
+export type Team = {
   id: number;
   name: string;
-};
-
-export type Project = {
-  id: number;
-  name: string;
-  description: string;
-  ownerEmail: string;
-  members: Member[];
+  ownerEmail: string[];
+  createdAt: Date;
   startDate: Date;
   endDate: Date;
-  status: string;
+  status: TeamStatus;
+  picture: string;
+  numOfMember: number;
+  isPublish: boolean;
+  description: string | null;
+  members: [Member];
 };
 
 export type Member = {
   id: number;
+  isOwner: boolean;
+  email: string | null;
+  teamId: number;
+  joinedAt: Date;
+  assignedBy: string | null;
+  status: MemberStatus;
+  user: User;
+  team: Team;
+};
+
+export type UserProfile = {
+  id: number;
   userId: number;
   name: string;
-  joinedAt: string;
+  picture: string;
+  nickname: string;
+  gender: string;
+  workplace: string | null;
+  address: string | null;
+  userStatus: UserOnlineStatus;
+  school: string | null;
+  introduction: string | null;
+  phoneNumber: string | null;
+  talents: string | null;
+  interests: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  user: User;
 };
+
+export type Session = {
+  id: number;
+  userId: number;
+  token: string;
+  expiresAt: Date;
+  data: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type MemberStatus = 'PENDING_INVITATION' | 'JOINED';
+export type UserOnlineStatus = 'ONLINE' | 'OFFLINE';
+export type TeamStatus = 'DOING' | 'DONE';
 
 export type User = {
   id: number;
-  name: string;
   email: string;
+  createdAt: Date;
+  updatedAt: Date;
   isAdmin: boolean;
-  createdAt: string;
-  updatedAt: string;
   status: string;
-};
-
-export type Me = {
-  id: number;
-  email: string;
-  name: string;
-  isAdmin: boolean;
-  picture: string | null;
+  profile: UserProfile;
+  members: [Member];
 };

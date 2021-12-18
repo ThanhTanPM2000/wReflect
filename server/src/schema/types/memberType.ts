@@ -5,15 +5,17 @@ import { TeamType, UserType } from '.';
 const MemberType = new GraphQLObjectType({
   name: 'Member',
   fields: () => ({
+    id: { type: GraphQLString },
+    email: { type: GraphQLString },
     isOwner: { type: GraphQLBoolean },
-    userId: { type: GraphQLInt },
     teamId: { type: GraphQLInt },
     joinedAt: { type: GraphQLString },
     assignedBy: { type: GraphQLString },
+    status: { type: GraphQLString },
     user: {
       type: UserType,
       resolve: async (_) => {
-        return await user.getUserById(_.userId);
+        return await user.getUserById(_?.email || undefined);
       },
     },
     team: { type: TeamType },

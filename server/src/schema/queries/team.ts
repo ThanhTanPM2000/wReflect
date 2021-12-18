@@ -1,5 +1,5 @@
 import { RequestWithUserInfo } from './../../types';
-import { GraphQLBoolean, GraphQLNonNull, GraphQLString, GraphQLInt } from 'graphql';
+import { GraphQLNonNull, GraphQLInt } from 'graphql';
 import { TeamType } from '../types';
 import { team } from '../../services';
 
@@ -15,7 +15,7 @@ export default {
     },
   },
   resolve: async (_, args: argument, request: RequestWithUserInfo) => {
-    const { id, isAdmin } = request.user;
-    return await team.findTeam(args.teamId, isAdmin ? undefined : id);
+    const { email, isAdmin } = request.user;
+    return await team.findTeam(args.teamId, isAdmin ? undefined : email);
   },
 };

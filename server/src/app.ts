@@ -13,7 +13,6 @@ import config from './config';
 import schema from './schema';
 import apiRouter from './apiRouter';
 
-
 const app = express();
 
 app.use(
@@ -47,5 +46,5 @@ app.use(express.static('public'));
 const port = config.PORT || 4000;
 
 app.listen(port, () => {
-  logger.info(`server is listening on ${config.SERVER_URL}:${port}`);
+  logger.info(`server is listening on ${config.SERVER_URL}`);
 });

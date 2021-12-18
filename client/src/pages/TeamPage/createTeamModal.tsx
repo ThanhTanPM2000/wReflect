@@ -6,6 +6,7 @@ import { useMutation } from '@apollo/client';
 
 import { TeamMutations } from '../../grapql-client/mutations';
 import { TeamQueries } from '../../grapql-client/queries';
+import config from '../../config';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -40,7 +41,7 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
       const teamName = values['teamName'];
       const teamDescription = values['teamDescription'];
       const isPublic = values['select'] === 'public' ? true : false;
-      const picture = values['upload'][0]?.response;
+      const picture = values['upload'][0]?.response || values['upload'];
 
       addNewTeam({
         variables: {

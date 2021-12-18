@@ -41,11 +41,11 @@ const AccountSetting = () => {
             <div className="flex flex-3 flex-ai-c flex-jc-c" style={{ alignContent: 'center' }}>
               <Form.Item
                 rules={[{ required: true, message: 'Please input images' }]}
-                initialValue={me?.picture}
+                initialValue={me?.profile?.picture}
                 name="upload"
               >
                 <div className="flex flex-jc-c flex-ai-c">
-                  <Avatar size={64} src={me?.picture} icon={<UserOutlined />} />
+                  <Avatar size={64} src={me?.profile?.picture} icon={<UserOutlined />} />
                   <Upload
                     action="http://localhost:4000/api/upload"
                     name="photo"

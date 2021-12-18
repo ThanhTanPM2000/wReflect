@@ -10,7 +10,11 @@ Table Session {
   data String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  user User [not null]
+  user User
+
+  indexes {
+    (userId, token) [unique]
+  }
 }
 
 Table Team {
@@ -20,40 +24,12 @@ Table Team {
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
-  status String [not null, default: 'Doing']
-  picture String [not null, default: 'https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_']
+  status TeamStatus [not null, default: 'DOING']
+  picture String [not null]
   numOfMember Int [not null, default: 1]
   isPublish Boolean [not null, default: true]
   description String
   teamToken TeamToken [not null]
-  members Member [not null]
-}
-
-Table Member {
-  user User [not null]
-  team Team [not null]
-  isOwner Boolean [not null, default: false]
-  userId Int [not null]
-  teamId Int [not null]
-  joinedAt DateTime [default: `now()`, not null]
-  assignedBy String
-
-  indexes {
-    (userId, teamId) [unique]
-  }
-}
-
-Table User {
-  id Int [pk, increment]
-  email String [unique, not null]
-  nickname String [not null, default: 'Not set']
-  picture String [not null, default: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAMFBMVEXg4OC9vb3f39/Kysrc3Ny+vr7Q0NDHx8fNzc3ExMTU1NTV1dXY2NjBwcG6urrLy8vXjdnDAAAEKElEQVR4nO3d63KrIBQF4IAIBgXf/22P5GpbEwGVzfasb6bTv6zhoiCQywUAAAAAAAAAAAAAAAAAAAAAAABgiVTW6k5bqyR1UQ6gbOP8RAgR/rnGKuoi7ao3bcg251vTUxdrN/31d7xHyOs5Miq3nO+W0Z2grXaf890ydtQF3Eh+aKDzpsp6YFXtSr6gZdxSh4h8wUBd0FwqMqAQTGtRxjTRR0Pl2Rev0QGFuFIXNsfKY+Injg+N2FHmid9ok9JGA3bt1Ka00cBb6iIncokBhXDURU7Tp1bhVIm8JhqpvTBg1RPj32bmOL3Z6PRGymysMVl1aKiLHU+mj6SB4/N2qnIa6dRM+XTEITMhnze3rIFmSqipCx6tywooBJ8JxvkTNpkJG+qCRzt/HZ4/oc5MyGcszZg7BYzmT+d/p0lYKZ3jtGqaMwHmNQXOmx/yGWj+hzn++ddp0pdLmS1iTDLqkLrIiZLHGlbjTJC8VMNokeYhsScyemN7SVtRZLSS+JLUTvm10SDlsc/qYf8WPYni2AnvbGRCZs/6uT4qINsaDIb1mWLLZ6V7kTQrexMNy1H0B/tne/AsX8u4C77J7kNG33b8K/BO6oV9wt7ps+S7Ud30ivOMOf13HdOH/DdqsF1jjGk6O5wwHgAAAAAAAMBFymn2a3U3Nk1jpr8xXDswKHmGVYwwrzeu9Y/LBmarNEHrDOf5vhy0ccKvnnT2whk9sKvOYUz+BjzyWftW+iqydgyJq2bQYnPjcQlpt8R7hax2pV91m+M9Q1a5XDysfGRKDGlqG3f2zVdfRpW3n3TNtZa2Kse96+/Jj1W8CHz7Aro5YgVfUNe+Ym/OSP0VPGInwla0OxmS7r7IRXlnxsEt9BWRalufPOYZsYTmLqnMYyN5WoqA5WowINieWTYgwVmFpswg8+YLHzDNOE+xOWLR1xtZPF9QsivmHmXepmA7zTu4tV252RRNFRasxKLP+rlih0wzDzJvV2xPf+5x++1KzTLybhDaQ6lJRt4NQnsodafb+evw/GNp5FGY/RU8XFN8ZhGUnV1QDDZlr46keDMtvMZfvisWP+GWeWNZLorD7Id9j1kMOJYPWGw9+BaQaE244IowTcByEQlvPSkTkfRal9Wfr9jOE99bc/hwQ/bh6eXgT4g1XLife8FenCpurTnwS3ctZ/XVQeONr2ZDzVGrbxV0wbdh/wmjq6SFPsmdp/2+qWI71A/Dl18fS85XWwU+6L0G1baKZ8QStc9HqaaeIfQvtbk7+qrzBRvrsfp8gfp0W8tq9fG5DkRak7yp3Qtj63tAfKG0Wz0QNIvnXeXnLBYpa+IeH63h+8Oyt9NdX+pyqjuOp7p+kaq/H2Lzs98D9vcja/2pfvtYDb21WndaW9vzPXQIAAAAAAAAAAAAAAAAAAAAAAAAh/oHOVI0YSQb7ewAAAAASUVORK5CYII=']
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  isAdmin Boolean [not null, default: false]
-  status String [not null, default: 'NotInitiated']
-  session Session [not null]
-  profile UserProfile
   members Member [not null]
 }
 
@@ -69,19 +45,48 @@ Table TeamToken {
   team Team [not null]
 }
 
+Table Member {
+  id Int [pk, increment]
+  team Team [not null]
+  user User
+  isOwner Boolean [not null, default: false]
+  email String
+  teamId Int [not null]
+  joinedAt DateTime [default: `now()`, not null]
+  assignedBy String
+  status MemberStatus [not null, default: 'JOINED']
+
+  indexes {
+    (email, teamId) [unique]
+  }
+}
+
+Table User {
+  id Int [pk, increment]
+  email String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  isAdmin Boolean [not null, default: false]
+  status String [not null, default: 'NotInitiated']
+  session Session [not null]
+  profile UserProfile
+  members Member [not null]
+}
+
 Table UserProfile {
   id Int [pk, increment]
   User User [not null]
   userId Int [not null]
-  firstName String [not null]
-  lastName String [not null]
+  name String [not null, default: 'Unknown']
+  nickname String [not null, default: 'Unknown']
+  picture String [not null]
   gender String [not null, default: 'Unspecified']
   workplace String
-  userStatus String [default: 'online']
+  address String
+  userStatus UserOnlineStatus [not null, default: 'OFFLINE']
   school String
   introduction String
-  phoneNumber String [not null]
-  photos String [not null]
+  phoneNumber String
   talents String
   interests String
   createdAt DateTime [default: `now()`, not null]
@@ -92,12 +97,27 @@ Table UserProfile {
   }
 }
 
+Enum TeamStatus {
+  DOING
+  DONE
+}
+
+Enum MemberStatus {
+  PENDING_INVITATION
+  JOINED
+}
+
+Enum UserOnlineStatus {
+  ONLINE
+  OFFLINE
+}
+
 Ref: Session.userId > User.id
 
-Ref: Member.userId > User.id
+Ref: TeamToken.teamId > Team.id
 
 Ref: Member.teamId > Team.id
 
-Ref: TeamToken.teamId > Team.id
+Ref: Member.email > User.email
 
 Ref: UserProfile.userId - User.id

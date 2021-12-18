@@ -7,9 +7,10 @@ import { TeamQueries } from '../../grapql-client/queries';
 import { useMutation } from '@apollo/client';
 
 import { UploadOutlined } from '@ant-design/icons';
+import { Team } from '../../types';
 
 type Props = {
-  teamData: any;
+  teamData: Team;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
 };
@@ -90,13 +91,7 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
             { max: 100, message: 'Team name must be maximum 100 characters.' },
           ]}
         >
-          <TextArea
-            bordered
-            placeholder="Description of the team"
-            rows={4}
-            name="description"
-            defaultValue={teamData?.description}
-          />
+          <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
         <Form.Item
           name="range-picker"

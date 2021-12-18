@@ -5,7 +5,7 @@ import { createBrowserHistory } from 'history';
 
 import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
-import { Me } from './types';
+import { User } from './types';
 import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
@@ -16,7 +16,7 @@ import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 
 type Props = {
-  me: null | Me;
+  me: null | User;
 };
 
 const { Footer, Content } = Layout;
@@ -26,7 +26,7 @@ const Routes = ({ me }: Props): JSX.Element => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  const picture = me?.picture || null;
+  const picture = me?.profile?.picture || null;
 
   return (
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>

@@ -19,13 +19,9 @@ const TeamType = new GraphQLObjectType({
     description: { type: GraphQLString },
     members: {
       type: new GraphQLList(MemberType),
-      args: {
-        searchText: { type: GraphQLString },
-      },
       resolve: async (_, args, request: RequestWithUserInfo) => {
-        const { id, isAdmin } = request.user;
-        const { searchText } = args;
-        return await member.getListMembers({ teamId: _.id }, searchText, isAdmin ? undefined : id);
+        const { email, isAdmin } = request.user;
+        return await member.getListMembers({ teamId: _.id }, isAdmin ? undefined : email);
       },
     },
   }),

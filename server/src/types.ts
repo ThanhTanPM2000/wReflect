@@ -1,5 +1,6 @@
 import { getListTeams } from './services/team';
 import { Request } from 'express';
+import { User, UserProfile } from '@prisma/client';
 
 export type SanitizedUser = {
   id: number;
@@ -10,7 +11,7 @@ export type SanitizedUser = {
 };
 
 export interface RequestWithUserInfo extends Request {
-  user: SanitizedUser;
+  user: User & { profile: UserProfile | null };
 }
 
 export type UserStatus = 'NotInitiated' | 'Initiated' | 'Completed';
@@ -55,12 +56,12 @@ export type addMemberToTeamType = {
 };
 
 export type removeMemberType = {
-  userId: number;
+  email: string;
   teamId: number;
 };
 
 export type setRoleMemberType = {
-  userId: number;
+  email: string;
   teamId: number;
   isOwner: boolean;
 };

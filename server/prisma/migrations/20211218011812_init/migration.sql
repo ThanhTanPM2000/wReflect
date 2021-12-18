@@ -1,3 +1,12 @@
+-- CreateEnum
+CREATE TYPE "TeamStatus" AS ENUM ('DOING', 'DONE');
+
+-- CreateEnum
+CREATE TYPE "MemberStatus" AS ENUM ('PENDING_INVITATION', 'JOINED');
+
+-- CreateEnum
+CREATE TYPE "UserOnlineStatus" AS ENUM ('ONLINE', 'OFFLINE');
+
 -- CreateTable
 CREATE TABLE "Session" (
     "id" SERIAL NOT NULL,
@@ -19,33 +28,11 @@ CREATE TABLE "Team" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
-    "status" TEXT NOT NULL DEFAULT E'Doing',
-    "picture" TEXT NOT NULL DEFAULT E'https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_',
+    "status" "TeamStatus" NOT NULL DEFAULT E'DOING',
+    "picture" TEXT NOT NULL,
     "numOfMember" INTEGER NOT NULL DEFAULT 1,
     "isPublish" BOOLEAN NOT NULL DEFAULT true,
     "description" TEXT,
-
-    PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Member" (
-    "isOwner" BOOLEAN NOT NULL DEFAULT false,
-    "userId" INTEGER NOT NULL,
-    "teamId" INTEGER NOT NULL,
-    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "assignedBy" TEXT
-);
-
--- CreateTable
-CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
-    "picture" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-    "status" TEXT NOT NULL DEFAULT E'NotInitiated',
 
     PRIMARY KEY ("id")
 );
@@ -65,18 +52,44 @@ CREATE TABLE "TeamToken" (
 );
 
 -- CreateTable
+CREATE TABLE "Member" (
+    "id" SERIAL NOT NULL,
+    "isOwner" BOOLEAN NOT NULL DEFAULT false,
+    "email" TEXT,
+    "teamId" INTEGER NOT NULL,
+    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "assignedBy" TEXT,
+    "status" "MemberStatus" NOT NULL DEFAULT E'JOINED',
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
+    "status" TEXT NOT NULL DEFAULT E'NotInitiated',
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "UserProfile" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
+    "name" TEXT NOT NULL DEFAULT E'Unknown',
+    "nickname" TEXT NOT NULL DEFAULT E'Unknown',
+    "picture" TEXT NOT NULL,
     "gender" TEXT NOT NULL DEFAULT E'Unspecified',
     "workplace" TEXT,
-    "userStatus" TEXT DEFAULT E'online',
+    "address" TEXT,
+    "userStatus" "UserOnlineStatus" NOT NULL DEFAULT E'OFFLINE',
     "school" TEXT,
     "introduction" TEXT,
-    "phoneNumber" TEXT[],
-    "photos" TEXT[],
+    "phoneNumber" TEXT,
     "talents" TEXT,
     "interests" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -89,7 +102,7 @@ CREATE TABLE "UserProfile" (
 CREATE INDEX "Session.expiresAt_index" ON "Session"("expiresAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Member.userId_teamId_unique" ON "Member"("userId", "teamId");
+CREATE UNIQUE INDEX "Member.email_teamId_unique" ON "Member"("email", "teamId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
@@ -104,13 +117,13 @@ CREATE UNIQUE INDEX "UserProfile.userId_unique" ON "UserProfile"("userId");
 ALTER TABLE "Session" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Member" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TeamToken" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Member" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TeamToken" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Member" ADD FOREIGN KEY ("email") REFERENCES "User"("email") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserProfile" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

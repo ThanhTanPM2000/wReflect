@@ -14,6 +14,7 @@ import EditTeamDetailModal from './editTeamDetailModal';
 
 import ListMember from './listMember';
 import SearchBar from '../../components/SearchBar/SearchBar';
+import { Member } from '../../types';
 
 const { TabPane } = Tabs;
 const { confirm } = Modal;
@@ -92,9 +93,14 @@ const TeamDetail = ({ teamId }: Props) => {
           </div>
           <div>Description: {data?.team?.description}</div>
           <div style={{ marginTop: '20px' }}>
-            {data?.team?.members.map((member: any) => {
+            {data?.team?.members.map((member: Member) => {
               return (
-                <Avatar style={{ marginRight: '3px' }} size="small" key={member.userId} src={member.user.picture} />
+                <Avatar
+                  style={{ marginRight: '3px' }}
+                  size="small"
+                  key={member?.email}
+                  src={member?.user?.profile?.picture}
+                />
               );
             })}
           </div>
@@ -135,10 +141,7 @@ const TeamDetail = ({ teamId }: Props) => {
             ) : (
               <>
                 <SearchBar onHandleSearch={handleSearch} isLoading={loading} placeholder="Find members" />
-                <ListMember
-                  team={data?.team}
-                  data={data?.team?.members.filter((member: any) => member?.user.email.includes(searchText))}
-                />
+                <ListMember searchText={searchText} teamData={data?.team} />
               </>
             )}
           </TabPane>

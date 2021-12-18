@@ -7,12 +7,12 @@ import { member } from '../../services';
 export default {
   type: MemberType,
   args: {
-    userId: { type: new GraphQLNonNull(GraphQLInt) },
+    email: { type: new GraphQLNonNull(GraphQLInt) },
     teamId: { type: new GraphQLNonNull(GraphQLInt) },
     isOwner: { type: new GraphQLNonNull(GraphQLBoolean) },
   },
   resolve: async (_, args: setRoleMemberType, request: RequestWithUserInfo) => {
-    const { email } = request.user;
-    return await member.setRoleMember(email, args);
+    const { email: ownerEmail } = request.user;
+    return await member.setRoleMember(ownerEmail, args);
   },
 };
