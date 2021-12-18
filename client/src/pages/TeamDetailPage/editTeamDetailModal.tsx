@@ -8,6 +8,7 @@ import { useMutation } from '@apollo/client';
 
 import { UploadOutlined } from '@ant-design/icons';
 import { Team } from '../../types';
+import config from '../../config';
 
 type Props = {
   teamData: Team;
@@ -58,7 +59,7 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
       <Form layout="vertical" ref={formRef}>
         <Form.Item name="upload" label="Avatar" initialValue={teamData?.picture}>
           <Upload
-            action="http://localhost:4000/api/upload"
+            action={`${config.SERVER_BASE_URL}/api/upload`}
             name="photo"
             multiple={false}
             listType="picture"

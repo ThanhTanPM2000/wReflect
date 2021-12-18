@@ -5,8 +5,7 @@ body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
-  overflow: hidden; }
+  min-height: 100vh; }
 
 body, .ant-layout-sider {
   background-color: #ececec; }
@@ -191,14 +190,39 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   font-size: 30px;
   font-style: "oblique"; }
 
+.profileUser .card-account {
+  background: #fff;
+  margin-top: 25px;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 24px; }
+
+.profileUser .bar, .profileUser .actions {
+  padding: 15px 2%;
+  border-top: 1px solid #e7eaea;
+  width: 60%; }
+
+.profileUser .actions {
+  position: relative; }
+
+.profileUser .ant-btn {
+  float: right;
+  width: auto; }
+
+.profileUser .ant-form-item {
+  margin-bottom: 0px; }
+
 .profileUser textarea {
   resize: none !important; }
 
-.sidebar .ant-layout-logo {
-  height: 32px;
-  background: #333;
-  border-radius: 6px;
-  margin: 16px; }
+.ant-layout-sider-collapsed {
+  overflow: "auto";
+  height: 100%;
+  width: 100%;
+  bacground-color: rgba(109, 121, 130, 0.3);
+  z-index: 100; }
+  .ant-layout-sider-collapsed.hihi {
+    position: fixed; }
 
 .topNavBar {
   display: flex;

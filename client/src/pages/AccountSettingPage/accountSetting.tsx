@@ -9,6 +9,7 @@ import SelfContext from '../../contexts/selfContext';
 
 import { UploadOutlined } from '@ant-design/icons';
 import { user } from '../../apis';
+import config from '../../config';
 
 const AccountSetting = () => {
   const me = useContext(SelfContext);
@@ -47,7 +48,7 @@ const AccountSetting = () => {
                 <div className="flex flex-jc-c flex-ai-c">
                   <Avatar size={64} src={me?.profile?.picture} icon={<UserOutlined />} />
                   <Upload
-                    action="http://localhost:4000/api/upload"
+                    action={`${config.SERVER_BASE_URL}/api/upload`}
                     name="photo"
                     multiple={false}
                     listType="picture"

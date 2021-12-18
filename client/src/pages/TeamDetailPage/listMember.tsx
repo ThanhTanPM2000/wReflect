@@ -30,7 +30,7 @@ export default function ListMember({ searchText, teamData }: Props) {
     refetchQueries: [TeamQueries.getTeam],
   });
   return (
-    <div style={{ overflowX: 'hidden', overflowY: 'scroll', height: 700}}>
+    <div style={{ overflowX: 'hidden', overflowY: 'scroll', height: 700 }}>
       <List
         dataSource={teamData?.members.filter((member: Member) => member?.email?.includes(searchText))}
         renderItem={(member: Member) => {

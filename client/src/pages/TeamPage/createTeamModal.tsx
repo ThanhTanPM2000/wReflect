@@ -18,6 +18,7 @@ type Props = {
 
 const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
+  const a = 1;
 
   const [addNewTeam] = useMutation(TeamMutations.addNewTeam, {
     refetchQueries: [
@@ -102,7 +103,7 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           getValueFromEvent={normFile}
         >
           <Upload
-            action="http://localhost:4000/api/upload"
+            action={`${config.SERVER_BASE_URL}/api/upload`}
             name="photo"
             multiple={false}
             listType="picture"

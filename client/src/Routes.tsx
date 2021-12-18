@@ -39,8 +39,9 @@ const Routes = ({ me }: Props): JSX.Element => {
             </Switch>
           ) : (
             <>
+              <div className="hihi" style={{ zIndex: '100' }}></div>
               <SideBar email={email} isAdmin={isAdmin} />
-              <Layout className="site-layout">
+              <Layout className="site-layout" style={{ marginLeft: '80px' }}>
                 <TopNavBar email={email} picture={picture} />
                 <Content style={{ margin: '10px 16px', height: '100%', overflow: 'auto' }}>
                   <Switch>
