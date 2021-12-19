@@ -38,7 +38,6 @@ const SideBar = ({ email, isAdmin }: Props) => {
           onMouseEnter={() => setIsCollapse(false)}
           onMouseLeave={() => setIsCollapse(true)}
           collapsible
-          style={{ position: 'fixed', height: '100%', zIndex: '102', backgroundColor: 'rgba(109, 121, 130, 0.3)' }}
           collapsed={isCollapse}
           onCollapse={(collapse) => setIsCollapse(collapse)}
         >

@@ -10,7 +10,6 @@ import { Team } from './pages/TeamPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { AccountSetting } from './pages/AccountSettingPage';
-import { DashBoard } from './components/DashBoard';
 import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
@@ -48,7 +47,6 @@ const Routes = ({ me }: Props): JSX.Element => {
                     {/* <Route exact path="/" component={Team} /> */}
                     {isAdmin ? (
                       <Switch>
-                        <Route path="/dashboard" component={DashBoard} />
                         <Route path="/user-managements" component={UserManagements} />
                         <Redirect to="/user-managements" />
                       </Switch>

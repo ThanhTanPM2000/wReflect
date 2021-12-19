@@ -12,7 +12,7 @@ const sessionManager = async (
   next: NextFunction,
 ): Promise<void | Response> => {
   try {
-    const PUBLIC_PATHS = ['/api/login', '/api/me', '/api/upload'];
+    const PUBLIC_PATHS = ['/api/login', '/api/me'];
     if (PUBLIC_PATHS.includes(req.path)) {
       next();
       return;

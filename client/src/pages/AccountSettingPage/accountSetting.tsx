@@ -22,7 +22,7 @@ const AccountSetting = () => {
 
   return (
     <div className="profileUser">
-      <div className="card-account">
+      <div className="card-wreflect">
         <div className="panelcont users row" style={{ padding: '0px', margin: '0px 0px 20px' }}>
           <h3 className="tname">Account Settings</h3>
         </div>

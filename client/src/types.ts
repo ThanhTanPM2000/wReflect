@@ -1,3 +1,8 @@
+export type Teams = {
+  data: [Team];
+  total: number;
+};
+
 export type Team = {
   id: number;
   name: string;

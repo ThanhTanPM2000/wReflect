@@ -2,11 +2,11 @@ import config from '../config';
 import logger from '../logger';
 import prisma from './../prisma';
 import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
-import { Team } from '.prisma/client';
+import { Team, TeamStatus } from '.prisma/client';
 
 export const getListTeams = async (
   email?: string,
-  status?: string,
+  status?: TeamStatus,
   isGettingAll = false,
   page = 1,
   size = 8,
@@ -26,10 +26,19 @@ export const getListTeams = async (
     const data = await prisma.team.findMany({
       where: {
         ...where,
-        name: {
-          contains: search,
-          mode: 'insensitive',
-        },
+        AND: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            status: {
+              equals: status,
+            },
+          },
+        ],
       },
       ...(!isGettingAll && { skip: (page - 1) * size }),
       ...(!isGettingAll && { take: size }),
@@ -132,7 +141,7 @@ export const updateTeam = async (email: string, data: updateTeamType): Promise<T
       data: {
         name: data.name,
         description: data.description,
-        // status: status,
+        // status: data.status,
         isPublish: data.isPublish,
         picture: data.picture,
         startDate,

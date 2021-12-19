@@ -61,7 +61,6 @@ const updateTeam = gql`
       description
       members {
         isOwner
-        userId
         joinedAt
         assignedBy
       }

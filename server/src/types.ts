@@ -1,4 +1,4 @@
-import { getListTeams } from './services/team';
+import { TeamStatus } from '.prisma/client';
 import { Request } from 'express';
 import { User, UserProfile } from '@prisma/client';
 
@@ -67,7 +67,7 @@ export type setRoleMemberType = {
 };
 
 export type getListDataType = {
-  status?: string;
+  status?: TeamStatus;
   isGettingAll?: boolean;
   search?: string;
   page?: number;

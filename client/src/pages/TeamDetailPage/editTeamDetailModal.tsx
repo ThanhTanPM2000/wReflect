@@ -62,6 +62,7 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
             action={`${config.SERVER_BASE_URL}/api/upload`}
             name="photo"
             multiple={false}
+            withCredentials={true}
             listType="picture"
             maxCount={1}
           >

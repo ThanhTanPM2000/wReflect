@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-import { useHistory } from 'react-router-dom';
 import 'antd/dist/antd.css';
 import { onError } from '@apollo/client/link/error';
 import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from } from '@apollo/client';
 
 import { User } from './types';
-import { notification } from 'antd';
+import { message, notification } from 'antd';
 import config from './config';
 import Routes from './Routes';
 import { setUpdateLoginState, user } from './apis';
 import SelfContext from './contexts/selfContext';
-import { NotFound } from './pages/NotFoundPage';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
@@ -20,22 +18,20 @@ const httpLink = new HttpLink({
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
-    graphQLErrors.forEach(({ message }) => {
-      notification.error({
-        message: `Notification`,
-        description: message,
-        placement: 'bottomLeft',
-      });
+    graphQLErrors.forEach(({ message: messageData }) => {
+      // notification.error({
+      //   message: `Notification`,
+      //   description: message,
+      //   placement: 'bottomLeft',
+      // });
+      message.error(`${messageData}`);
     });
 
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
 const client = new ApolloClient({
-  uri: `${config.SERVER_BASE_URL}/graphql`,
-  credentials: 'include',
   connectToDevTools: true,
-
   cache: new InMemoryCache({
     addTypename: true,
     typePolicies: {

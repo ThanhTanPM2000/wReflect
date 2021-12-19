@@ -37,10 +37,7 @@ export const checkAndExtendSession = async (
     const newExpiredAt = addMinutes(now, config.SESSION_DURATION_MINUTES);
     await prisma.session.update({
       where: {
-        userId_token: {
-          userId: user.id,
-          token: token,
-        },
+        id: user.id,
       },
       data: { expiresAt: newExpiredAt },
     });
