@@ -4,17 +4,18 @@ import prisma from '../prisma';
 import _ from 'lodash';
 
 import { sendMail } from './nodemailer/sentMail';
-import { Member } from '.prisma/client';
+import { Member, User } from '.prisma/client';
+import config from '../config';
 
-export const getListMembers = async (data: getListMembersType, searchText = '', userId?: number) => {
+export const getListMembers = async (data: getListMembersType, email?: string) => {
   try {
-    const where = userId
+    const where = email
       ? {
           OR: [
             {
               members: {
                 some: {
-                  userId,
+                  email,
                 },
               },
             },
@@ -33,24 +34,6 @@ export const getListMembers = async (data: getListMembersType, searchText = '', 
       select: {
         isPublish: true,
         members: {
-          where: {
-            user: {
-              OR: [
-                {
-                  email: {
-                    contains: searchText,
-                    mode: 'insensitive',
-                  },
-                },
-                {
-                  nickname: {
-                    contains: searchText,
-                    mode: 'insensitive',
-                  },
-                },
-              ],
-            },
-          },
           orderBy: { isOwner: 'desc' },
         },
       },
@@ -90,7 +73,7 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
 
     if (!team) throw new Error(`You are not the owner of Team ${data.teamId}`);
 
-    const currentUsers = await prisma.user.findMany({
+    const currentUsers: User[] = await prisma.user.findMany({
       where: {
         email: {
           in: data.emailUsers,
@@ -106,54 +89,70 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
     if (newEmail.length > 0) {
       await Promise.all(
         newEmail.map(async (email) => {
-          sendMail(email, `Invite to team ${data.teamId}`, `Someone invite you to team ${team.name} - ${team.id}`);
-          success.push(`We have sent email invite to ${email}`);
+          try {
+            sendMail(email, `Invite to team ${data.teamId}`, `Someone invite you to team ${team.name} - ${team.id}`);
+            success.push(`We have sent email invite to ${email}`);
 
-          const user = await prisma.user.create({
-            data: {
-              email: email,
-              nickname: 'Pending Invitation',
-              members: {
-                create: { teamId: team.id, assignedBy },
+            await prisma.user.create({
+              data: {
+                email: email,
+                members: {
+                  create: {
+                    teamId: team.id,
+                    assignedBy,
+                    status: 'PENDING_INVITATION',
+                  },
+                },
+                profile: {
+                  create: {
+                    picture: `${config.SERVER_URL}/uploads/avatarDefault.png`,
+                    nickname: 'Unknown',
+                    name: 'Unknown',
+                  },
+                },
               },
-            },
-          });
-
-          console.log(user);
+            });
+          } catch (error) {
+            errors.push(`Something failed with ${email}`);
+          }
         }),
       );
     }
     if (currentUsers.length > 0) {
       for (let idx = 0; idx < currentUsers.length; idx++) {
-        const member = await prisma.member.findUnique({
-          where: {
-            userId_teamId: {
-              teamId: data.teamId,
-              userId: currentUsers[idx].id,
-            },
-          },
-        });
-        if (member) {
-          errors.push(`${currentUsers[idx].email} already exists in this team`);
-        } else {
-          await prisma.member.create({
-            data: {
-              assignedBy,
-              userId: currentUsers[idx].id,
-              teamId: data.teamId,
-            },
-          });
-          prisma.team.update({
+        try {
+          const member = await prisma.member.findUnique({
             where: {
-              id: team.id,
-            },
-            data: {
-              numOfMember: {
-                increment: 1,
+              email_teamId: {
+                teamId: data.teamId,
+                email: currentUsers[idx].email,
               },
             },
           });
-          success.push(`${currentUsers[idx].email} added in this team`);
+          if (member) {
+            errors.push(`${currentUsers[idx].email} already exists in this team`);
+          } else {
+            await prisma.member.create({
+              data: {
+                assignedBy,
+                email: currentUsers[idx].email,
+                teamId: data?.teamId,
+              },
+            });
+            prisma.team.update({
+              where: {
+                id: team.id,
+              },
+              data: {
+                numOfMember: {
+                  increment: 1,
+                },
+              },
+            });
+            success.push(`${currentUsers[idx]?.email} added in this team`);
+          }
+        } catch (error) {
+          errors.push(`Something failed with ${currentUsers[idx]?.email}`);
         }
       }
     }
@@ -183,7 +182,7 @@ export const removeMember = async (ownerEmail: string, data: removeMemberType) =
 
     const members = await prisma.member.delete({
       where: {
-        userId_teamId: {
+        email_teamId: {
           ...data,
         },
       },
@@ -208,9 +207,9 @@ export const setRoleMember = async (ownerEmail: string, data: setRoleMemberType)
 
     const member = await prisma.member.update({
       where: {
-        userId_teamId: {
+        email_teamId: {
           teamId: data.teamId,
-          userId: data.userId,
+          email: data.email,
         },
       },
       data: {
@@ -222,15 +221,15 @@ export const setRoleMember = async (ownerEmail: string, data: setRoleMemberType)
       },
     });
 
-    const index = team.ownerEmail.indexOf(member.user.email);
-    if (index > -1) {
-      team.ownerEmail.splice(index, 1);
-    }
+    // const index = team.ownerEmail.indexOf(member?.user?.email);
+    // if (index > -1) {
+    //   team.ownerEmail.splice(index, 1);
+    // }
 
     const updateTeam = data.isOwner
       ? {
           ownerEmail: {
-            push: member.user.email,
+            push: member?.user?.email,
           },
         }
       : {

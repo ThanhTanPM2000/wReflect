@@ -1,7 +1,11 @@
 import { gql } from '@apollo/client';
 
+export type variables = {
+  $teamId: number;
+};
+
 const getTeam = gql`
-  query getTeam($teamId: Int!, $searchText: String) {
+  query getTeam($teamId: Int!) {
     team(teamId: $teamId) {
       id
       name
@@ -14,12 +18,13 @@ const getTeam = gql`
       numOfMember
       isPublish
       description
-      members(searchText: $searchText) {
+      members {
         isOwner
-        userId
+        email
         teamId
         joinedAt
         assignedBy
+        status
         user {
           id
           nickname
@@ -28,7 +33,14 @@ const getTeam = gql`
           updatedAt
           isAdmin
           status
-          picture
+          profile {
+            id
+            userId
+            name
+            nickname
+            gender
+            picture
+          }
         }
       }
     }
@@ -44,13 +56,18 @@ const getTeams = gql`
         description
         picture
         members {
-          userId
+          id
+          email
+          joinedAt
+          assignedBy
+          status
           isOwner
-          userId
           user {
             id
             email
-            picture
+            profile {
+              picture
+            }
           }
         }
       }

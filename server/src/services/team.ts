@@ -1,22 +1,23 @@
+import config from '../config';
 import logger from '../logger';
 import prisma from './../prisma';
 import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
-import { Team } from '.prisma/client';
+import { Team, TeamStatus } from '.prisma/client';
 
 export const getListTeams = async (
-  userId?: number,
-  status?: string,
+  email?: string,
+  status?: TeamStatus,
   isGettingAll = false,
   page = 1,
   size = 8,
   search = '',
 ) => {
   try {
-    const where = userId
+    const where = email
       ? {
           members: {
             some: {
-              userId,
+              email,
             },
           },
         }
@@ -25,24 +26,22 @@ export const getListTeams = async (
     const data = await prisma.team.findMany({
       where: {
         ...where,
-        name: {
-          contains: search,
-          mode: 'insensitive',
-        },
-        status: {
-          contains: status,
-          mode: 'insensitive',
-        },
+        AND: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            status: {
+              equals: status,
+            },
+          },
+        ],
       },
       ...(!isGettingAll && { skip: (page - 1) * size }),
       ...(!isGettingAll && { take: size }),
-      include: {
-        members: {
-          include: {
-            user: true,
-          },
-        },
-      },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -51,10 +50,6 @@ export const getListTeams = async (
         ...where,
         name: {
           contains: search,
-          mode: 'insensitive',
-        },
-        status: {
-          contains: status,
           mode: 'insensitive',
         },
       },
@@ -70,14 +65,14 @@ export const getListTeams = async (
   }
 };
 
-export const findTeam = async (teamId: number, userId?: number) => {
+export const findTeam = async (teamId: number, email?: string) => {
   try {
-    const where = userId
+    const where = email
       ? {
           id: teamId,
           members: {
             some: {
-              userId,
+              email,
             },
           },
         }
@@ -101,14 +96,18 @@ export const createTeam = async (email: string, userId: number, data: createTeam
     const endDate = data.endDate ? new Date(data.endDate) : new Date();
 
     const newTeam = await prisma.team.create({
-      data: { ...data, startDate, endDate, ownerEmail: [email] },
-    });
-
-    await prisma.member.create({
       data: {
-        isOwner: true,
-        userId,
-        teamId: newTeam.id,
+        picture: `${config.SERVER_URL}/uploads/teamDefault.png`,
+        ...data,
+        startDate,
+        endDate,
+        ownerEmail: [email],
+        members: {
+          create: {
+            isOwner: true,
+            email,
+          },
+        },
       },
     });
 
@@ -142,7 +141,7 @@ export const updateTeam = async (email: string, data: updateTeamType): Promise<T
       data: {
         name: data.name,
         description: data.description,
-        status: data.status,
+        // status: data.status,
         isPublish: data.isPublish,
         picture: data.picture,
         startDate,

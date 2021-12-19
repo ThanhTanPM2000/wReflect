@@ -1,5 +1,8 @@
+import { profile } from '../../services';
+import { RequestWithUserInfo } from './../../types';
 import { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLInt, GraphQLList } from 'graphql';
 import { MemberType, ProfileType } from '.';
+import { User } from '@prisma/client';
 
 const UserType = new GraphQLObjectType({
   name: 'User',
@@ -13,8 +16,15 @@ const UserType = new GraphQLObjectType({
     isAdmin: { type: GraphQLBoolean },
     status: { type: GraphQLString },
     members: { type: new GraphQLList(MemberType) },
-    picture: { type: GraphQLString },
-    profile: { type: ProfileType },
+    profile: {
+      type: ProfileType,
+      args: {
+        userId: { type: GraphQLInt },
+      },
+      resolve: async (_: User, args, request: RequestWithUserInfo) => {
+        return await profile.getUserProfile(_?.id);
+      },
+    },
   }),
 });
 

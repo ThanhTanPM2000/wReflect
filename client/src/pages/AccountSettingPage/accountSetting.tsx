@@ -9,6 +9,7 @@ import SelfContext from '../../contexts/selfContext';
 
 import { UploadOutlined } from '@ant-design/icons';
 import { user } from '../../apis';
+import config from '../../config';
 
 const AccountSetting = () => {
   const me = useContext(SelfContext);
@@ -21,7 +22,7 @@ const AccountSetting = () => {
 
   return (
     <div className="profileUser">
-      <div className="card-account">
+      <div className="card-wreflect">
         <div className="panelcont users row" style={{ padding: '0px', margin: '0px 0px 20px' }}>
           <h3 className="tname">Account Settings</h3>
         </div>
@@ -41,13 +42,13 @@ const AccountSetting = () => {
             <div className="flex flex-3 flex-ai-c flex-jc-c" style={{ alignContent: 'center' }}>
               <Form.Item
                 rules={[{ required: true, message: 'Please input images' }]}
-                initialValue={me?.picture}
+                initialValue={me?.profile?.picture}
                 name="upload"
               >
                 <div className="flex flex-jc-c flex-ai-c">
-                  <Avatar size={64} src={me?.picture} icon={<UserOutlined />} />
+                  <Avatar size={64} src={me?.profile?.picture} icon={<UserOutlined />} />
                   <Upload
-                    action="http://localhost:4000/api/upload"
+                    action={`${config.SERVER_BASE_URL}/api/upload`}
                     name="photo"
                     multiple={false}
                     listType="picture"

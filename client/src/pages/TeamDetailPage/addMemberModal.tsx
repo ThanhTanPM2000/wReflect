@@ -14,7 +14,12 @@ type Props = {
   setIsVisible: (isVisible: boolean) => void;
 };
 
-const showNotification = (data: any) => {
+type listStatusAddMembers = {
+  success: [string];
+  errors: [string];
+};
+
+const showNotification = (data: listStatusAddMembers) => {
   const { success, errors } = data;
   success.map((suc: string) => {
     message.success(suc);
@@ -26,7 +31,6 @@ const showNotification = (data: any) => {
 
 const AddMembersModal = ({ teamId, isVisible, setIsVisible }: Props) => {
   const [listEmails, setListEmails] = useState<string[]>([]);
-  // const formRef = React.createRef<FormInstance<any>>();
   const formRef = useRef<FormInstance>(null);
 
   const [addNewMember] = useMutation(MemberMutations.AddNewMember, {

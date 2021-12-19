@@ -15,7 +15,7 @@ import {
   CalendarOutlined,
   UsergroupDeleteOutlined,
   BarChartOutlined,
-  RollbackOutlined
+  RollbackOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;

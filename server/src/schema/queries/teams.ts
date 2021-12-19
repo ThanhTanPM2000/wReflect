@@ -20,10 +20,10 @@ export default {
     size: { type: GraphQLInt },
   },
   resolve: async (_, args: getListDataType, request: RequestWithUserInfo) => {
-    const { id, isAdmin } = request.user;
+    const { email, isAdmin } = request.user;
     const { status, isGettingAll, search, page, size } = args;
-  const { data, total } = await team.getListTeams(
-      isAdmin ? undefined : id,
+    const { data, total } = await team.getListTeams(
+      isAdmin ? undefined : email,
       status,
       !!isGettingAll,
       page,

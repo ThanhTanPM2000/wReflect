@@ -1,24 +1,29 @@
 import prisma from '../prisma';
 import logger from '../logger';
-import { updateUserType } from '../types';
 
-export const findOrCreateUserByEmail = async (email: string, picture: string, nickname: string) => {
+export const findOrCreateUserByEmail = async (email: string, picture: string, name, nickname: string) => {
   try {
     const user = await prisma.user.upsert({
       where: { email },
       update: {
         email,
-        picture,
-        nickname,
+        profile: {
+          update: {
+            nickname,
+            name,
+            picture,
+            userStatus: 'ONLINE',
+          },
+        },
       },
       create: {
         email,
-        picture,
-        nickname,
         profile: {
           create: {
-            firstName: 'firstName',
-            lastName: 'lastName',
+            name,
+            picture,
+            userStatus: 'ONLINE',
+            nickname,
           },
         },
       },
@@ -75,11 +80,12 @@ export const getListUsers = async (search = '', isGettingAll = false, page = 1, 
   }
 };
 
-export const getUserById = async (userId: number) => {
+export const getUserById = async (email?: string) => {
   try {
+    if (!email) return null;
     const user = await prisma.user.findUnique({
       where: {
-        id: userId,
+        email,
       },
       include: {
         members: true,
@@ -91,7 +97,7 @@ export const getUserById = async (userId: number) => {
 
     return user;
   } catch (error) {
-    logger.info('Error in getUserById service');
+    logger.error('Error in getUserById service');
     throw error;
   }
 };
@@ -103,12 +109,19 @@ export const updateUser = async (userId: number, args: any) => {
         id: userId,
       },
       data: {
-        picture: args?.picture,
+        profile: {
+          update: {
+            picture: args?.picture,
+          },
+        },
       },
     });
 
     if (!user) throw new Error('You dont have permission or user not found');
 
     return user;
-  } catch (error) {}
+  } catch (error) {
+    logger.error('Error in updateUser service');
+    throw error;
+  }
 };

@@ -7,15 +7,17 @@ body
 	-webkit-font-smoothing: antialiased
 	-moz-osx-font-smoothing: grayscale
 	min-height: 100vh
-	overflow: hidden
+	 
+
 
 body, .ant-layout-sider
-  	background-color: #ececec
+  	background-color: #f7f8fa
 
 code
 	font-family: 'Inter', sans-serif;
 	-webkit-font-smoothing: antialiased
 
+	
 
 .flex
 	display: flex
@@ -107,11 +109,22 @@ code
   line-height: 25px
   text-align: center
   color: #fff
-  background: #404040
+  background: #f7f8fa
   border-radius: 0 4px 4px 0
   cursor: pointer
 .anticon
 	line-height: 25px
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn
+  color: #a4a0f1
+  text-shadow: 0 0 0.25px currentColor
+
+.ant-tabs-tab:hover 
+.ant-spin
+  color: #a4a0f1
+
+.ant-spin-dot-item
+	background-color: #a4a0f1
 
 .mb
 	&-10
@@ -150,3 +163,11 @@ code
 		margin-right: 11px
 	&-12
 		margin-right: 12px
+
+.card-wreflect
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02), 0 2px 3px 0 rgba(0, 0, 0, 0.02), 0 2px 7px 0 rgba(0, 0, 0, 0.04);
+		background: #fff
+		margin-top: 25px
+		border-radius: 8px
+		background-color: #fff
+		padding: 24px

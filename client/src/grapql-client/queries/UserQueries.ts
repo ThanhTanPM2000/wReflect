@@ -25,26 +25,27 @@ const me = gql`
 `;
 
 const getUser = gql`
-  query getUser($userId: Int) {
-    user(userId: $userId) {
+  query getUser($email: String!) {
+    user(email: $email) {
       id
-      name
       email
       createdAt
       updatedAt
       isAdmin
       status
-      picture
       members {
+        id
+        email
         isOwner
         teamId
         joinedAt
         assignedBy
+        status
       }
       profile {
         id
-        firstName
-        lastName
+        name
+        nickname
         gender
         workplace
         userStatus
@@ -55,7 +56,6 @@ const getUser = gql`
         createdAt
         updatedAt
         phoneNumbers
-        photos
       }
     }
   }
@@ -72,7 +72,6 @@ const getUsers = gql`
         updatedAt
         isAdmin
         status
-        picture
       }
       total
     }

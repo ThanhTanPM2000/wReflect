@@ -7,9 +7,11 @@ import { TeamQueries } from '../../grapql-client/queries';
 import { useMutation } from '@apollo/client';
 
 import { UploadOutlined } from '@ant-design/icons';
+import { Team } from '../../types';
+import config from '../../config';
 
 type Props = {
-  teamData: any;
+  teamData: Team;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
 };
@@ -57,9 +59,10 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
       <Form layout="vertical" ref={formRef}>
         <Form.Item name="upload" label="Avatar" initialValue={teamData?.picture}>
           <Upload
-            action="http://localhost:4000/api/upload"
+            action={`${config.SERVER_BASE_URL}/api/upload`}
             name="photo"
             multiple={false}
+            withCredentials={true}
             listType="picture"
             maxCount={1}
           >
@@ -90,13 +93,7 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
             { max: 100, message: 'Team name must be maximum 100 characters.' },
           ]}
         >
-          <TextArea
-            bordered
-            placeholder="Description of the team"
-            rows={4}
-            name="description"
-            defaultValue={teamData?.description}
-          />
+          <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
         <Form.Item
           name="range-picker"

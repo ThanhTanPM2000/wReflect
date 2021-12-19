@@ -10,8 +10,8 @@ const addNewMember = gql`
 `;
 
 const removeMember = gql`
-  mutation removeMember($userId: Int!, $teamId: Int!) {
-    removeMember(userId: $userId, teamId: $teamId) {
+  mutation removeMember($email: String!, $teamId: Int!) {
+    removeMember(email: $email, teamId: $teamId) {
       isOwner
       userId
       teamId
@@ -22,8 +22,8 @@ const removeMember = gql`
 `;
 
 const setRoleMember = gql`
-  mutation setRoleMember($userId: Int!, $teamId: Int!, $isOwner: Boolean!) {
-    setRoleMember(userId: $userId, teamId: $teamId, isOwner: $isOwner) {
+  mutation setRoleMember($email: String!, $teamId: Int!, $isOwner: Boolean!) {
+    setRoleMember(email: $email, teamId: $teamId, isOwner: $isOwner) {
       isOwner
       userId
       teamId
