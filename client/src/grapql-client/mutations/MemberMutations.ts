@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 const addNewMember = gql`
-  mutation addMembers($emailUsers: [String], $teamId: Int) {
+  mutation addMembers($emailUsers: [String]!, $teamId: String!) {
     addMember(emailUsers: $emailUsers, teamId: $teamId) {
       success
       errors
@@ -10,25 +10,31 @@ const addNewMember = gql`
 `;
 
 const removeMember = gql`
-  mutation removeMember($email: String!, $teamId: Int!) {
-    removeMember(email: $email, teamId: $teamId) {
-      isOwner
+  mutation removeMember($memberId: String!) {
+    removeMember(memberId: $memberId) {
+      id
       userId
       teamId
+      isOwner
+      isPendingInvitation
+      isGuess
+      invitedBy
       joinedAt
-      assignedBy
     }
   }
 `;
 
 const setRoleMember = gql`
-  mutation setRoleMember($email: String!, $teamId: Int!, $isOwner: Boolean!) {
-    setRoleMember(email: $email, teamId: $teamId, isOwner: $isOwner) {
-      isOwner
+  mutation setRoleMember($memberId: String!, $isOwner: Boolean!) {
+    setRoleMember(memberId: $memberId, isOwner: $isOwner) {
+      id
       userId
       teamId
+      isOwner
+      isPendingInvitation
+      isGuess
+      invitedBy
       joinedAt
-      assignedBy
     }
   }
 `;

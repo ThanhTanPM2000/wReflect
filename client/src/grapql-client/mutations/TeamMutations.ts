@@ -1,12 +1,12 @@
 import { gql } from '@apollo/client';
 
-const addNewTeam = gql`
+const createTeam = gql`
   mutation createTeam(
     $name: String!
     $startDate: String!
     $endDate: String!
     $description: String
-    $isPublish: Boolean
+    $isPublic: Boolean
     $picture: String
   ) {
     createTeam(
@@ -14,39 +14,8 @@ const addNewTeam = gql`
       startDate: $startDate
       endDate: $endDate
       description: $description
-      isPublish: $isPublish
+      isPublic: $isPublic
       picture: $picture
-    ) {
-      id
-      name
-      description
-      ownerEmail
-      startDate
-      endDate
-      status
-      picture
-    }
-  }
-`;
-
-const updateTeam = gql`
-  mutation updateTeam(
-    $id: Int!
-    $name: String
-    $startDate: String
-    $endDate: String
-    $status: String
-    $picture: String
-    $description: String
-  ) {
-    updateTeam(
-      id: $id
-      name: $name
-      status: $status
-      startDate: $startDate
-      endDate: $endDate
-      picture: $picture
-      description: $description
     ) {
       id
       name
@@ -57,19 +26,60 @@ const updateTeam = gql`
       status
       picture
       numOfMember
-      isPublish
+      isPublic
       description
+    }
+  }
+`;
+
+const updateTeam = gql`
+  mutation updateTeam(
+    $id: String!
+    $name: String
+    $startDate: String
+    $endDate: String
+    $status: String
+    $picture: String
+    $isPublic: Boolean
+    $description: String
+  ) {
+    updateTeam(
+      id: $id
+      name: $name
+      status: $status
+      startDate: $startDate
+      endDate: $endDate
+      isPublic: $isPublic
+      picture: $picture
+      description: $description
+    ) {
+      id
+      name
+      ownerEmail
+      createdAt
+      startDate
+      endDate
+      picture
+      numOfMember
+      isPublic
+      description
+      status
       members {
+        id
+        userId
+        teamId
         isOwner
+        isPendingInvitation
+        isGuess
+        invitedBy
         joinedAt
-        assignedBy
       }
     }
   }
 `;
 
 const deleteTeam = gql`
-  mutation deleteTeam($teamId: Int) {
+  mutation deleteTeam($teamId: String!) {
     deleteTeam(teamId: $teamId) {
       id
       name
@@ -80,9 +90,9 @@ const deleteTeam = gql`
       status
       picture
       numOfMember
-      isPublish
+      isPublic
       description
     }
   }
 `;
-export { addNewTeam, updateTeam, deleteTeam };
+export { createTeam, updateTeam, deleteTeam };

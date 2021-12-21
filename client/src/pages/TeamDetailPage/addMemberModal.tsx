@@ -10,8 +10,6 @@ const validEmail = new RegExp('^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$');
 
 type Props = {
   teamId: number;
-  isVisible: boolean;
-  setIsVisible: (isVisible: boolean) => void;
 };
 
 type listStatusAddMembers = {
@@ -29,7 +27,7 @@ const showNotification = (data: listStatusAddMembers) => {
   });
 };
 
-const AddMembersModal = ({ teamId, isVisible, setIsVisible }: Props) => {
+const AddMembersModal = ({ teamId }: Props) => {
   const [listEmails, setListEmails] = useState<string[]>([]);
   const formRef = useRef<FormInstance>(null);
 
@@ -80,7 +78,6 @@ const AddMembersModal = ({ teamId, isVisible, setIsVisible }: Props) => {
   const handleDeleteData = () => {
     setListEmails([]);
     formRef.current?.resetFields();
-    setIsVisible(false);
   };
 
   const handleCreate = async () => {
@@ -89,57 +86,47 @@ const AddMembersModal = ({ teamId, isVisible, setIsVisible }: Props) => {
     const { data } = await addNewMember({ variables: { emailUsers: myListEmails, teamId } });
     showNotification(data.addMember);
     formRef.current?.resetFields();
-    setIsVisible(false);
   };
 
   return (
-    <Modal
-      destroyOnClose
-      centered
-      title="Add new members to team"
-      visible={isVisible}
-      onOk={handleCreate}
-      onCancel={handleDeleteData}
-    >
-      <Form onFinish={(value) => onAddEmail(value)} ref={formRef}>
-        <div className="flex flex-dir-r">
-          <Form.Item
-            style={{ flex: 1 }}
-            name="email"
-            rules={[
-              { required: true, message: 'Input is empty' },
-              { type: 'email', message: 'The input is not valid E-mail!' },
-            ]}
-          >
-            <Input allowClear autoFocus placeholder="Please input email to add member in Team" />
-          </Form.Item>
-          <Form.Item className="ml-10">
-            <Button htmlType="submit" size="middle" style={{ width: '100px' }} title="Add" type="primary">
-              Add
-            </Button>
-          </Form.Item>
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <TweenOneGroup
-            enter={{
-              scale: 0.8,
-              opacity: 0,
-              type: 'from',
-              duration: 100,
-            }}
-            onEnd={(e: any) => {
-              if (e?.type === 'appear' || e?.type === 'enter') {
-                e.target.style = 'display: inline-block';
-              }
-            }}
-            leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
-            appear={false}
-          >
-            {tagChild}
-          </TweenOneGroup>
-        </div>
-      </Form>
-    </Modal>
+    <Form onFinish={(value) => onAddEmail(value)} ref={formRef}>
+      <div className="flex flex-dir-r">
+        <Form.Item
+          style={{ flex: 1 }}
+          name="email"
+          rules={[
+            { required: true, message: 'Input is empty' },
+            { type: 'email', message: 'The input is not valid E-mail!' },
+          ]}
+        >
+          <Input allowClear autoFocus placeholder="Please input email to add member in Team" />
+        </Form.Item>
+        <Form.Item className="ml-10">
+          <Button htmlType="submit" size="middle" style={{ width: '100px' }} title="Add" type="primary">
+            Add
+          </Button>
+        </Form.Item>
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <TweenOneGroup
+          enter={{
+            scale: 0.8,
+            opacity: 0,
+            type: 'from',
+            duration: 100,
+          }}
+          onEnd={(e: any) => {
+            if (e?.type === 'appear' || e?.type === 'enter') {
+              e.target.style = 'display: inline-block';
+            }
+          }}
+          leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
+          appear={false}
+        >
+          {tagChild}
+        </TweenOneGroup>
+      </div>
+    </Form>
   );
 };
 

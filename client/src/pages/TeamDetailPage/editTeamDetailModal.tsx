@@ -103,7 +103,7 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
           <RangePicker defaultValue={[moment(+teamData?.startDate), moment(+teamData?.endDate)]} />
         </Form.Item>
         <Form.Item name="select" label="Select">
-          <Select defaultValue={teamData?.isPublish ? 'public' : 'private'}>
+          <Select defaultValue={teamData?.isPublic ? 'public' : 'private'}>
             <Select.Option value="private">Private</Select.Option>
             <Select.Option value="public">Public</Select.Option>
           </Select>

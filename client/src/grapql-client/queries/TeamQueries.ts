@@ -5,7 +5,7 @@ export type variables = {
 };
 
 const getTeam = gql`
-  query getTeam($teamId: Int!) {
+  query getTeam($teamId: String!) {
     team(teamId: $teamId) {
       id
       name
@@ -13,33 +13,42 @@ const getTeam = gql`
       createdAt
       startDate
       endDate
-      status
       picture
       numOfMember
-      isPublish
+      isPublic
       description
+      status
       members {
-        isOwner
-        email
+        id
+        userId
         teamId
+        isOwner
+        isPendingInvitation
+        isGuess
+        invitedBy
         joinedAt
-        assignedBy
-        status
         user {
           id
-          nickname
           email
           createdAt
           updatedAt
           isAdmin
-          status
+          userStatus
           profile {
             id
             userId
             name
             nickname
-            gender
             picture
+            workplace
+            address
+            school
+            introduction
+            talents
+            interests
+            createdAt
+            updatedAt
+            gender
           }
         }
       }
@@ -53,19 +62,36 @@ const getTeams = gql`
       data {
         id
         name
-        description
+        ownerEmail
+        createdAt
+        startDate
+        endDate
         picture
+        numOfMember
+        isPublic
+        description
+        status
         members {
           id
-          email
-          joinedAt
-          assignedBy
-          status
+          userId
+          teamId
           isOwner
+          isPendingInvitation
+          isGuess
+          invitedBy
+          joinedAt
           user {
             id
             email
+            createdAt
+            updatedAt
+            isAdmin
+            userStatus
             profile {
+              id
+              userId
+              name
+              nickname
               picture
             }
           }

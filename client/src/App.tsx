@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import 'antd/dist/antd.css';
 import { onError } from '@apollo/client/link/error';
 import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from } from '@apollo/client';
 
@@ -10,6 +9,8 @@ import config from './config';
 import Routes from './Routes';
 import { setUpdateLoginState, user } from './apis';
 import SelfContext from './contexts/selfContext';
+
+import './styles/less/ant.less';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
@@ -34,11 +35,6 @@ const client = new ApolloClient({
   connectToDevTools: true,
   cache: new InMemoryCache({
     addTypename: true,
-    typePolicies: {
-      teams: {
-        keyFields: ['id'],
-      },
-    },
   }),
   link: from([errorLink, httpLink]),
 });
@@ -62,7 +58,7 @@ const App = (): JSX.Element => {
   return (
     <ApolloProvider client={client}>
       <SelfContext.Provider value={me}>
-        <Routes me={me} />;
+        <Routes me={me} />
       </SelfContext.Provider>
     </ApolloProvider>
   );

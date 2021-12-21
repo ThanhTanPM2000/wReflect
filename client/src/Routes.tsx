@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { User } from './types';
 import { Team } from './pages/TeamPage';
+import { ManageMembers } from './pages/ManageMembersPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { AccountSetting } from './pages/AccountSettingPage';
@@ -41,7 +42,7 @@ const Routes = ({ me }: Props): JSX.Element => {
               <div className="hihi" style={{ zIndex: '100' }}></div>
               <SideBar email={email} isAdmin={isAdmin} />
               <Layout className="site-layout" style={{ marginLeft: '80px' }}>
-                <TopNavBar email={email} picture={picture} />
+                {/* <TopNavBar email={email} picture={picture} /> */}
                 <Content style={{ margin: '10px 16px', height: '100%', overflow: 'auto' }}>
                   <Switch>
                     {/* <Route exact path="/" component={Team} /> */}
@@ -53,9 +54,13 @@ const Routes = ({ me }: Props): JSX.Element => {
                     ) : (
                       <Switch>
                         <Route path="/teams" exact component={Team} />
-                        <Route
+                        {/* <Route
                           path="/teams/:id"
                           render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
+                        /> */}
+                        <Route
+                          path="/manage-members/:teamId"
+                          render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
                         />
                         <Route path="/me" component={ProfileUser} />
                         <Route path="/account" component={AccountSetting} />

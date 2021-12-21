@@ -11,6 +11,8 @@ type Props = {
 };
 
 export default function loading({ children, data, refetch, loading, error }: Props) {
+  console.log('error', error);
+
   return (
     <>
       {loading || error ? (

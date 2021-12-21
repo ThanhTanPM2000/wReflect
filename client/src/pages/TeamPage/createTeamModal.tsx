@@ -23,11 +23,8 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
   const [linkUpload, setLinkUpload] = useState('');
 
-  const [addNewTeam] = useMutation(TeamMutations.addNewTeam, {
-    refetchQueries: [
-      TeamQueries.getTeams, // DocumentNode object parsed with gql
-      'teams', // Query name
-    ],
+  const [addNewTeam] = useMutation(TeamMutations.createTeam, {
+    refetchQueries: [TeamQueries.getTeams],
   });
 
   const normFile = (e: any) => {

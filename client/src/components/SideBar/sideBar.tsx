@@ -11,11 +11,13 @@ import {
   StockOutlined,
   TeamOutlined,
   CarryOutOutlined,
+  TrophyOutlined,
   HomeOutlined,
   CalendarOutlined,
   UsergroupDeleteOutlined,
   BarChartOutlined,
   RollbackOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -28,7 +30,6 @@ type Props = {
 
 const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
-  const urlChangeIcon = window.location.pathname + window.location.search;
 
   return (
     <>
@@ -56,18 +57,15 @@ const SideBar = ({ email, isAdmin }: Props) => {
                   Settings
                 </Menu.Item>
               </>
-            ) : urlChangeIcon === '/teams' ? (
-              <>
-                <Menu.Item icon={<HomeOutlined />} style={{ marginTop: 20 }} key="/WorkSpace">
-                  <Link to="/teams">Home</Link>
-                </Menu.Item>
-              </>
             ) : (
               <>
-                <Menu.Item icon={<RollbackOutlined />} style={{ marginTop: 20 }}>
-                  <Link to="/teams">Back</Link>
+                <Menu.Item icon={<TrophyOutlined />} style={{ marginTop: 20 }} key="Teams">
+                  <Link to="/teams">Teams</Link>
                 </Menu.Item>
                 <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
+                  <Menu.Item icon={<TeamOutlined />} key="ManageMembers">
+                    <Link to="/manage-members">Members</Link>
+                  </Menu.Item>
                   <Menu.Item key="3" icon={<PieChartOutlined />}>
                     Board
                   </Menu.Item>
@@ -81,6 +79,9 @@ const SideBar = ({ email, isAdmin }: Props) => {
                     Manager
                   </Menu.Item>
                 </SubMenu>
+                <Menu.Item icon={<UserOutlined />} key="account">
+                  <Link to="/me">Account</Link>
+                </Menu.Item>
               </>
             )}
 

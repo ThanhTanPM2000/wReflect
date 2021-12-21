@@ -1,24 +1,23 @@
 import { gql } from '@apollo/client';
 
 const getListMembers = gql`
-  query getListMembers($teamId: Int!) {
+  query getListMembers($teamId: String!) {
     members(teamId: $teamId) {
       id
-      email
+      userId
       teamId
       isOwner
+      isPendingInvitation
+      isGuess
+      invitedBy
       joinedAt
-      assignedBy
-      status
       user {
+        id
         email
         createdAt
         updatedAt
         isAdmin
-        status
-        profile {
-          picture
-        }
+        userStatus
       }
     }
   }

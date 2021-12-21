@@ -4,55 +4,55 @@ export type Teams = {
 };
 
 export type Team = {
-  id: number;
+  id: string;
   name: string;
   ownerEmail: string[];
   createdAt: Date;
   startDate: Date;
   endDate: Date;
-  status: TeamStatus;
   picture: string;
   numOfMember: number;
-  isPublish: boolean;
+  isPublic: boolean;
   description: string | null;
+  status: TeamStatus;
   members: [Member];
 };
 
 export type Member = {
-  id: number;
+  id: string;
+  userId: string;
+  teamId: string;
   isOwner: boolean;
-  email: string | null;
-  teamId: number;
+  isPendingInvitation: boolean;
+  isGuess: boolean;
+  invitedBy: string | null;
   joinedAt: Date;
-  assignedBy: string | null;
-  status: MemberStatus;
+  role: string | null;
   user: User;
   team: Team;
 };
 
 export type UserProfile = {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   name: string;
-  picture: string;
   nickname: string;
-  gender: string;
+  picture: string;
   workplace: string | null;
   address: string | null;
-  userStatus: UserOnlineStatus;
   school: string | null;
   introduction: string | null;
-  phoneNumber: string | null;
   talents: string | null;
   interests: string | null;
   createdAt: Date;
   updatedAt: Date;
+  gender: Gender;
   user: User;
 };
 
 export type Session = {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   token: string;
   expiresAt: Date;
   data: string | null;
@@ -63,14 +63,16 @@ export type Session = {
 export type MemberStatus = 'PENDING_INVITATION' | 'JOINED';
 export type UserOnlineStatus = 'ONLINE' | 'OFFLINE';
 export type TeamStatus = 'DOING' | 'DONE';
+export type UserStatus = 'ONLINE' | 'OFFLINE';
+export type Gender = 'UNSPECIFIED' | 'MALE' | 'FEMALE';
 
 export type User = {
-  id: number;
+  id: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;
   isAdmin: boolean;
-  status: string;
+  userStatus: UserStatus;
   profile: UserProfile;
   members: [Member];
 };

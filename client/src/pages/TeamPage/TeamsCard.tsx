@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Card, Col, Avatar, Row, Pagination, Result, Button, Spin, Empty } from 'antd';
+import { Card, Col, Avatar, Row, Pagination } from 'antd';
 
 import { NetworkStatus, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
@@ -24,16 +24,14 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
   const history = useHistory();
   const [isVisibleAddModal, setVisibleModal] = useState(false);
 
-  const redirect = (value: number) => {
-    history.push(`/teams/${value}`);
+  const redirect = (value: string) => {
+    history.push(`/manage-members/${value}`);
   };
 
   const { error, data, loading, refetch, networkStatus } = useQuery(TeamQueries.getTeams, {
     variables: { status, isGettingAll: false, search: searchText, page, size },
-    fetchPolicy: 'cache-and-network', // Used for first execution
+    fetchPolicy: 'cache-first', // Used for first execution
     notifyOnNetworkStatusChange: true,
-
-    // errorPolicy: 'all',
   });
 
   useEffect(() => {
@@ -115,7 +113,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                                     <Avatar
                                       style={{ marginRight: '3px' }}
                                       size="small"
-                                      key={member?.email}
+                                      key={member?.user?.email}
                                       src={member?.user?.profile?.picture}
                                     />
                                   );

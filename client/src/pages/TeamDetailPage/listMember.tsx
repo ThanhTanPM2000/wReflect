@@ -20,6 +20,7 @@ type Props = {
 const { confirm } = Modal;
 
 export default function ListMember({ searchText, teamData }: Props) {
+  console.log('team data is', teamData);
   const me = useContext(SelfContext);
 
   const [setRoleMember] = useMutation(MemberMutations.SetRoleMember, {
@@ -30,13 +31,13 @@ export default function ListMember({ searchText, teamData }: Props) {
     refetchQueries: [TeamQueries.getTeam],
   });
   return (
-    <div style={{ overflowX: 'hidden', overflowY: 'scroll', height: 700 }}>
+    <div style={{ flex: '1', overflowX: 'hidden', overflowY: 'scroll', height: '100%' }}>
       <List
-        dataSource={teamData?.members.filter((member: Member) => member?.email?.includes(searchText))}
+        dataSource={teamData?.members.filter((member: Member) => member?.user?.email?.includes(searchText))}
         renderItem={(member: Member) => {
           const handleRemove = () => {
             removeMember({
-              variables: { teamId: teamData?.id, email: member?.email },
+              variables: { teamId: teamData?.id, email: member?.user?.email },
             })
               .then((res) => message.success(`${member?.user?.email} successfully removed`))
               .catch((error) => message.error(error.message));
@@ -83,7 +84,7 @@ export default function ListMember({ searchText, teamData }: Props) {
                 <Dropdown key="list-loadmore-edit" overlay={menu}>
                   <Button
                     type="text"
-                    hidden={member?.email === me?.email || !teamData?.ownerEmail.includes(me?.email as string)}
+                    hidden={member?.user?.email === me?.email || !teamData?.ownerEmail.includes(me?.email as string)}
                   >
                     <MoreOutlined />
                   </Button>
@@ -98,10 +99,10 @@ export default function ListMember({ searchText, teamData }: Props) {
                 }
                 // title={<a href="https://ant.design">{member?.  member?.user?.profile?.nickname || 'unknow'}</a>}
                 title={
-                  member?.status === 'JOINED' ? (
-                    <a href="https://ant.design">{member?.user?.profile?.nickname || 'Unknown'}</a>
-                  ) : (
+                  member?.isPendingInvitation ? (
                     'Pending Invitation'
+                  ) : (
+                    <a href="https://ant.design">{member?.user?.profile?.nickname || 'Unknown'}</a>
                   )
                 }
                 description={member?.user?.email}
