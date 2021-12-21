@@ -1,3 +1,4 @@
+import { getErrorCode } from './errorsManagement';
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
@@ -33,10 +34,10 @@ app.use(
   '/graphql',
   graphqlHTTP({
     schema,
-    // rootValue: root,
     graphiql: true,
-    customFormatErrorFn: (error: Error) => {
-      return { message: error.message };
+    customFormatErrorFn: (err: Error) => {
+      const error = getErrorCode(err.message);
+      return { message: error?.message, code: error?.code };
     },
   }),
 );

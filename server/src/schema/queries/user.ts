@@ -4,10 +4,15 @@ import { user } from '../../services';
 
 export default {
   type: UserType,
+  name: 'GetUser',
   args: {
-    email: { type: new GraphQLNonNull(GraphQLString) },
+    userId: { type: new GraphQLNonNull(GraphQLString) },
   },
-  resolve: async (_, args: { email: string }) => {
-    return await user.getUserById(args?.email || undefined);
+  resolve: async (_, args: { userId: string }) => {
+    try {
+      return await user.getUser(args.userId);
+    } catch (error) {
+      throw error;
+    }
   },
 };

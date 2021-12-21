@@ -23,6 +23,11 @@ export enum UserStatusEnum {
 
 export const apiPaths = ['/api', '/graphql'];
 
+export type customerError = {
+  message: string;
+  code: number;
+};
+
 export type createTeamType = {
   name: string;
   startDate: string;
@@ -33,12 +38,12 @@ export type createTeamType = {
 };
 
 export type updateTeamType = {
-  id: number;
+  id: string;
   name?: string;
   startDate?: string;
   endDate?: string;
   status?: string;
-  isPublish?: boolean;
+  isPublic?: boolean;
   picture?: string;
   description?: string;
 };
@@ -52,17 +57,16 @@ export type updateProfileType = {
 
 export type addMemberToTeamType = {
   emailUsers: string[];
-  teamId: number;
+  teamId: string;
 };
 
 export type removeMemberType = {
-  email: string;
-  teamId: number;
+  memberId: string;
 };
 
 export type setRoleMemberType = {
-  email: string;
-  teamId: number;
+  userId: string;
+  teamId: string;
   isOwner: boolean;
 };
 
@@ -75,7 +79,7 @@ export type getListDataType = {
 };
 
 export type getListMembersType = {
-  teamId: number;
+  teamId: string;
 };
 
 export type updateUserType = {

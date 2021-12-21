@@ -6,66 +6,30 @@ import _ from 'lodash';
 import { sendMail } from './nodemailer/sentMail';
 import { Member, User } from '.prisma/client';
 import config from '../config';
+import { errorName } from '../constant/errorsConstant';
 
-export const getListMembers = async (data: getListMembersType, email?: string) => {
+export const getListMembers = async (teamId?: string, userId?: string) => {
   try {
-    const where = email
-      ? {
-          OR: [
-            {
-              members: {
-                some: {
-                  email,
-                },
-              },
-            },
-            {
-              isPublish: true,
-            },
-          ],
-        }
-      : undefined;
-
-    const team = await prisma.team.findFirst({
+    const members = await prisma.member.findMany({
       where: {
-        ...where,
-        id: data.teamId,
-      },
-      select: {
-        isPublish: true,
-        members: {
-          orderBy: { isOwner: 'desc' },
-        },
+        teamId,
+        userId,
       },
     });
 
-    if (!team) throw new Error('Team not found');
-
-    const membersRoleOwner = <Member[]>[],
-      membersRoleNormal = <Member[]>[];
-    await Promise.all(
-      team.members.map((member) => {
-        if (member.isOwner) {
-          membersRoleOwner.push(member);
-        } else {
-          membersRoleNormal.push(member);
-        }
-      }),
-    );
-
-    return team.members;
+    return members;
   } catch (error) {
     logger.error('Error at getListMembers Service');
     throw error;
   }
 };
 
-export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeamType) => {
+export const addMembersToTeam = async (invitedBy: string, data: addMemberToTeamType) => {
   try {
     const team = await prisma.team.findFirst({
       where: {
         ownerEmail: {
-          has: assignedBy,
+          has: invitedBy,
         },
         id: data.teamId,
       },
@@ -99,8 +63,8 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
                 members: {
                   create: {
                     teamId: team.id,
-                    assignedBy,
-                    status: 'PENDING_INVITATION',
+                    invitedBy,
+                    isPendingInvitation: true,
                   },
                 },
                 profile: {
@@ -123,9 +87,9 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
         try {
           const member = await prisma.member.findUnique({
             where: {
-              email_teamId: {
+              userId_teamId: {
                 teamId: data.teamId,
-                email: currentUsers[idx].email,
+                userId: currentUsers[idx].id,
               },
             },
           });
@@ -134,8 +98,8 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
           } else {
             await prisma.member.create({
               data: {
-                assignedBy,
-                email: currentUsers[idx].email,
+                invitedBy,
+                userId: currentUsers[idx].id,
                 teamId: data?.teamId,
               },
             });
@@ -167,28 +131,20 @@ export const addMembersToTeam = async (assignedBy: string, data: addMemberToTeam
   }
 };
 
-export const removeMember = async (ownerEmail: string, data: removeMemberType) => {
+export const removeMember = async (ownerEmail: string, memberId: string) => {
   try {
-    const team = await prisma.team.findFirst({
+    const member = await prisma.member.deleteMany({
       where: {
-        ownerEmail: {
-          has: ownerEmail,
-        },
-        id: data.teamId,
-      },
-    });
-
-    if (!team) throw new Error(`You are not the owner of Team ${data.teamId}`);
-
-    const members = await prisma.member.delete({
-      where: {
-        email_teamId: {
-          ...data,
+        id: memberId,
+        team: {
+          ownerEmail: {
+            has: ownerEmail,
+          },
         },
       },
     });
-
-    return members;
+    if (!member) throw new Error(`You are not the owner of Team`);
+    return member;
   } catch (error) {}
 };
 
@@ -207,9 +163,9 @@ export const setRoleMember = async (ownerEmail: string, data: setRoleMemberType)
 
     const member = await prisma.member.update({
       where: {
-        email_teamId: {
+        userId_teamId: {
           teamId: data.teamId,
-          email: data.email,
+          userId: data.userId,
         },
       },
       data: {

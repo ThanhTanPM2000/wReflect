@@ -1,11 +1,12 @@
 import config from '../config';
 import logger from '../logger';
 import prisma from './../prisma';
-import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
+import { createTeamType, updateTeamType } from '../types';
 import { Team, TeamStatus } from '.prisma/client';
+import { errorName } from '../constant/errorsConstant';
 
-export const getListTeams = async (
-  email?: string,
+export const getTeams = async (
+  userId?: string,
   status?: TeamStatus,
   isGettingAll = false,
   page = 1,
@@ -13,11 +14,11 @@ export const getListTeams = async (
   search = '',
 ) => {
   try {
-    const where = email
+    const where = userId
       ? {
           members: {
             some: {
-              email,
+              userId,
             },
           },
         }
@@ -65,21 +66,28 @@ export const getListTeams = async (
   }
 };
 
-export const findTeam = async (teamId: number, email?: string) => {
+export const getTeam = async (teamId: string, userId?: string) => {
   try {
-    const where = email
+    const where = userId
       ? {
-          id: teamId,
-          members: {
-            some: {
-              email,
+          OR: [
+            {
+              isPublic: true,
             },
-          },
+            {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          ],
         }
       : undefined;
     const team = await prisma.team.findFirst({
       where: {
         ...where,
+        id: teamId,
       },
     });
 
@@ -90,7 +98,7 @@ export const findTeam = async (teamId: number, email?: string) => {
   }
 };
 
-export const createTeam = async (email: string, userId: number, data: createTeamType) => {
+export const createTeam = async (email: string, userId: string, data: createTeamType) => {
   try {
     const startDate = data.startDate ? new Date(data.startDate) : new Date();
     const endDate = data.endDate ? new Date(data.endDate) : new Date();
@@ -105,7 +113,7 @@ export const createTeam = async (email: string, userId: number, data: createTeam
         members: {
           create: {
             isOwner: true,
-            email,
+            userId,
           },
         },
       },
@@ -118,46 +126,39 @@ export const createTeam = async (email: string, userId: number, data: createTeam
   }
 };
 
-export const updateTeam = async (email: string, data: updateTeamType): Promise<Team | null> => {
+export const updateTeam = async (email: string, data: updateTeamType): Promise<Team> => {
   try {
-    const team = await prisma.team.findFirst({
+    const startDate = data.startDate ? new Date(data.startDate) : undefined;
+    const endDate = data.endDate ? new Date(data.endDate) : undefined;
+
+    const team = await prisma.team.updateMany({
       where: {
         ownerEmail: {
           has: email,
         },
         id: data.id,
       },
-    });
-
-    if (!team) throw new Error(`You are not the owner of Team ${data.id}`);
-
-    const startDate = data.startDate ? new Date(data.startDate) : undefined;
-    const endDate = data.endDate ? new Date(data.endDate) : undefined;
-
-    const newTeam = await prisma.team.update({
-      where: {
-        id: data.id,
-      },
       data: {
         name: data.name,
         description: data.description,
-        // status: data.status,
-        isPublish: data.isPublish,
+        // isPublic: data.isPublic,
+        isPublic: data.isPublic,
         picture: data.picture,
         startDate,
         endDate,
-        ownerEmail: [email],
       },
     });
 
-    return newTeam;
+    if (!team[0]) throw new Error(errorName.FORBIDDEN);
+
+    return team[0];
   } catch (error) {
     logger.error('Error in updateTeam service');
     throw error;
   }
 };
 
-export const deleteTeam = async (ownerEmail: string, teamId: number) => {
+export const deleteTeam = async (ownerEmail: string, teamId: string) => {
   try {
     return await prisma.team.delete({
       where: {
@@ -170,7 +171,7 @@ export const deleteTeam = async (ownerEmail: string, teamId: number) => {
   }
 };
 
-export const isOwnerTeam = async (email: string, teamId: number) => {
+export const isOwnerTeam = async (email: string, teamId: string) => {
   const team = await prisma.team.findFirst({
     where: {
       id: teamId,

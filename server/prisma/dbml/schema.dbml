@@ -3,14 +3,14 @@
 //// ------------------------------------------------------
 
 Table Session {
-  id Int [pk, increment]
-  userId Int [not null]
+  id String [pk]
+  userId String [not null]
   token String [not null]
   expiresAt DateTime [not null]
   data String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  user User
+  user User [not null]
 
   indexes {
     (userId, token) [unique]
@@ -18,79 +18,88 @@ Table Session {
 }
 
 Table Team {
-  id Int [pk, increment]
+  id String [pk]
   name String [not null]
   ownerEmail String [not null]
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
-  status TeamStatus [not null, default: 'DOING']
   picture String [not null]
   numOfMember Int [not null, default: 1]
-  isPublish Boolean [not null, default: true]
+  isPublic Boolean [not null, default: true]
   description String
-  teamToken TeamToken [not null]
+  status TeamStatus [not null, default: 'DOING']
   members Member [not null]
+  InviteLink InviteLink [not null]
 }
 
-Table TeamToken {
-  id Int [pk, increment]
-  teamId Int [not null]
-  inviteEmail String [not null]
-  value String [not null]
-  expiredAt DateTime [not null]
-  usedAt DateTime
+Table InviteLink {
+  id String [pk]
+  teamId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  expiresAt DateTime [not null]
+  type TypeToken [not null, default: 'INVITE']
   team Team [not null]
 }
 
 Table Member {
-  id Int [pk, increment]
-  team Team [not null]
-  user User
+  id String [pk]
+  userId String [not null]
+  teamId String [not null]
   isOwner Boolean [not null, default: false]
-  email String
-  teamId Int [not null]
+  isPendingInvitation Boolean [not null, default: false]
+  isGuess Boolean [not null, default: false]
+  invitedBy String
   joinedAt DateTime [default: `now()`, not null]
-  assignedBy String
-  status MemberStatus [not null, default: 'JOINED']
+  role String
+  user User [not null]
+  team Team [not null]
 
   indexes {
-    (email, teamId) [unique]
+    (userId, teamId) [unique]
   }
 }
 
+Table Notification {
+  id String [pk]
+  userId String [not null]
+  title String [not null]
+  description String [not null]
+  linkRedirect String
+  isSeen Boolean [not null]
+  user User [not null]
+}
+
 Table User {
-  id Int [pk, increment]
+  id String [pk]
   email String [unique, not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
-  status String [not null, default: 'NotInitiated']
+  userStatus UserStatus [not null, default: 'OFFLINE']
   session Session [not null]
   profile UserProfile
   members Member [not null]
+  Notification Notification [not null]
 }
 
 Table UserProfile {
-  id Int [pk, increment]
-  User User [not null]
-  userId Int [not null]
-  name String [not null, default: 'Unknown']
-  nickname String [not null, default: 'Unknown']
+  id String [pk]
+  userId String [not null]
+  name String [not null]
+  nickname String [not null]
   picture String [not null]
-  gender String [not null, default: 'Unspecified']
   workplace String
   address String
-  userStatus UserOnlineStatus [not null, default: 'OFFLINE']
   school String
   introduction String
-  phoneNumber String
   talents String
   interests String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  gender Gender [not null, default: 'UNSPECIFIED']
+  user User [not null]
 
   indexes {
     (userId) [unique]
@@ -102,22 +111,29 @@ Enum TeamStatus {
   DONE
 }
 
-Enum MemberStatus {
-  PENDING_INVITATION
-  JOINED
+Enum TypeToken {
+  INVITE
 }
 
-Enum UserOnlineStatus {
+Enum Gender {
+  UNSPECIFIED
+  MALE
+  FEMALE
+}
+
+Enum UserStatus {
   ONLINE
   OFFLINE
 }
 
 Ref: Session.userId > User.id
 
-Ref: TeamToken.teamId > Team.id
+Ref: InviteLink.teamId > Team.id
+
+Ref: Member.userId > User.id
 
 Ref: Member.teamId > Team.id
 
-Ref: Member.email > User.email
+Ref: Notification.userId > User.id
 
 Ref: UserProfile.userId - User.id

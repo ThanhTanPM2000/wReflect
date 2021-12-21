@@ -7,20 +7,25 @@ import { updateTeamType } from '../../types';
 
 export default {
   type: TeamType,
+  name: 'UpdateTeam',
   args: {
-    id: { type: new GraphQLNonNull(GraphQLInt) },
+    id: { type: new GraphQLNonNull(GraphQLString) },
     name: {
       type: GraphQLString,
     },
     startDate: { type: GraphQLString },
     endDate: { type: GraphQLString },
     status: { type: GraphQLString },
-    isPublish: { type: GraphQLBoolean },
+    isPublic: { type: GraphQLBoolean },
     picture: { type: GraphQLString },
     description: { type: GraphQLString },
   },
   resolve: async (_, args: updateTeamType, request: RequestWithUserInfo) => {
-    const { email } = request.user;
-    return await team.updateTeam(email, args);
+    try {
+      const { email } = request?.user;
+      return await team.updateTeam(email, args);
+    } catch (error) {
+      throw error;
+    }
   },
 };

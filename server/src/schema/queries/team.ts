@@ -1,21 +1,26 @@
 import { RequestWithUserInfo } from './../../types';
-import { GraphQLNonNull, GraphQLInt } from 'graphql';
+import { GraphQLNonNull, GraphQLString } from 'graphql';
 import { TeamType } from '../types';
 import { team } from '../../services';
 
 type argument = {
-  teamId: number;
+  teamId: string;
 };
 
 export default {
   type: TeamType,
+  name: 'GetTeam',
   args: {
     teamId: {
-      type: new GraphQLNonNull(GraphQLInt),
+      type: new GraphQLNonNull(GraphQLString),
     },
   },
   resolve: async (_, args: argument, request: RequestWithUserInfo) => {
-    const { email, isAdmin } = request.user;
-    return await team.findTeam(args.teamId, isAdmin ? undefined : email);
+    try {
+      const { id, isAdmin } = request?.user;
+      return await team.getTeam(args.teamId, isAdmin ? undefined : id);
+    } catch (error) {
+      throw error;
+    }
   },
 };

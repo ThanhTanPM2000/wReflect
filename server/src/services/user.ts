@@ -1,3 +1,4 @@
+import { errorName } from '../constant/errorsConstant';
 import prisma from '../prisma';
 import logger from '../logger';
 
@@ -7,22 +8,22 @@ export const findOrCreateUserByEmail = async (email: string, picture: string, na
       where: { email },
       update: {
         email,
+        userStatus: 'ONLINE',
         profile: {
           update: {
             nickname,
             name,
             picture,
-            userStatus: 'ONLINE',
           },
         },
       },
       create: {
         email,
+        userStatus: 'ONLINE',
         profile: {
           create: {
             name,
             picture,
-            userStatus: 'ONLINE',
             nickname,
           },
         },
@@ -80,12 +81,11 @@ export const getListUsers = async (search = '', isGettingAll = false, page = 1, 
   }
 };
 
-export const getUserById = async (email?: string) => {
+export const getUser = async (userId: string) => {
   try {
-    if (!email) return null;
     const user = await prisma.user.findUnique({
       where: {
-        email,
+        id: userId,
       },
       include: {
         members: true,
@@ -93,7 +93,7 @@ export const getUserById = async (email?: string) => {
       },
     });
 
-    if (!user) throw new Error('User not found in system');
+    if (!user) throw new Error(errorName.NOTFOUND);
 
     return user;
   } catch (error) {
@@ -102,7 +102,7 @@ export const getUserById = async (email?: string) => {
   }
 };
 
-export const updateUser = async (userId: number, args: any) => {
+export const updateUser = async (userId: string, args: any) => {
   try {
     const user = await prisma.user.update({
       where: {
@@ -117,7 +117,7 @@ export const updateUser = async (userId: number, args: any) => {
       },
     });
 
-    if (!user) throw new Error('You dont have permission or user not found');
+    if (!user) throw new Error(errorName.FORBIDDEN);
 
     return user;
   } catch (error) {

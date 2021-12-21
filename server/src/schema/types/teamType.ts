@@ -2,26 +2,31 @@ import { RequestWithUserInfo } from '../../types';
 import { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList, GraphQLBoolean } from 'graphql';
 import MemberType from './memberType';
 import { member } from '../../services';
+import { Team } from '@prisma/client';
 
 const TeamType = new GraphQLObjectType({
   name: 'Team',
   fields: () => ({
-    id: { type: GraphQLInt },
+    id: { type: GraphQLString },
     name: { type: GraphQLString },
     ownerEmail: { type: new GraphQLList(GraphQLString) },
     createdAt: { type: GraphQLString },
     startDate: { type: GraphQLString },
     endDate: { type: GraphQLString },
-    status: { type: GraphQLString },
     picture: { type: GraphQLString },
     numOfMember: { type: GraphQLInt },
-    isPublish: { type: GraphQLBoolean },
+    isPublic: { type: GraphQLBoolean },
     description: { type: GraphQLString },
+    status: { type: GraphQLString },
     members: {
       type: new GraphQLList(MemberType),
-      resolve: async (_, args, request: RequestWithUserInfo) => {
-        const { email, isAdmin } = request.user;
-        return await member.getListMembers({ teamId: _.id }, isAdmin ? undefined : email);
+      resolve: async (_: Team, args, request: RequestWithUserInfo) => {
+        try {
+          const members = await member.getListMembers(_.id);
+          return members;
+        } catch (error) {
+          throw error;
+        }
       },
     },
   }),

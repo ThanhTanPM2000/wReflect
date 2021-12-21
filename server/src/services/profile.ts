@@ -1,14 +1,13 @@
 import prisma from '../prisma';
 import logger from '../logger';
-import { UserProfile } from '@prisma/client';
 
-export const getUserProfile = async (userId: number) => {
+export const getUserProfile = async (userId: string) => {
   try {
     const userProfile = await prisma.userProfile.findUnique({
       where: {
         userId,
       },
-      include: { User: true },
+      include: { user: true },
     });
     return userProfile;
   } catch (error) {

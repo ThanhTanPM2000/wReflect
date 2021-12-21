@@ -2,15 +2,18 @@
 CREATE TYPE "TeamStatus" AS ENUM ('DOING', 'DONE');
 
 -- CreateEnum
-CREATE TYPE "MemberStatus" AS ENUM ('PENDING_INVITATION', 'JOINED');
+CREATE TYPE "TypeToken" AS ENUM ('INVITE');
 
 -- CreateEnum
-CREATE TYPE "UserOnlineStatus" AS ENUM ('ONLINE', 'OFFLINE');
+CREATE TYPE "Gender" AS ENUM ('UNSPECIFIED', 'MALE', 'FEMALE');
+
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ONLINE', 'OFFLINE');
 
 -- CreateTable
 CREATE TABLE "Session" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "data" TEXT,
@@ -22,78 +25,88 @@ CREATE TABLE "Session" (
 
 -- CreateTable
 CREATE TABLE "Team" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "ownerEmail" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
-    "status" "TeamStatus" NOT NULL DEFAULT E'DOING',
     "picture" TEXT NOT NULL,
     "numOfMember" INTEGER NOT NULL DEFAULT 1,
-    "isPublish" BOOLEAN NOT NULL DEFAULT true,
+    "isPublic" BOOLEAN NOT NULL DEFAULT true,
     "description" TEXT,
+    "status" "TeamStatus" NOT NULL DEFAULT E'DOING',
 
     PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "TeamToken" (
-    "id" SERIAL NOT NULL,
-    "teamId" INTEGER NOT NULL,
-    "inviteEmail" TEXT NOT NULL,
-    "value" TEXT NOT NULL,
-    "expiredAt" TIMESTAMP(3) NOT NULL,
-    "usedAt" TIMESTAMP(3),
+CREATE TABLE "InviteLink" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "type" "TypeToken" NOT NULL DEFAULT E'INVITE',
 
     PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Member" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
     "isOwner" BOOLEAN NOT NULL DEFAULT false,
-    "email" TEXT,
-    "teamId" INTEGER NOT NULL,
+    "isPendingInvitation" BOOLEAN NOT NULL DEFAULT false,
+    "isGuess" BOOLEAN NOT NULL DEFAULT false,
+    "invitedBy" TEXT,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "assignedBy" TEXT,
-    "status" "MemberStatus" NOT NULL DEFAULT E'JOINED',
+    "role" TEXT,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Notification" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "linkRedirect" TEXT,
+    "isSeen" BOOLEAN NOT NULL,
 
     PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-    "status" TEXT NOT NULL DEFAULT E'NotInitiated',
+    "userStatus" "UserStatus" NOT NULL DEFAULT E'OFFLINE',
 
     PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "UserProfile" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "name" TEXT NOT NULL DEFAULT E'Unknown',
-    "nickname" TEXT NOT NULL DEFAULT E'Unknown',
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nickname" TEXT NOT NULL,
     "picture" TEXT NOT NULL,
-    "gender" TEXT NOT NULL DEFAULT E'Unspecified',
     "workplace" TEXT,
     "address" TEXT,
-    "userStatus" "UserOnlineStatus" NOT NULL DEFAULT E'OFFLINE',
     "school" TEXT,
     "introduction" TEXT,
-    "phoneNumber" TEXT,
     "talents" TEXT,
     "interests" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "gender" "Gender" NOT NULL DEFAULT E'UNSPECIFIED',
 
     PRIMARY KEY ("id")
 );
@@ -105,7 +118,7 @@ CREATE UNIQUE INDEX "Session.userId_token_unique" ON "Session"("userId", "token"
 CREATE INDEX "Session.expiresAt_index" ON "Session"("expiresAt");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Member.email_teamId_unique" ON "Member"("email", "teamId");
+CREATE UNIQUE INDEX "Member.userId_teamId_unique" ON "Member"("userId", "teamId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
@@ -120,13 +133,16 @@ CREATE UNIQUE INDEX "UserProfile.userId_unique" ON "UserProfile"("userId");
 ALTER TABLE "Session" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TeamToken" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "InviteLink" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Member" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Member" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Member" ADD FOREIGN KEY ("email") REFERENCES "User"("email") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserProfile" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

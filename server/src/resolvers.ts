@@ -12,7 +12,7 @@ export const users = async (_, args, request: RequestWithUserInfo) => {
 export const teams = async (args, request: RequestWithUserInfo) => {
   const { email, isAdmin } = request.user;
   const { status, isGettingAll, search, page, size } = args;
-  const { data, total } = await team.getListTeams(
+  const { data, total } = await team.getTeams(
     isAdmin ? undefined : email,
     status,
     !!isGettingAll,

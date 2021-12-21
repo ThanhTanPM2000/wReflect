@@ -1,5 +1,5 @@
 import { RequestWithUserInfo } from '../../types';
-import { GraphQLString, GraphQLList } from 'graphql';
+import { GraphQLString } from 'graphql';
 
 import { UserType } from '../types';
 import { user } from '../../services';
@@ -14,7 +14,11 @@ export default {
     picture: { type: GraphQLString },
   },
   resolve: async (_, args: arguments, request: RequestWithUserInfo) => {
-    const { id } = request.user;
-    return await user.updateUser(id, args);
+    try {
+      const { id } = request?.user;
+      return await user.updateUser(id, args);
+    } catch (error) {
+      throw error;
+    }
   },
 };

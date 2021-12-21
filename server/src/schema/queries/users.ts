@@ -6,7 +6,7 @@ import { RequestWithUserInfo } from '../../types';
 
 export default {
   type: new GraphQLObjectType({
-    name: 'GetListUsers',
+    name: 'GetUsers',
     fields: {
       data: { type: new GraphQLList(UserType) },
       total: { type: GraphQLInt },
@@ -19,10 +19,14 @@ export default {
     size: { type: GraphQLInt },
   },
   resolve: async (_, args: getListDataType, request: RequestWithUserInfo) => {
-    const { isAdmin } = request.user;
-    if (!isAdmin) throw new Error('User dont have permission');
-    const { isGettingAll, search, page, size } = args;
-    const { data, total } = await user.getListUsers(search, !!isGettingAll, page, size);
-    return { data, total };
+    try {
+      const { isAdmin } = request?.user;
+      if (!isAdmin) throw new Error('User dont have permission');
+      const { isGettingAll, search, page, size } = args;
+      const { data, total } = await user.getListUsers(search, !!isGettingAll, page, size);
+      return { data, total };
+    } catch (error) {
+      throw error;
+    }
   },
 };
