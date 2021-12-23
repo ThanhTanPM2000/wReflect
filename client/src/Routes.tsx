@@ -4,6 +4,9 @@ import { Router, Switch, Redirect, Route } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 
 import { HomePage } from './pages/HomePage';
+import LoginPage from './pages/LoginPage/LoginPage';
+import SignUpPage from './pages/SigupPage/signupPage';
+import ForgotPassword from './pages/ForgotPassword/forgotPassword';
 import { SideBar } from './components/SideBar';
 import { Me } from './types';
 import { Team } from './pages/TeamPage';
@@ -34,6 +37,9 @@ const Routes = ({ me }: Props): JSX.Element => {
         <Switch>
           {!isLoggedIn ? (
             <Switch>
+              <Route path='/loginpage' component={LoginPage} />
+              <Route path='/signuppage' component={SignUpPage} />
+              <Route path='/forgotpassword' component={ForgotPassword}/>
               <Route path="/" component={() => <HomePage email={email} picture={picture} />} />
               <Redirect to="/" />
             </Switch>

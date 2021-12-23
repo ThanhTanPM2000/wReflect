@@ -97,7 +97,8 @@ const ProfileUser = () => {
               className="flex-2 site-layout-background card-workspace"
               style={{
                 background: 'white',
-                height: 730,
+                height: '730px',
+                width: '600px',
                 marginRight: 20,
                 boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
               }}
@@ -155,7 +156,7 @@ const ProfileUser = () => {
             </div>
           </div>
         </div>
-        <div style={{ width: '1100px', padding: '20px' }}>
+        <div style={{ width: '100%', padding: '20px' }}>
           <div
             className="flex-2 site-layout-background card-workspace"
             style={{

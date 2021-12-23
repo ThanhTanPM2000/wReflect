@@ -147,6 +147,12 @@ code {
 .mr-12 {
   margin-right: 12px; }
 
+.flex.flex-1.homepage {
+  background: white !important; }
+
+ul.slick-dots.slick-dots-bottom {
+  display: none !important; }
+
 .ant-menu.ant-menu-dark .ant-menu-sub, .ant-layout-sider-trigger {
   background: #a4a0f1; }
 
@@ -193,6 +199,19 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
 
 .profileUser textarea {
   resize: none !important; }
+
+.login-with-social {
+  display: flex;
+  justify-content: center;
+  margin-top: 20; }
+
+.login-with-social button {
+  height: 60px;
+  width: 160px;
+  color: gray; }
+
+.login-with-social button:hover {
+  box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19); }
 
 .sidebar .ant-layout-logo {
   height: 32px;
