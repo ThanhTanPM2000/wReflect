@@ -15,6 +15,7 @@ import { TeamMutations } from '../../grapql-client/mutations';
 import { useHistory } from 'react-router-dom';
 import { Loading } from '../../components/Loading';
 import { AddTeamMembers } from '.';
+import { Team } from '../../types';
 
 type Props = {
   teamId: string;
@@ -30,14 +31,20 @@ export default function manageMembers({ teamId }: Props) {
   const history = useHistory();
   const me = useContext(SelfContext);
 
-  const { loading, data, error, refetch } = useQuery(TeamQueries.getTeam, {
-    variables: { teamId },
-  });
-  console.log('team is?', data);
+  const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamData, TeamQueries.getTeamVars>(
+    TeamQueries.getTeam,
+    {
+      fetchPolicy: 'cache-first',
+      variables: { teamId },
+    },
+  );
 
-  const [deleteTeam] = useMutation(TeamMutations.deleteTeam, {
-    refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
-  });
+  const [deleteTeam] = useMutation<TeamMutations.deleteTeamResult, TeamMutations.deleteTeamVars>(
+    TeamMutations.deleteTeam,
+    {
+      refetchQueries: [TeamQueries.getTeams],
+    },
+  );
 
   const handleSearch = (searchText: string) => {
     setSearchText(searchText);
@@ -80,14 +87,21 @@ export default function manageMembers({ teamId }: Props) {
     </>
   );
 
+  console.log(me?.members?.find((member) => member.teamId === data?.team.id && member.isOwner) && operations);
+
   return (
-    <Loading refetch={refetch} data={!!data || data?.length >= 0} loading={loading} error={error}>
+    <Loading refetch={refetch} data={!!data} loading={loading} error={error}>
       <div>
         <Tabs
           type="card"
           className="tab-inner"
           style={{ height: '100%' }}
-          tabBarExtraContent={data?.team?.ownerEmail.includes(me?.email) && operations}
+          // tabBarExtraContent={
+          //   me?.members?.find((member) => member.teamId === data?.team.id && member.isOwner) && operations
+          // }
+          tabBarExtraContent={
+            data?.team.members.find((member) => member.userId === me?.id && member.isOwner) && operations
+          }
         >
           <TabPane tab="Member" key="1" className="flex flex-1 flex-dir-r">
             <>
@@ -98,7 +112,7 @@ export default function manageMembers({ teamId }: Props) {
                 </div>
               </div>
               <div className="flex-1" style={{ padding: '40px 40px 100px 70px' }}>
-                <AddTeamMembers teamId={teamId} />
+                <AddTeamMembers teamData={data?.team} />
               </div>
             </>
           </TabPane>

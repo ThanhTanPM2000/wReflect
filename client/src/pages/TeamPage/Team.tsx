@@ -34,7 +34,7 @@ const Team = () => {
   );
 
   return (
-    <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
+    <div className="flex-1 site-layout-background card-workspace" style={{ padding: 24 }}>
       <Tabs
         type="card"
         className="tab-inner"

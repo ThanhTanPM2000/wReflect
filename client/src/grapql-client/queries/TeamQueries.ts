@@ -1,7 +1,32 @@
+import { StringNullableChain } from 'lodash';
 import { gql } from '@apollo/client';
+import { Team } from '../../types';
 
-export type variables = {
-  $teamId: number;
+export type getTeamVars = {
+  teamId: string;
+};
+
+export type getTeamsVars = {
+  input: {
+    status?: string;
+    isGettingAll?: boolean;
+    search?: string;
+    page?: number;
+    size?: number;
+  };
+};
+
+export type getTeamData = {
+  team: Team;
+};
+
+export type getTeamsData = {
+  teams: {
+    data: Team[];
+    total: number;
+    page: number;
+    size: number;
+  };
 };
 
 const getTeam = gql`
@@ -9,12 +34,10 @@ const getTeam = gql`
     team(teamId: $teamId) {
       id
       name
-      ownerEmail
       createdAt
       startDate
       endDate
       picture
-      numOfMember
       isPublic
       description
       status
@@ -44,8 +67,8 @@ const getTeam = gql`
             address
             school
             introduction
-            talents
-            interests
+            talent
+            interest
             createdAt
             updatedAt
             gender
@@ -57,20 +80,20 @@ const getTeam = gql`
 `;
 
 const getTeams = gql`
-  query teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
-    teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
+  query Teams($input: TeamsInput) {
+    teams(input: $input) {
       data {
         id
         name
-        ownerEmail
+        ownerUserIds
         createdAt
         startDate
         endDate
         picture
         numOfMember
         isPublic
-        description
         status
+        description
         members {
           id
           userId
@@ -80,6 +103,7 @@ const getTeams = gql`
           isGuess
           invitedBy
           joinedAt
+          role
           user {
             id
             email
@@ -89,15 +113,26 @@ const getTeams = gql`
             userStatus
             profile {
               id
-              userId
               name
               nickname
               picture
+              workplace
+              address
+              school
+              introduction
+              talent
+              interest
+              createdAt
+              updatedAt
+              gender
+              userId
             }
           }
         }
       }
       total
+      page
+      size
     }
   }
 `;

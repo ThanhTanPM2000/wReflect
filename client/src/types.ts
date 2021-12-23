@@ -6,12 +6,10 @@ export type Teams = {
 export type Team = {
   id: string;
   name: string;
-  ownerEmail: string[];
   createdAt: Date;
   startDate: Date;
   endDate: Date;
   picture: string;
-  numOfMember: number;
   isPublic: boolean;
   description: string | null;
   status: TeamStatus;

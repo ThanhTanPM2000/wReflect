@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef } from 'react';
 
-import { Button, Dropdown, Menu, Modal, List, Avatar, message } from 'antd';
+import { Button, Dropdown, Menu, Modal, List, Avatar, message, notification } from 'antd';
 
 import SelfContext from '../../contexts/selfContext';
 
@@ -14,22 +14,35 @@ import config from '../../config';
 
 type Props = {
   searchText: string;
-  teamData: Team;
+  teamData?: Team;
 };
 
 const { confirm } = Modal;
 
 export default function ListMember({ searchText, teamData }: Props) {
-  console.log('team data is', teamData);
   const me = useContext(SelfContext);
 
-  const [setRoleMember] = useMutation(MemberMutations.SetRoleMember, {
-    refetchQueries: [TeamQueries.getTeam],
-  });
+  const [changeRoleMember] = useMutation<MemberMutations.changeRoleMemberResult, MemberMutations.changeRoleMemberVars>(
+    MemberMutations.changeRoleMember,
+    {
+      refetchQueries: [TeamQueries.getTeam],
+      onError: (err) => {
+        notification.error({
+          message: 'Error happen',
+          description: err.message,
+        });
+      },
+    },
+  );
 
-  const [removeMember] = useMutation(MemberMutations.RemoveMember, {
-    refetchQueries: [TeamQueries.getTeam],
-  });
+  const [removeMember] = useMutation<MemberMutations.removeMemberResult, MemberMutations.removeMemberVars>(
+    MemberMutations.removeMember,
+    {
+      refetchQueries: [TeamQueries.getTeam],
+    },
+  );
+  console.log('member list is', teamData?.members);
+
   return (
     <div style={{ flex: '1', overflowX: 'hidden', overflowY: 'scroll', height: '100%' }}>
       <List
@@ -37,7 +50,7 @@ export default function ListMember({ searchText, teamData }: Props) {
         renderItem={(member: Member) => {
           const handleRemove = () => {
             removeMember({
-              variables: { teamId: teamData?.id, email: member?.user?.email },
+              variables: { memberId: member.id },
             })
               .then((res) => message.success(`${member?.user?.email} successfully removed`))
               .catch((error) => message.error(error.message));
@@ -47,8 +60,8 @@ export default function ListMember({ searchText, teamData }: Props) {
               <Menu.Item
                 key="1"
                 onClick={() => {
-                  setRoleMember({
-                    variables: { teamId: teamData?.id, userId: member.user.id, isOwner: !member?.isOwner },
+                  changeRoleMember({
+                    variables: { memberId: member.id, teamId: teamData?.id as string, isOwner: !member.isOwner },
                   });
                 }}
               >
@@ -80,16 +93,21 @@ export default function ListMember({ searchText, teamData }: Props) {
           return (
             <List.Item
               key={`${member?.id}`}
-              actions={[
-                <Dropdown key="list-loadmore-edit" overlay={menu}>
-                  <Button
-                    type="text"
-                    hidden={member?.user?.email === me?.email || !teamData?.ownerEmail.includes(me?.email as string)}
-                  >
-                    <MoreOutlined />
-                  </Button>
-                </Dropdown>,
-              ]}
+              actions={
+                [
+                  // <Dropdown key="list-loadmore-edit" overlay={menu}>
+                  //   <Button
+                  //     type="text"
+                  //     hidden={
+                  //       member?.user?.email === me?.email ||
+                  //       !teamData?.members.find((member) => member.userId === me?.id && member.isOwner)
+                  //     }
+                  //   >
+                  //     <MoreOutlined />
+                  //   </Button>
+                  // </Dropdown>,
+                ]
+              }
             >
               <List.Item.Meta
                 avatar={
@@ -120,6 +138,25 @@ export default function ListMember({ searchText, teamData }: Props) {
                   Owner
                 </div>
               )}
+              <Dropdown key="list-loadmore-edit" overlay={menu}>
+                <Button
+                  type="text"
+                  style={
+                    member?.user?.email === me?.email ||
+                    !teamData?.members.find((member) => member.userId === me?.id && member.isOwner)
+                      ? {
+                          visibility: 'hidden',
+                        }
+                      : {}
+                  }
+                  // hidden={
+                  //   member?.user?.email === me?.email ||
+                  //   !teamData?.members.find((member) => member.userId === me?.id && member.isOwner)
+                  // }
+                >
+                  <MoreOutlined />
+                </Button>
+              </Dropdown>
             </List.Item>
           );
         }}

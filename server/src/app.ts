@@ -1,51 +1,86 @@
-import { getErrorCode } from './errorsManagement';
+import { StatusCodes } from 'http-status-codes';
+import { ApolloError } from 'apollo-server-errors';
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import { graphqlHTTP } from 'express-graphql';
 
 import sessionManager from './middleware/sessionManager';
 import './prisma'; // eager load to test connection
-import logger from './logger';
 import config from './config';
-import schema from './schema';
 import apiRouter from './apiRouter';
 
-const app = express();
+import { ApolloServer } from 'apollo-server-express';
+// import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 
-app.use(
-  cors({
-    origin: [config.CLIENT_URL, 'http://localhost:3000'],
-    credentials: true,
-  }),
-);
+import http from 'http';
 
-app.use(cookieParser());
-app.use(bodyParser.json({ type: 'application/json' }));
+import { resolvers, typeDefs } from './apollo';
+import logger from './logger';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
 
-app.use(sessionManager);
+async function startApolloServer(typeDefs, resolvers) {
+  const app = express();
 
-app.use('/api', apiRouter());
+  app.use(
+    cors({
+      origin: [config.CLIENT_URL, 'http://localhost:4000', 'https://studio.apollographql.com'],
+      credentials: true,
+    }),
+  );
+  app.use(cookieParser());
+  app.use(bodyParser.json());
+  app.use(express.static('public'));
+  app.use(sessionManager);
 
-app.use(
-  '/graphql',
-  graphqlHTTP({
+  app.use('/api', apiRouter());
+
+  let schema = makeExecutableSchema({
+    typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+    resolvers,
+  });
+  schema = constraintDirective()(schema);
+
+  const httpServer = http.createServer(app);
+  const server = new ApolloServer({
     schema,
-    graphiql: true,
-    customFormatErrorFn: (err: Error) => {
-      const error = getErrorCode(err.message);
-      return { message: error?.message, code: error?.code };
+
+    context: ({ req, res }) => ({ req, res }),
+    formatError: (err) => {
+      if (err.extensions?.code === `INTERNAL_SERVER_ERROR`) {
+        return new ApolloError('Something failed with server', `${StatusCodes.INTERNAL_SERVER_ERROR}`, {
+          messageDetail: err.message,
+        });
+      } else if (err.extensions?.code === `BAD_USER_INPUT`) {
+        return new ApolloError(`Invalid argument value`, `${StatusCodes.BAD_REQUEST}`, {
+          messageDetail: err.message,
+        });
+      }
+      return err;
     },
-  }),
-);
+    // plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+  await server.start();
 
-app.use(express.static('public'));
+  server.applyMiddleware({
+    app,
+    cors: {
+      origin: [config.CLIENT_URL, 'http://localhost:4000'],
+      credentials: true,
+    },
+  });
 
-const port = config.PORT || 4000;
+  const port = config.PORT || 4000;
 
-app.listen(port, () => {
+  // httpServer.listen(port, () => {
+  //   logger.info(`server is listening on ${config.SERVER_URL}`);
+  // });
+  await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
+  // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
   logger.info(`server is listening on ${config.SERVER_URL}`);
-});
+}
+
+startApolloServer(typeDefs, resolvers);

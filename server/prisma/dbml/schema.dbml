@@ -20,12 +20,10 @@ Table Session {
 Table Team {
   id String [pk]
   name String [not null]
-  ownerEmail String [not null]
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
   picture String [not null]
-  numOfMember Int [not null, default: 1]
   isPublic Boolean [not null, default: true]
   description String
   status TeamStatus [not null, default: 'DOING']

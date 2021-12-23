@@ -7,7 +7,6 @@ import { useMutation } from '@apollo/client';
 import { TeamMutations } from '../../grapql-client/mutations';
 import { TeamQueries } from '../../grapql-client/queries';
 import { RcFile, UploadChangeParam } from 'antd/lib/upload';
-import { uploadFile } from '../../apis/aws';
 import config from '../../config';
 import { UploadFile } from 'antd/lib/upload/interface';
 
@@ -21,11 +20,13 @@ type Props = {
 
 const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
-  const [linkUpload, setLinkUpload] = useState('');
 
-  const [addNewTeam] = useMutation(TeamMutations.createTeam, {
-    refetchQueries: [TeamQueries.getTeams],
-  });
+  const [addNewTeam] = useMutation<TeamMutations.createTeamResult, TeamMutations.createTeamVars>(
+    TeamMutations.createTeam,
+    {
+      refetchQueries: [TeamQueries.getTeams],
+    },
+  );
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -42,7 +43,6 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
       const teamDescription = values['teamDescription'];
       const isPublic = values['select'] === 'public' ? true : false;
       const picture = values['upload'][0]?.response || values['upload'];
-
       addNewTeam({
         variables: {
           startDate,
@@ -111,7 +111,7 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           name="upload"
           label="Upload"
           valuePropName="file"
-          initialValue={linkUpload}
+          initialValue={`${config.SERVER_BASE_URL}/uploads/teamDefault.png`}
           getValueFromEvent={normFile}
         >
           <Upload

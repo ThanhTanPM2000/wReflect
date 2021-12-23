@@ -7,6 +7,7 @@ import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { Member, Team, Teams, TeamStatus } from '../../types';
 import { Loading } from '../../components/Loading';
+import { TeamMutations } from '../../grapql-client/mutations';
 
 const { Meta } = Card;
 
@@ -28,11 +29,19 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
     history.push(`/manage-members/${value}`);
   };
 
-  const { error, data, loading, refetch, networkStatus } = useQuery(TeamQueries.getTeams, {
-    variables: { status, isGettingAll: false, search: searchText, page, size },
-    fetchPolicy: 'cache-first', // Used for first execution
-    notifyOnNetworkStatusChange: true,
-  });
+  const { error, data, loading, refetch, networkStatus } = useQuery<TeamQueries.getTeamsData, TeamQueries.getTeamsVars>(
+    TeamQueries.getTeams,
+    {
+      variables: { input: { status, isGettingAll: false, search: searchText, page, size } },
+      fetchPolicy: 'cache-first', // Used for first execution
+      notifyOnNetworkStatusChange: true,
+      onCompleted: (data: TeamQueries.getTeamsData) => {
+        const { page, size } = data.teams;
+        setPage(page);
+        size && setSize(size);
+      },
+    },
+  );
 
   useEffect(() => {
     refetch();
@@ -47,16 +56,25 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
   };
 
   const onPaginationChanged = (page: number, pageSize: number | undefined) => {
+    console.log('page is', page);
+    refetch({
+      input: {
+        search: searchText,
+        status: 'DOING',
+        isGettingAll: false,
+        page,
+        size: 8,
+      },
+    });
     setPage(page);
     pageSize && setSize(pageSize);
   };
-  console.log(data);
 
   return (
     <div className="flex flex-1 flex-dir-c" style={{ padding: '10px' }}>
       <Loading
         refetch={refetch}
-        data={data?.teams?.data?.length > 0}
+        data={!!data && data?.teams?.data?.length > 0}
         loading={loading || networkStatus === NetworkStatus.refetch}
         error={error}
       >

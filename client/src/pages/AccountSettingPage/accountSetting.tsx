@@ -3,7 +3,6 @@ import { useMutation } from '@apollo/client';
 import { Form, Avatar, Button, Input, Modal, Upload, message, Card, Col } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
-import { UserQueries } from '../../grapql-client/queries';
 import { UserMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
 
@@ -13,7 +12,7 @@ import config from '../../config';
 
 const AccountSetting = () => {
   const me = useContext(SelfContext);
-  const [updateAcctount, { data, loading }] = useMutation(UserMutations.updateUser, {});
+  const [updateAcctount] = useMutation(UserMutations.updateUser, {});
 
   const handleFinish = (values: any) => {
     updateAcctount({ variables: { picture: values['email'] } });

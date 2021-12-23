@@ -1,5 +1,9 @@
 import { gql } from '@apollo/client';
 
+export type getListMembersVars = {
+  teamId: string;
+};
+
 const getListMembers = gql`
   query getListMembers($teamId: String!) {
     members(teamId: $teamId) {

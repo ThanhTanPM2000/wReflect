@@ -11,7 +11,7 @@ import { Team } from '../../types';
 import config from '../../config';
 
 type Props = {
-  teamData: Team;
+  teamData?: Team;
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
 };
@@ -98,9 +98,10 @@ const EditTeamDetailModal = ({ teamData, isVisible, setIsVisible }: Props) => {
         <Form.Item
           name="range-picker"
           label="RangePicker"
-          initialValue={[moment(+teamData?.startDate), moment(+teamData?.endDate)]}
+          // initialValue={[moment(+teamData?.startDate), moment(+teamData?.endDate)]}
+          initialValue={[moment(teamData?.startDate), moment(teamData?.endDate)]}
         >
-          <RangePicker defaultValue={[moment(+teamData?.startDate), moment(+teamData?.endDate)]} />
+          <RangePicker defaultValue={[moment(teamData?.startDate), moment(teamData?.endDate)]} />
         </Form.Item>
         <Form.Item name="select" label="Select">
           <Select defaultValue={teamData?.isPublic ? 'public' : 'private'}>

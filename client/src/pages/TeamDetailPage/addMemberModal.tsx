@@ -31,7 +31,7 @@ const AddMembersModal = ({ teamId }: Props) => {
   const [listEmails, setListEmails] = useState<string[]>([]);
   const formRef = useRef<FormInstance>(null);
 
-  const [addNewMember] = useMutation(MemberMutations.AddNewMember, {
+  const [addNewMember] = useMutation(MemberMutations.addMembers, {
     refetchQueries: [TeamQueries.getTeam],
   });
 

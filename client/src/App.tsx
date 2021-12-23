@@ -1,66 +1,48 @@
-import React, { useState } from 'react';
-
-import { onError } from '@apollo/client/link/error';
-import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from } from '@apollo/client';
+import React, { useState, useEffect } from 'react';
 
 import { User } from './types';
-import { message, notification } from 'antd';
-import config from './config';
 import Routes from './Routes';
 import { setUpdateLoginState, user } from './apis';
 import SelfContext from './contexts/selfContext';
 
+// import { createUploadLink } from 'apollo-upload-client';
+
 import './styles/less/ant.less';
-
-const httpLink = new HttpLink({
-  uri: `${config.SERVER_BASE_URL}/graphql`,
-  credentials: 'include',
-});
-
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message: messageData }) => {
-      // notification.error({
-      //   message: `Notification`,
-      //   description: message,
-      //   placement: 'bottomLeft',
-      // });
-      message.error(`${messageData}`);
-    });
-
-  if (networkError) console.log(`[Network error]: ${networkError}`);
-});
-
-const client = new ApolloClient({
-  connectToDevTools: true,
-  cache: new InMemoryCache({
-    addTypename: true,
-  }),
-  link: from([errorLink, httpLink]),
-});
+import { UserQueries } from './grapql-client/queries';
+// const link = createUploadLink({ uri: 'http://localhost:4000/graphql', credentials: 'include' });
 
 const App = (): JSX.Element => {
   const [me, setMe] = useState<null | User>(null);
-  const [constructor, setContructor] = useState(true);
+  // const [loading, setLoading] = useState(loadingMe);
 
-  setUpdateLoginState((newMe: null | User) => {
+  // const [getMe, { loading }] = useLazyQuery(UserQueries.me);
+  // const { data, loading } = useQuery(UserQueries.me);
+
+  setUpdateLoginState(async (newMe: null | User) => {
     setMe(newMe);
     localStorage.setItem('email', newMe?.email || '');
   });
 
-  if (constructor) {
-    setContructor(false);
+  // if (!loading) {
+  //   console.log('hello');
+  //   setMe(data?.me);
+  //   localStorage.setItem('email', data?.me?.email || '');
+  // }
+
+  useEffect(() => {
     (async function () {
+      // if (!loading) {
+      //   setMe(data.me);
+      //   localStorage.setItem('email', data?.me?.email || '');
+      // }
       await user.me();
     })();
-  }
-  // useEffect(() => {}, []);
+  }, []);
+
   return (
-    <ApolloProvider client={client}>
-      <SelfContext.Provider value={me}>
-        <Routes me={me} />
-      </SelfContext.Provider>
-    </ApolloProvider>
+    <SelfContext.Provider value={me}>
+      <Routes me={me} />
+    </SelfContext.Provider>
   );
 };
 

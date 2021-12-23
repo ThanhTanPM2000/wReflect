@@ -11,7 +11,17 @@ type Props = {
 };
 
 export default function loading({ children, data, refetch, loading, error }: Props) {
-  console.log('error', error);
+  // const handleError = (code: string) => {
+  //   switch (code) {
+  //     case "404":
+  //       return (
+  //         <Result
+  //       )
+
+  //     default:
+  //       break;
+  //   }
+  // };
 
   return (
     <>
@@ -20,21 +30,26 @@ export default function loading({ children, data, refetch, loading, error }: Pro
           {loading ? (
             <Spin tip="Loading..." />
           ) : (
-            <Result
-              status="warning"
-              title="There are some problems with your operation."
-              extra={
-                <Button
-                  type="primary"
-                  key="console"
-                  onClick={() => {
-                    refetch();
-                  }}
-                >
-                  Reload
-                </Button>
-              }
-            />
+            <>
+              {console.log('error of loading is ', { ...error })}
+              <Result
+                status={error?.graphQLErrors[0]?.extensions?.code}
+                // title="There are some problems with your operation."
+                title={error?.graphQLErrors[0]?.extensions?.code}
+                subTitle={error?.message}
+                extra={
+                  <Button
+                    type="primary"
+                    key="console"
+                    onClick={() => {
+                      refetch();
+                    }}
+                  >
+                    Reload
+                  </Button>
+                }
+              />
+            </>
           )}
         </div>
       ) : (

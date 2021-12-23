@@ -65,7 +65,7 @@ export type removeMemberType = {
 };
 
 export type setRoleMemberType = {
-  userId: string;
+  memberId: string;
   teamId: string;
   isOwner: boolean;
 };

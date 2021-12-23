@@ -2,8 +2,6 @@ import { Router } from 'express';
 
 import { auth, user } from './controllers';
 import { uploadFile, upload } from './controllers/file';
-import path from 'path';
-import multer from 'multer';
 
 // export const uploadImage = uploads.fields([{ name: 'image-file', maxCount: 1 }]);
 const apiRouter = (): Router => {

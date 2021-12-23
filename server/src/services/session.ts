@@ -4,7 +4,7 @@ import { addMinutes } from 'date-fns';
 import prisma from '../prisma';
 import config from '../config';
 import logger from '../logger';
-import { User, UserProfile } from '@prisma/client';
+import { Team, User, UserProfile } from '@prisma/client';
 
 export const createSession = async (userId: string, sessionDurationMinutes: number) => {
   const session = await prisma.session.create({
@@ -21,12 +21,22 @@ export const createSession = async (userId: string, sessionDurationMinutes: numb
 export const checkAndExtendSession = async (
   email: string,
   token: string,
-): Promise<(User & { profile: UserProfile | null }) | null> => {
+): Promise<
+  | (User & {
+      profile: UserProfile | null;
+    })
+  | null
+> => {
   try {
     const user = await prisma.user.findFirst({
       where: { email },
       include: {
         profile: true,
+        members: {
+          include: {
+            team: true,
+          },
+        },
       },
     });
     if (!user) return null;
@@ -36,10 +46,7 @@ export const checkAndExtendSession = async (
     const newExpiredAt = addMinutes(now, config.SESSION_DURATION_MINUTES);
     await prisma.session.update({
       where: {
-        userId_token: {
-          userId: user.id,
-          token,
-        },
+        id: session.id,
       },
       data: { expiresAt: newExpiredAt },
     });
@@ -48,13 +55,13 @@ export const checkAndExtendSession = async (
     };
   } catch (error) {
     if (error instanceof Error) logger.error(error.message);
-    throw error;
+    return null;
   }
 };
 
 export const endSession = async (userId: string, token: string) => {
   try {
-    prisma.session.update({
+    await prisma.session.update({
       where: {
         userId_token: {
           userId,
@@ -74,5 +81,6 @@ export const endSession = async (userId: string, token: string) => {
     if (error instanceof Error) {
       logger.error(error.message);
     }
+    return null;
   }
 };

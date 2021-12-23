@@ -1,4 +1,40 @@
 import { gql } from '@apollo/client';
+import { StringNullableChain } from 'lodash';
+import { Team } from '../../types';
+
+export type createTeamVars = {
+  name: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  isPublic?: boolean;
+  picture?: string;
+};
+export type updateTeamVars = {
+  id: string;
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  picture?: string;
+  isPublic?: string;
+  description?: string;
+};
+
+export type deleteTeamVars = {
+  teamId: string;
+};
+export type createTeamResult = {
+  createTeam: Team;
+};
+export type updateTeamResult = {
+  updateTeam: Team;
+};
+export type deleteTeamResult = {
+  deleteTeam: {
+    count: number;
+  };
+};
 
 const createTeam = gql`
   mutation createTeam(
@@ -19,13 +55,11 @@ const createTeam = gql`
     ) {
       id
       name
-      ownerEmail
       createdAt
       startDate
       endDate
       status
       picture
-      numOfMember
       isPublic
       description
     }
@@ -55,12 +89,10 @@ const updateTeam = gql`
     ) {
       id
       name
-      ownerEmail
       createdAt
       startDate
       endDate
       picture
-      numOfMember
       isPublic
       description
       status
@@ -81,18 +113,28 @@ const updateTeam = gql`
 const deleteTeam = gql`
   mutation deleteTeam($teamId: String!) {
     deleteTeam(teamId: $teamId) {
-      id
-      name
-      ownerEmail
-      createdAt
-      startDate
-      endDate
-      status
-      picture
-      numOfMember
-      isPublic
-      description
+      count
     }
   }
 `;
-export { createTeam, updateTeam, deleteTeam };
+
+export type changeTeamAccessVars = {
+  teamId: string;
+  isPublic: boolean;
+};
+
+export type changeTeamAccessResult = {
+  changeTeamAccess: {
+    count: number;
+  };
+};
+
+const changeTeamAccess = gql`
+  mutation ChangeTeamAccess($teamId: String!, $isPublic: Boolean!) {
+    changeTeamAccess(teamId: $teamId, isPublic: $isPublic) {
+      count
+    }
+  }
+`;
+
+export { createTeam, updateTeam, deleteTeam, changeTeamAccess };

@@ -25,7 +25,8 @@ const sessionManager = async (
     if (!sanitizedUser) {
       setCookie('email', '', 0, res);
       setCookie('token', '', 0, res);
-      return res.status(StatusCodes.UNAUTHORIZED).send();
+      // return res.status(StatusCodes.UNAUTHORIZED).send();
+      throw new Error('Unauthen');
     }
     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;
     // TODO: Refactor cookie adding and remove to one place

@@ -1,9 +1,11 @@
 import { gql } from '@apollo/client';
+import { Member } from '../../types';
 
-const addNewMember = gql`
-  mutation addMembers($emailUsers: [String]!, $teamId: String!) {
-    addMember(emailUsers: $emailUsers, teamId: $teamId) {
+const addMembers = gql`
+  mutation addMembers($emailUsers: [String!], $teamId: String!) {
+    addMembers(emailUsers: $emailUsers, teamId: $teamId) {
       success
+      warnings
       errors
     }
   }
@@ -12,31 +14,54 @@ const addNewMember = gql`
 const removeMember = gql`
   mutation removeMember($memberId: String!) {
     removeMember(memberId: $memberId) {
+      count
+    }
+  }
+`;
+
+const changeRoleMember = gql`
+  mutation ChangeRoleMember($memberId: String!, $isOwner: Boolean!, $teamId: String!) {
+    changeRoleMember(memberId: $memberId, isOwner: $isOwner, teamId: $teamId) {
       id
-      userId
       teamId
+      userId
       isOwner
       isPendingInvitation
       isGuess
       invitedBy
       joinedAt
+      role
     }
   }
 `;
 
-const setRoleMember = gql`
-  mutation setRoleMember($memberId: String!, $isOwner: Boolean!) {
-    setRoleMember(memberId: $memberId, isOwner: $isOwner) {
-      id
-      userId
-      teamId
-      isOwner
-      isPendingInvitation
-      isGuess
-      invitedBy
-      joinedAt
-    }
-  }
-`;
+export type addMembersVars = {
+  emailUsers: string[];
+  teamId: string;
+};
+export type removeMemberVars = {
+  memberId: string;
+};
 
-export { addNewMember as AddNewMember, removeMember as RemoveMember, setRoleMember as SetRoleMember };
+export type changeRoleMemberVars = {
+  memberId: string;
+  teamId: string;
+  isOwner: boolean;
+};
+export type addMembersResult = {
+  addMembers: {
+    success: string[];
+    warnings: string[];
+    errors: string[];
+  };
+};
+export type removeMemberResult = {
+  removeMember: {
+    count: number;
+  };
+};
+export type changeRoleMemberResult = {
+  changeRoleMember: Member;
+};
+
+export { addMembers as addMembers, removeMember, changeRoleMember };

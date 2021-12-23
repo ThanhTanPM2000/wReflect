@@ -16,7 +16,7 @@ export const errorType = (errorName: string) => {
       };
     case 'FORBIDDEN':
       return {
-        message: 'You dont have permission for this request',
+        message: 'You don\'t have permission for this request',
         code: StatusCodes.FORBIDDEN,
       };
     case 'BADREQUEST':

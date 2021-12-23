@@ -1,41 +1,68 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { TweenOneGroup } from 'rc-tween-one';
 import { Form, notification, message, Button, FormInstance, Input, Tag, Switch, Tooltip } from 'antd';
 import { useMutation } from '@apollo/client';
-import { MemberMutations } from '../../grapql-client/mutations';
+import { MemberMutations, TeamMutations } from '../../grapql-client/mutations';
 import { TeamQueries } from '../../grapql-client/queries';
 import { UserAddOutlined, CheckOutlined, SendOutlined, CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { Team } from '../../types';
+import { isTemplateMiddleOrTemplateTail, resolveProjectReferencePath } from 'typescript';
 
 const validEmail = new RegExp('^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$');
 
 type Props = {
-  teamId: string;
+  teamData?: Team;
 };
 
 type listStatusAddMembers = {
-  success: [string];
-  errors: [string];
+  success: string[];
+  warnings: string[];
+  errors: string[];
 };
 
 const showNotification = (data: listStatusAddMembers) => {
-  const { success, errors } = data;
+  const { success, warnings, errors } = data;
   success.map((suc: string) => {
     message.success(suc);
+  });
+  warnings.map((warn: string) => {
+    message.info(warn);
   });
   errors.map((error: string) => {
     message.error(error);
   });
 };
 
-const AddMembersModal = ({ teamId }: Props) => {
+const AddMembersModal = ({ teamData }: Props) => {
   const [inviteUrl, setInviteUrl] = useState('http://localhost:3000');
   const [listEmails, setListEmails] = useState<string[]>([]);
   const formRef = useRef<FormInstance>(null);
 
-  const [addNewMember] = useMutation(MemberMutations.AddNewMember, {
-    refetchQueries: [TeamQueries.getTeam],
-  });
+  const [addNewMember] = useMutation<MemberMutations.addMembersResult, MemberMutations.addMembersVars>(
+    MemberMutations.addMembers,
+    {
+      refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
+      onError: () => ({}),
+      onCompleted: (data) => {
+        showNotification(data.addMembers);
+        formRef.current?.resetFields();
+      },
+    },
+  );
+
+  const [changeTeamAccess] = useMutation<TeamMutations.changeTeamAccessResult, TeamMutations.changeTeamAccessVars>(
+    TeamMutations.changeTeamAccess,
+    {
+      refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
+      onError: () => ({}),
+      onCompleted: (data: TeamMutations.changeTeamAccessResult) => {
+        // if (data?.changeTeamAccess?.count > 0) {
+        //   setIsPublic(!isPublic);
+        // }
+      },
+    },
+  );
 
   const onAddEmail = (value: any) => {
     if (validEmail.test(value.email)) {
@@ -77,17 +104,11 @@ const AddMembersModal = ({ teamId }: Props) => {
     );
   });
 
-  const handleDeleteData = () => {
-    setListEmails([]);
-    formRef.current?.resetFields();
-  };
-
   const handleCreate = async () => {
+    if (listEmails.length <= 0) return;
     const myListEmails = _.clone(listEmails);
     setListEmails([]);
-    const { data } = await addNewMember({ variables: { emailUsers: myListEmails, teamId } });
-    showNotification(data.addMember);
-    formRef.current?.resetFields();
+    addNewMember({ variables: { emailUsers: myListEmails, teamId: teamData?.id as string } });
   };
 
   const copyToClipboard = async () => {
@@ -101,6 +122,12 @@ const AddMembersModal = ({ teamId }: Props) => {
       });
   };
 
+  const handleChangeAccess = (value: boolean) => {
+    if (teamData) {
+      changeTeamAccess({ variables: { teamId: teamData?.id, isPublic: value } });
+    }
+  };
+
   return (
     <div>
       <h3>Add Team Members</h3>
@@ -110,15 +137,21 @@ const AddMembersModal = ({ teamId }: Props) => {
           style={{ marginLeft: 'auto' }}
           checkedChildren={<CheckOutlined />}
           unCheckedChildren={<CloseOutlined />}
-          defaultChecked
+          onChange={handleChangeAccess}
+          checked={teamData?.isPublic}
         />
       </h4>
       <p>Anyone with the link can join your team.</p>
       <div>
         <Input.Group compact>
-          <Input style={{ width: 'calc(100% - 80px)' }} defaultValue={inviteUrl} />
+          <Input disabled={true} style={{ width: 'calc(100% - 80px)' }} defaultValue={inviteUrl} />
           <Tooltip title="copy git url">
-            <Button onClick={copyToClipboard} icon={<CopyOutlined />} />
+            <Button
+              style={{ borderRadius: '0px' }}
+              disabled={!teamData?.isPublic}
+              onClick={copyToClipboard}
+              icon={<CopyOutlined />}
+            />
           </Tooltip>
         </Input.Group>
       </div>
@@ -152,7 +185,9 @@ const AddMembersModal = ({ teamId }: Props) => {
               size="middle"
               style={{ width: '100px' }}
               title="Send"
+              disabled={!(listEmails && listEmails.length > 0)}
               type="primary"
+              onClick={handleCreate}
             >
               Send
             </Button>

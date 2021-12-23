@@ -29,12 +29,10 @@ model Session {
 model Team {
   id          String       @id @default(uuid())
   name        String
-  ownerEmail  String[]
   createdAt   DateTime     @default(now())
   startDate   DateTime
   endDate     DateTime
   picture     String
-  numOfMember Int          @default(1)
   isPublic    Boolean      @default(true)
   description String?
   status      TeamStatus   @default(DOING)
@@ -105,15 +103,15 @@ model User {
 model UserProfile {
   id           String   @id @default(uuid())
   userId       String
-  name         String
-  nickname     String
-  picture      String
-  workplace    String?
-  address      String?
-  school       String?
-  introduction String?
-  talents      String?
-  interests    String?
+  name         String   @db.VarChar(100)
+  nickname     String   @db.VarChar(150)
+  picture      String   @db.VarChar(500)
+  workplace    String?  @db.VarChar(300)
+  address      String?  @db.VarChar(300)
+  school       String?  @db.VarChar(300)
+  introduction String?  @db.VarChar(500)
+  talents      String?  @db.VarChar(500)
+  interests    String?  @db.VarChar(500)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   gender       Gender   @default(UNSPECIFIED)

@@ -12,11 +12,9 @@ import {
   TeamOutlined,
   CarryOutOutlined,
   TrophyOutlined,
-  HomeOutlined,
   CalendarOutlined,
   UsergroupDeleteOutlined,
   BarChartOutlined,
-  RollbackOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 
@@ -36,13 +34,19 @@ const SideBar = ({ email, isAdmin }: Props) => {
       {email && (
         <Sider
           className="sidebar"
+          width={150}
           onMouseEnter={() => setIsCollapse(false)}
           onMouseLeave={() => setIsCollapse(true)}
           collapsible
           collapsed={isCollapse}
           onCollapse={(collapse) => setIsCollapse(collapse)}
         >
-          <div className="ant-layout-logo"></div>
+          <div className="ant-layout-logo flex flex-dir-r flex-ai-c ">
+            <span style={{ marginLeft: '10px' }}>wR</span>
+            <span className="title" style={isCollapse ? { opacity: 0 } : { opacity: 1, transition: '0.7s' }}>
+              eflect
+            </span>
+          </div>
           <Menu className="flex flex-1" theme="dark" defaultSelectedKeys={['1']} mode="inline">
             {isAdmin ? (
               <>

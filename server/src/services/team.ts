@@ -1,9 +1,10 @@
+import { StatusCodes } from 'http-status-codes';
 import config from '../config';
-import logger from '../logger';
 import prisma from './../prisma';
 import { createTeamType, updateTeamType } from '../types';
 import { Team, TeamStatus } from '.prisma/client';
 import { errorName } from '../constant/errorsConstant';
+import { ForbiddenError, ApolloError } from 'apollo-server-errors';
 
 export const getTeams = async (
   userId?: string,
@@ -13,172 +14,176 @@ export const getTeams = async (
   size = 8,
   search = '',
 ) => {
-  try {
-    const where = userId
-      ? {
-          members: {
-            some: {
-              userId,
-            },
-          },
-        }
-      : undefined;
-
-    const data = await prisma.team.findMany({
-      where: {
-        ...where,
-        AND: [
-          {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            status: {
-              equals: status,
-            },
-          },
-        ],
-      },
-      ...(!isGettingAll && { skip: (page - 1) * size }),
-      ...(!isGettingAll && { take: size }),
-      orderBy: { createdAt: 'desc' },
-    });
-
-    const total = await prisma.team.count({
-      where: {
-        ...where,
-        name: {
-          contains: search,
-          mode: 'insensitive',
-        },
-      },
-    });
-
-    return {
-      data,
-      total,
-    };
-  } catch (error) {
-    logger.error('Error in getListTeams service');
-    throw error;
-  }
-};
-
-export const getTeam = async (teamId: string, userId?: string) => {
-  try {
-    const where = userId
-      ? {
-          OR: [
-            {
-              isPublic: true,
-            },
-            {
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          ],
-        }
-      : undefined;
-    const team = await prisma.team.findFirst({
-      where: {
-        ...where,
-        id: teamId,
-      },
-    });
-
-    return team;
-  } catch (error) {
-    logger.error('Error in findTeam service');
-    throw error;
-  }
-};
-
-export const createTeam = async (email: string, userId: string, data: createTeamType) => {
-  try {
-    const startDate = data.startDate ? new Date(data.startDate) : new Date();
-    const endDate = data.endDate ? new Date(data.endDate) : new Date();
-
-    const newTeam = await prisma.team.create({
-      data: {
-        picture: `${config.SERVER_URL}/uploads/teamDefault.png`,
-        ...data,
-        startDate,
-        endDate,
-        ownerEmail: [email],
+  const where = userId
+    ? {
         members: {
-          create: {
-            isOwner: true,
+          some: {
             userId,
           },
         },
-      },
-    });
+      }
+    : undefined;
 
-    return newTeam;
-  } catch (error) {
-    logger.error('Error in createTeam');
-    throw error;
-  }
-};
-
-export const updateTeam = async (email: string, data: updateTeamType): Promise<Team> => {
-  try {
-    const startDate = data.startDate ? new Date(data.startDate) : undefined;
-    const endDate = data.endDate ? new Date(data.endDate) : undefined;
-
-    const team = await prisma.team.updateMany({
-      where: {
-        ownerEmail: {
-          has: email,
+  const data = await prisma.team.findMany({
+    where: {
+      ...where,
+      AND: [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
         },
-        id: data.id,
-      },
-      data: {
-        name: data.name,
-        description: data.description,
-        // isPublic: data.isPublic,
-        isPublic: data.isPublic,
-        picture: data.picture,
-        startDate,
-        endDate,
-      },
-    });
+        {
+          status: status,
+        },
+      ],
+    },
+    ...(!isGettingAll && { skip: (page - 1) * size }),
+    ...(!isGettingAll && { take: size }),
+    orderBy: { createdAt: 'desc' },
+  });
 
-    if (!team[0]) throw new Error(errorName.FORBIDDEN);
+  const total = await prisma.team.count({
+    where: {
+      ...where,
+      AND: [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          status: status,
+        },
+      ],
+    },
+  });
 
-    return team[0];
-  } catch (error) {
-    logger.error('Error in updateTeam service');
-    throw error;
-  }
+  return {
+    data,
+    total,
+    page,
+    size,
+  };
 };
 
-export const deleteTeam = async (ownerEmail: string, teamId: string) => {
-  try {
-    return await prisma.team.delete({
-      where: {
-        id: teamId,
-      },
-    });
-  } catch (error) {
-    logger.error('Error in deleteTeam service');
-    throw error;
-  }
-};
+export const getTeam = async (teamId: string, userId?: string) => {
+  const where = userId
+    ? {
+        OR: [
+          {
+            isPublic: true,
+          },
+          {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        ],
+      }
+    : undefined;
 
-export const isOwnerTeam = async (email: string, teamId: string) => {
   const team = await prisma.team.findFirst({
     where: {
+      ...where,
       id: teamId,
-      ownerEmail: {
-        has: email,
+    },
+  });
+
+  if (!team) throw new ApolloError(`Team not found`, `${StatusCodes.NOT_FOUND}`);
+
+  return team;
+};
+
+export const createTeam = async (meId: string, data: createTeamType) => {
+  const startDate = data.startDate ? new Date(data.startDate) : new Date();
+  const endDate = data.endDate ? new Date(data.endDate) : new Date();
+
+  const team = await prisma.team.create({
+    data: {
+      picture: `${config.SERVER_URL}/uploads/teamDefault.png`,
+      ...data,
+      startDate,
+      endDate,
+      members: {
+        create: {
+          isOwner: true,
+          userId: meId,
+        },
       },
     },
   });
-  return team ? true : false;
+
+  return team;
+};
+
+export const updateTeam = async (meId: string, data: updateTeamType): Promise<Team> => {
+  const startDate = data.startDate ? new Date(data.startDate) : undefined;
+  const endDate = data.endDate ? new Date(data.endDate) : undefined;
+
+  const team = await prisma.team.updateMany({
+    where: {
+      id: data.id,
+      members: {
+        some: {
+          userId: meId,
+          isOwner: true,
+        },
+      },
+    },
+    data: {
+      name: data.name,
+      description: data.description,
+      // isPublic: data.isPublic,
+      isPublic: data.isPublic,
+      picture: data.picture,
+      startDate,
+      endDate,
+    },
+  });
+
+  if (!team[0]) throw new Error(errorName.FORBIDDEN);
+
+  return team[0];
+};
+
+export const changeTeamAccess = async (meId: string, teamId: string, isPublic: boolean) => {
+  const team = await prisma.team.updateMany({
+    where: {
+      id: teamId,
+      members: {
+        some: {
+          userId: meId,
+          isOwner: true,
+        },
+      },
+    },
+    data: {
+      isPublic: isPublic,
+    },
+  });
+
+  if (!team) throw new ApolloError("You don't have permission for this request", `${StatusCodes.FORBIDDEN}`);
+  return team;
+};
+
+export const deleteTeam = async (meId: string, teamId: string) => {
+  const batchPayload = await prisma.team.deleteMany({
+    where: {
+      id: teamId,
+      members: {
+        some: {
+          userId: meId,
+          isOwner: true,
+        },
+      },
+    },
+  });
+
+  if (!batchPayload) throw new ForbiddenError(`You are not the owner of Team ${teamId}`);
+  return batchPayload;
 };
