@@ -1,11 +1,13 @@
 import axios from 'axios';
 import statusCodes from 'http-status-codes';
 import config from '../config';
-import { Me } from '../types';
+import { User } from '../types';
+import { UserQueries } from '../grapql-client/queries';
+import { useQuery } from '@apollo/client';
 
 // Function is dynamically added on initialization to prevent circular dependencies
 // For updating react state
-type UpdateLoginState = null | ((newEmail: null | Me) => void);
+type UpdateLoginState = null | ((newEmail: null | User) => void);
 let updateLoginState: UpdateLoginState = null;
 const setUpdateLoginState = (updateLoginStateFunction: UpdateLoginState) => {
   updateLoginState = updateLoginStateFunction;
@@ -28,11 +30,12 @@ instance.interceptors.response.use(
       response?.data?.email && response?.config?.url && PATHS_THAT_GET_IDENTITY.includes(response.config.url);
     const requiresEmailVerification = response?.data?.requiresEmailVerification;
     if (hasIdentity && !requiresEmailVerification) {
-      updateLoginState?.(<Me>{
-        id: response.data.id,
-        email: response.data.email,
-        isAdmin: response.data.isAdmin,
-        picture: response.data.picture,
+      updateLoginState?.(<User>{
+        // id: response.data.id,
+        // email: response.data.email,
+        // isAdmin: response.data.isAdmin,
+        // picture: response.data.picture,
+        ...response?.data,
       });
     }
     if (response.config.url === '/logout') {

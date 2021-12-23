@@ -1,4 +1,4 @@
 import React from 'react';
-import { Me } from '../types';
+import { User, UserProfile } from '../types';
 
-export default React.createContext<null | Me>(null);
+export default React.createContext<null | (User & { profile: UserProfile })>(null);

@@ -16,7 +16,7 @@ const ProfileUser = () => {
 
   const { loading, data } = useQuery(UserQueries.getUser, {
     variables: {
-      userId: me?.id,
+      email: me?.email,
     },
   });
 
@@ -106,7 +106,7 @@ const ProfileUser = () => {
               <div className="flex flex-ai-c flex-jc-sb">
                 <Avatar
                   className="avatarSetting"
-                  src={`${me?.picture}`}
+                  src={`${me?.profile?.picture}`}
                   style={{ height: 150, width: 150, marginTop: 20 }}
                 />
                 <Upload {...props}>

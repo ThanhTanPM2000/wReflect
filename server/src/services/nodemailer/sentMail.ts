@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import logger from '../../logger';
 
-export const sendMail = (receiverEmail: string, subject: string, content: string) => {
+const sendMail = (receiverEmail: string, subject: string, content: string) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -27,3 +27,5 @@ export const sendMail = (receiverEmail: string, subject: string, content: string
     }
   });
 };
+
+export default sendMail;

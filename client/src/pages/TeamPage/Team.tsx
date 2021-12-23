@@ -34,7 +34,7 @@ const Team = () => {
   );
 
   return (
-    <div className="site-layout-background card-workspace" style={{ padding: 24, height: '100%' }}>
+    <div className="flex-1 site-layout-background card-workspace" style={{ padding: 24 }}>
       <Tabs
         type="card"
         className="tab-inner"
@@ -47,7 +47,6 @@ const Team = () => {
       >
         <TabPane tab="All" key="1" className="flex flex-1">
           <TeamsCard
-            status=""
             setIsLoading={setIsLoading}
             searchText={searchText}
             page={page}
@@ -58,7 +57,7 @@ const Team = () => {
         </TabPane>
         <TabPane tab="Doing" key="2" className="flex flex-1">
           <TeamsCard
-            status="Doing"
+            status="DOING"
             setIsLoading={setIsLoading}
             searchText={searchText}
             page={page}
@@ -69,7 +68,7 @@ const Team = () => {
         </TabPane>
         <TabPane tab="Done" key="3" className="flex flex-1">
           <TeamsCard
-            status="Done"
+            status="DONE"
             setIsLoading={setIsLoading}
             searchText={searchText}
             page={page}

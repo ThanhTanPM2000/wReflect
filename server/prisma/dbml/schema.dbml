@@ -3,101 +3,135 @@
 //// ------------------------------------------------------
 
 Table Session {
-  id Int [pk, increment]
-  userId Int [not null]
+  id String [pk]
+  userId String [not null]
   token String [not null]
   expiresAt DateTime [not null]
   data String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   user User [not null]
+
+  indexes {
+    (userId, token) [unique]
+  }
 }
 
 Table Team {
-  id Int [pk, increment]
+  id String [pk]
   name String [not null]
-  ownerEmail String [not null]
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
-  status String [not null, default: 'Doing']
-  picture String [not null, default: 'https://cdn2.psychologytoday.com/assets/styles/manual_crop_1_91_1_1528x800/public/2020-08/shutterstock_1731284125_0.jpg?itok=89UrdUt_']
-  numOfMember Int [not null, default: 1]
-  isPublish Boolean [not null, default: true]
+  picture String [not null]
+  isPublic Boolean [not null, default: true]
   description String
-  teamToken TeamToken [not null]
+  status TeamStatus [not null, default: 'DOING']
   members Member [not null]
+  InviteLink InviteLink [not null]
+}
+
+Table InviteLink {
+  id String [pk]
+  teamId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  expiresAt DateTime [not null]
+  type TypeToken [not null, default: 'INVITE']
+  team Team [not null]
 }
 
 Table Member {
+  id String [pk]
+  userId String [not null]
+  teamId String [not null]
+  isOwner Boolean [not null, default: false]
+  isPendingInvitation Boolean [not null, default: false]
+  isGuess Boolean [not null, default: false]
+  invitedBy String
+  joinedAt DateTime [default: `now()`, not null]
+  role String
   user User [not null]
   team Team [not null]
-  isOwner Boolean [not null, default: false]
-  userId Int [not null]
-  teamId Int [not null]
-  joinedAt DateTime [default: `now()`, not null]
-  assignedBy String
 
   indexes {
     (userId, teamId) [unique]
   }
 }
 
+Table Notification {
+  id String [pk]
+  userId String [not null]
+  title String [not null]
+  description String [not null]
+  linkRedirect String
+  isSeen Boolean [not null]
+  user User [not null]
+}
+
 Table User {
-  id Int [pk, increment]
+  id String [pk]
   email String [unique, not null]
-  nickname String [not null, default: 'Not set']
-  picture String [not null, default: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAMFBMVEXg4OC9vb3f39/Kysrc3Ny+vr7Q0NDHx8fNzc3ExMTU1NTV1dXY2NjBwcG6urrLy8vXjdnDAAAEKElEQVR4nO3d63KrIBQF4IAIBgXf/22P5GpbEwGVzfasb6bTv6zhoiCQywUAAAAAAAAAAAAAAAAAAAAAAABgiVTW6k5bqyR1UQ6gbOP8RAgR/rnGKuoi7ao3bcg251vTUxdrN/31d7xHyOs5Miq3nO+W0Z2grXaf890ydtQF3Eh+aKDzpsp6YFXtSr6gZdxSh4h8wUBd0FwqMqAQTGtRxjTRR0Pl2Rev0QGFuFIXNsfKY+Injg+N2FHmid9ok9JGA3bt1Ka00cBb6iIncokBhXDURU7Tp1bhVIm8JhqpvTBg1RPj32bmOL3Z6PRGymysMVl1aKiLHU+mj6SB4/N2qnIa6dRM+XTEITMhnze3rIFmSqipCx6tywooBJ8JxvkTNpkJG+qCRzt/HZ4/oc5MyGcszZg7BYzmT+d/p0lYKZ3jtGqaMwHmNQXOmx/yGWj+hzn++ddp0pdLmS1iTDLqkLrIiZLHGlbjTJC8VMNokeYhsScyemN7SVtRZLSS+JLUTvm10SDlsc/qYf8WPYni2AnvbGRCZs/6uT4qINsaDIb1mWLLZ6V7kTQrexMNy1H0B/tne/AsX8u4C77J7kNG33b8K/BO6oV9wt7ps+S7Ud30ivOMOf13HdOH/DdqsF1jjGk6O5wwHgAAAAAAAMBFymn2a3U3Nk1jpr8xXDswKHmGVYwwrzeu9Y/LBmarNEHrDOf5vhy0ccKvnnT2whk9sKvOYUz+BjzyWftW+iqydgyJq2bQYnPjcQlpt8R7hax2pV91m+M9Q1a5XDysfGRKDGlqG3f2zVdfRpW3n3TNtZa2Kse96+/Jj1W8CHz7Aro5YgVfUNe+Ym/OSP0VPGInwla0OxmS7r7IRXlnxsEt9BWRalufPOYZsYTmLqnMYyN5WoqA5WowINieWTYgwVmFpswg8+YLHzDNOE+xOWLR1xtZPF9QsivmHmXepmA7zTu4tV252RRNFRasxKLP+rlih0wzDzJvV2xPf+5x++1KzTLybhDaQ6lJRt4NQnsodafb+evw/GNp5FGY/RU8XFN8ZhGUnV1QDDZlr46keDMtvMZfvisWP+GWeWNZLorD7Id9j1kMOJYPWGw9+BaQaE244IowTcByEQlvPSkTkfRal9Wfr9jOE99bc/hwQ/bh6eXgT4g1XLife8FenCpurTnwS3ctZ/XVQeONr2ZDzVGrbxV0wbdh/wmjq6SFPsmdp/2+qWI71A/Dl18fS85XWwU+6L0G1baKZ8QStc9HqaaeIfQvtbk7+qrzBRvrsfp8gfp0W8tq9fG5DkRak7yp3Qtj63tAfKG0Wz0QNIvnXeXnLBYpa+IeH63h+8Oyt9NdX+pyqjuOp7p+kaq/H2Lzs98D9vcja/2pfvtYDb21WndaW9vzPXQIAAAAAAAAAAAAAAAAAAAAAAAAh/oHOVI0YSQb7ewAAAAASUVORK5CYII=']
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
-  status String [not null, default: 'NotInitiated']
+  userStatus UserStatus [not null, default: 'OFFLINE']
   session Session [not null]
   profile UserProfile
   members Member [not null]
-}
-
-Table TeamToken {
-  id Int [pk, increment]
-  teamId Int [not null]
-  inviteEmail String [not null]
-  value String [not null]
-  expiredAt DateTime [not null]
-  usedAt DateTime
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  team Team [not null]
+  Notification Notification [not null]
 }
 
 Table UserProfile {
-  id Int [pk, increment]
-  User User [not null]
-  userId Int [not null]
-  firstName String [not null]
-  lastName String [not null]
-  gender String [not null, default: 'Unspecified']
+  id String [pk]
+  userId String [not null]
+  name String [not null]
+  nickname String [not null]
+  picture String [not null]
   workplace String
-  userStatus String [default: 'online']
+  address String
   school String
   introduction String
-  phoneNumber String [not null]
-  photos String [not null]
   talents String
   interests String
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  gender Gender [not null, default: 'UNSPECIFIED']
+  user User [not null]
 
   indexes {
     (userId) [unique]
   }
 }
 
+Enum TeamStatus {
+  DOING
+  DONE
+}
+
+Enum TypeToken {
+  INVITE
+}
+
+Enum Gender {
+  UNSPECIFIED
+  MALE
+  FEMALE
+}
+
+Enum UserStatus {
+  ONLINE
+  OFFLINE
+}
+
 Ref: Session.userId > User.id
+
+Ref: InviteLink.teamId > Team.id
 
 Ref: Member.userId > User.id
 
 Ref: Member.teamId > Team.id
 
-Ref: TeamToken.teamId > Team.id
+Ref: Notification.userId > User.id
 
 Ref: UserProfile.userId - User.id

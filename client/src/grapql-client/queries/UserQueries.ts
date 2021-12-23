@@ -16,35 +16,77 @@ const me = gql`
   query me {
     me {
       id
-      name
       email
-      picture
-      status
+      createdAt
+      updatedAt
+      isAdmin
+      userStatus
+      profile {
+        id
+        userId
+        name
+        nickname
+        picture
+        workplace
+        address
+        school
+        introduction
+        talent
+        interest
+        createdAt
+        updatedAt
+        gender
+      }
+      members {
+        id
+        userId
+        teamId
+        isOwner
+        isPendingInvitation
+        isGuess
+        invitedBy
+        joinedAt
+        role
+        team {
+          id
+          name
+          ownerUserIds
+          createdAt
+          startDate
+          endDate
+          picture
+          numOfMember
+          isPublic
+          status
+          description
+        }
+      }
     }
   }
 `;
 
 const getUser = gql`
-  query getUser($userId: Int) {
-    user(userId: $userId) {
+  query getUser($email: String!) {
+    user(email: $email) {
       id
-      name
       email
       createdAt
       updatedAt
       isAdmin
       status
-      picture
       members {
+        id
+        email
         isOwner
         teamId
         joinedAt
         assignedBy
+        status
       }
       profile {
         id
-        firstName
-        lastName
+        name
+        nickname
         gender
         workplace
         userStatus
@@ -55,7 +97,6 @@ const getUser = gql`
         createdAt
         updatedAt
         phoneNumbers
-        photos
       }
     }
   }
@@ -72,7 +113,6 @@ const getUsers = gql`
         updatedAt
         isAdmin
         status
-        picture
       }
       total
     }

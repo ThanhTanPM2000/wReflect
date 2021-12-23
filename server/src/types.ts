@@ -1,5 +1,6 @@
-import { getListTeams } from './services/team';
+import { TeamStatus } from '.prisma/client';
 import { Request } from 'express';
+import { User, UserProfile } from '@prisma/client';
 
 export type SanitizedUser = {
   id: number;
@@ -10,7 +11,7 @@ export type SanitizedUser = {
 };
 
 export interface RequestWithUserInfo extends Request {
-  user: SanitizedUser;
+  user: User & { profile: UserProfile | null };
 }
 
 export type UserStatus = 'NotInitiated' | 'Initiated' | 'Completed';
@@ -22,6 +23,11 @@ export enum UserStatusEnum {
 
 export const apiPaths = ['/api', '/graphql'];
 
+export type customerError = {
+  message: string;
+  code: number;
+};
+
 export type createTeamType = {
   name: string;
   startDate: string;
@@ -32,12 +38,12 @@ export type createTeamType = {
 };
 
 export type updateTeamType = {
-  id: number;
+  id: string;
   name?: string;
   startDate?: string;
   endDate?: string;
   status?: string;
-  isPublish?: boolean;
+  isPublic?: boolean;
   picture?: string;
   description?: string;
 };
@@ -51,22 +57,21 @@ export type updateProfileType = {
 
 export type addMemberToTeamType = {
   emailUsers: string[];
-  teamId: number;
+  teamId: string;
 };
 
 export type removeMemberType = {
-  userId: number;
-  teamId: number;
+  memberId: string;
 };
 
 export type setRoleMemberType = {
-  userId: number;
-  teamId: number;
+  memberId: string;
+  teamId: string;
   isOwner: boolean;
 };
 
 export type getListDataType = {
-  status?: string;
+  status?: TeamStatus;
   isGettingAll?: boolean;
   search?: string;
   page?: number;
@@ -74,7 +79,7 @@ export type getListDataType = {
 };
 
 export type getListMembersType = {
-  teamId: number;
+  teamId: string;
 };
 
 export type updateUserType = {

@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
-import { Modal, Form, Input, DatePicker, Upload, Button, Select, message, Space } from 'antd';
+import { Modal, Form, Input, DatePicker, Upload, Button, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useMutation } from '@apollo/client';
 
 import { TeamMutations } from '../../grapql-client/mutations';
 import { TeamQueries } from '../../grapql-client/queries';
+import { RcFile, UploadChangeParam } from 'antd/lib/upload';
+import config from '../../config';
+import { UploadFile } from 'antd/lib/upload/interface';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -18,12 +21,12 @@ type Props = {
 const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
 
-  const [addNewTeam] = useMutation(TeamMutations.addNewTeam, {
-    refetchQueries: [
-      TeamQueries.getTeams, // DocumentNode object parsed with gql
-      'teams', // Query name
-    ],
-  });
+  const [addNewTeam] = useMutation<TeamMutations.createTeamResult, TeamMutations.createTeamVars>(
+    TeamMutations.createTeam,
+    {
+      refetchQueries: [TeamQueries.getTeams],
+    },
+  );
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -34,14 +37,12 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
 
   const onFinish = () => {
     form.validateFields().then(async (values: any) => {
-      console.log('all arguments ', values);
       const startDate = values['range-picker'] && values['range-picker'][0] ? values['range-picker'][0] : moment();
       const endDate = values['range-picker'] && values['range-picker'][1] ? values['range-picker'][1] : moment();
       const teamName = values['teamName'];
       const teamDescription = values['teamDescription'];
       const isPublic = values['select'] === 'public' ? true : false;
-      const picture = values['upload'][0]?.response;
-
+      const picture = values['upload'][0]?.response || values['upload'];
       addNewTeam({
         variables: {
           startDate,
@@ -55,6 +56,18 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
       form.resetFields();
       setIsVisible(false);
     });
+  };
+
+  const props = {
+    beforeUpload: async (file: RcFile) => {
+      if (file.type !== 'image/png') {
+        message.error(`${file.name} is not a png file`);
+      }
+      return file.type === 'image/png' ? true : Upload.LIST_IGNORE;
+    },
+    onChange: (info: UploadChangeParam<UploadFile<any>>) => {
+      console.log(info.fileList);
+    },
   };
 
   return (
@@ -98,14 +111,17 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           name="upload"
           label="Upload"
           valuePropName="file"
+          initialValue={`${config.SERVER_BASE_URL}/uploads/teamDefault.png`}
           getValueFromEvent={normFile}
         >
           <Upload
-            action="http://localhost:4000/api/upload"
+            action={`${config.SERVER_BASE_URL}/api/upload`}
             name="photo"
             multiple={false}
+            withCredentials={true}
             listType="picture"
             maxCount={1}
+            {...props}
           >
             <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>

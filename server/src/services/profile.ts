@@ -1,14 +1,13 @@
-import { updateProfileType } from './../types';
 import prisma from '../prisma';
 import logger from '../logger';
 
-export const getUserProfile = async (userId: number) => {
+export const getUserProfile = async (userId: string) => {
   try {
     const userProfile = await prisma.userProfile.findUnique({
       where: {
         userId,
       },
-      include: { User: true },
+      include: { user: true },
     });
     return userProfile;
   } catch (error) {
@@ -17,21 +16,11 @@ export const getUserProfile = async (userId: number) => {
   }
 };
 
-// export const updateUserProfile = async (userId: number, data: updateProfileType) => {
+// export const editProfile = (userId: number, data: UserProfile) => {
 //   try {
-//     const updatedProfile = await prisma.userProfile.update({
-//       where: {
-//         userId,
-//       },
-//       data: {
-//         ...data,
-//       },
-//       include: {
-//         User: true,
-//       },
-//     });
-//     return updatedProfile;
+//     const;
 //   } catch (error) {
-//     logger.error('Error in updateUserProfile');
+//     logger.error('Error in edit Profile');
+//     throw error;
 //   }
 // };

@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Card, Col, Avatar, Row, Pagination, Skeleton, notification, Empty } from 'antd';
+import { Card, Col, Avatar, Row, Pagination } from 'antd';
 
-import { useQuery } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Member, Team, Teams, TeamStatus } from '../../types';
+import { Loading } from '../../components/Loading';
+import { TeamMutations } from '../../grapql-client/mutations';
 
 const { Meta } = Card;
 
 type Props = {
-  status: string;
+  status?: TeamStatus;
   searchText: string;
   setIsLoading: (value: boolean) => void;
   page: number;
@@ -22,157 +25,144 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
   const history = useHistory();
   const [isVisibleAddModal, setVisibleModal] = useState(false);
 
-  const redirect = (value: number) => {
-    history.push(`/teams/${value}`);
+  const redirect = (value: string) => {
+    history.push(`/manage-members/${value}`);
   };
 
-  const { error, data, loading, refetch } = useQuery(TeamQueries.getTeams, {
-    variables: { status, isGettingAll: false, search: searchText, page, size },
-    fetchPolicy: 'cache-and-network', // Used for first execution
-    nextFetchPolicy: 'cache-first', // Used for subsequent executions
-    errorPolicy: 'all',
-  });
-
-  useEffect(() => {
-    setIsLoading(loading);
-  }, [loading]);
+  const { error, data, loading, refetch, networkStatus } = useQuery<TeamQueries.getTeamsData, TeamQueries.getTeamsVars>(
+    TeamQueries.getTeams,
+    {
+      variables: { input: { status, isGettingAll: false, search: searchText, page, size } },
+      fetchPolicy: 'cache-first', // Used for first execution
+      notifyOnNetworkStatusChange: true,
+      onCompleted: (data: TeamQueries.getTeamsData) => {
+        const { page, size } = data.teams;
+        setPage(page);
+        size && setSize(size);
+      },
+    },
+  );
 
   useEffect(() => {
     refetch();
   }, [searchText, page, size]);
 
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading]);
+
   const onAddMember = () => {
     setVisibleModal(true);
   };
 
-  if (loading || error)
-    return (
-      <>
-        <Card style={{ width: 300, marginTop: 16 }} loading={true}>
-          <Meta
-            avatar={<Avatar key="k1" src="https://joeschmoe.io/api/v1/random" />}
-            title="Card title"
-            description="This is the description"
-          />
-        </Card>
-        <Card
-          style={{ width: 300, marginTop: 16 }}
-          actions={[
-            <SettingOutlined key="setting" />,
-            <UsergroupAddOutlined key="edit" />,
-            <EllipsisOutlined key="ellipsis" />,
-          ]}
-        >
-          <Skeleton loading={true} avatar active>
-            <Meta
-              avatar={<Avatar key="key2" src="https://joeschmoe.io/api/v1/random" />}
-              title="Card title"
-              description="This is the description"
-            />
-          </Skeleton>
-        </Card>
-      </>
-    );
-
   const onPaginationChanged = (page: number, pageSize: number | undefined) => {
+    console.log('page is', page);
+    refetch({
+      input: {
+        search: searchText,
+        status: 'DOING',
+        isGettingAll: false,
+        page,
+        size: 8,
+      },
+    });
     setPage(page);
     pageSize && setSize(pageSize);
   };
 
   return (
-    <>
-      <div className="flex flex-1 flex-dir-c" style={{ padding: '10px' }}>
-        {!data.teams || data.teams.data.length == 0 ? (
-          <div className="flex" style={{ flex: 1, height: '100%', width: '100%' }}>
-            <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
-              <Row className="flex flex-dir-r" style={{ height: '100%' }} key={`row`} gutter={[16, 16]}>
-                {data.teams.data.map((team: any) => {
-                  return (
-                    <Col
+    <div className="flex flex-1 flex-dir-c" style={{ padding: '10px' }}>
+      <Loading
+        refetch={refetch}
+        data={!!data && data?.teams?.data?.length > 0}
+        loading={loading || networkStatus === NetworkStatus.refetch}
+        error={error}
+      >
+        <>
+          <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
+            <Row className="flex flex-dir-r" style={{ height: '100%', padding: '10px' }} key={`row`} gutter={[16, 16]}>
+              {data?.teams?.data?.map((team: Team) => {
+                return (
+                  <Col
+                    key={team.id}
+                    className="flex"
+                    style={{ height: '100%', maxWidth: '500px', maxHeight: '200px' }}
+                    span={(() => {
+                      switch (data.teams.data.length) {
+                        case 1:
+                          return 24;
+                        case 2:
+                          return 12;
+                        case 3:
+                          return 8;
+                        default:
+                          return 6;
+                      }
+                    })()}
+                  >
+                    <Card
+                      // style={{ height: '100%' }}
+                      bodyStyle={{ display: 'flex', flex: 1 }}
+                      className="flex flex-1 flex-dir-c"
+                      hoverable
                       key={team.id}
-                      className="flex"
-                      style={{ height: '100%', maxWidth: '500px', maxHeight: '200px' }}
-                      span={(() => {
-                        switch (data.teams.data.length) {
-                          case 1:
-                            return 24;
-                          case 2:
-                            return 12;
-                          case 3:
-                            return 8;
-                          default:
-                            return 6;
-                        }
-                      })()}
+                      size="small"
+                      loading={loading}
+                      actions={[
+                        <SettingOutlined key="setting" />,
+                        <UsergroupAddOutlined key="edit" onClick={() => onAddMember()} />,
+                        <EllipsisOutlined key="ellipsis" />,
+                      ]}
                     >
-                      <Card
-                        // style={{ height: '100%' }}
-                        bodyStyle={{ display: 'flex', flex: 1 }}
-                        className="flex flex-1 flex-dir-c"
-                        hoverable
-                        key={team.id}
-                        size="small"
-                        loading={loading}
-                        actions={[
-                          <SettingOutlined key="setting" />,
-                          <UsergroupAddOutlined key="edit" onClick={() => onAddMember()} />,
-                          <EllipsisOutlined key="ellipsis" />,
-                        ]}
-                      >
-                        <>
-                          <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team.id)}>
-                            <div className="flex">
-                              <Meta
-                                key={team.name}
-                                title={team.name}
-                                avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
-                              ></Meta>
-                            </div>
-                            <div>
-                              <div className="flex flex-dir-r flex-jc-sb">
-                                <div>
-                                  {team.members.map((member: any) => {
-                                    return (
-                                      <Avatar
-                                        style={{ marginRight: '3px' }}
-                                        size="small"
-                                        key={member.userId}
-                                        src={member.user.picture}
-                                      />
-                                    );
-                                  })}
-                                </div>
-                                <div>
-                                  <span>{`${team.members.length}`} members</span>
-                                </div>
+                      <>
+                        <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team.id)}>
+                          <div className="flex">
+                            <Meta
+                              key={team.name}
+                              title={team.name}
+                              avatar={<Avatar key={`hek${team.id}`} shape="square" src={team.picture} />}
+                            ></Meta>
+                          </div>
+                          <div>
+                            <div className="flex flex-dir-r flex-jc-sb">
+                              <div>
+                                {team.members.map((member: Member) => {
+                                  return (
+                                    <Avatar
+                                      style={{ marginRight: '3px' }}
+                                      size="small"
+                                      key={member?.user?.email}
+                                      src={member?.user?.profile?.picture}
+                                    />
+                                  );
+                                })}
+                              </div>
+                              <div>
+                                <span>{`${team?.members?.length}`} members</span>
                               </div>
                             </div>
                           </div>
-                        </>
-                      </Card>
-                    </Col>
-                  );
-                })}
-              </Row>
-            </div>
-            <div className="flex flex-ai-c flex-jc-c mt-12">
-              <Pagination
-                defaultCurrent={1}
-                current={page}
-                total={data.teams.total}
-                defaultPageSize={8}
-                pageSize={size}
-                onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
-              />
-            </div>
-          </>
-        )}
-      </div>
-    </>
+                        </div>
+                      </>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          </div>
+          <div className="flex flex-ai-c flex-jc-c mt-12">
+            <Pagination
+              defaultCurrent={1}
+              current={page}
+              total={data?.teams?.total}
+              defaultPageSize={8}
+              pageSize={size}
+              onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
+            />
+          </div>
+        </>
+      </Loading>
+    </div>
   );
 };
 

@@ -1,12 +1,48 @@
 import { gql } from '@apollo/client';
+import { StringNullableChain } from 'lodash';
+import { Team } from '../../types';
 
-const addNewTeam = gql`
+export type createTeamVars = {
+  name: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  isPublic?: boolean;
+  picture?: string;
+};
+export type updateTeamVars = {
+  id: string;
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  picture?: string;
+  isPublic?: string;
+  description?: string;
+};
+
+export type deleteTeamVars = {
+  teamId: string;
+};
+export type createTeamResult = {
+  createTeam: Team;
+};
+export type updateTeamResult = {
+  updateTeam: Team;
+};
+export type deleteTeamResult = {
+  deleteTeam: {
+    count: number;
+  };
+};
+
+const createTeam = gql`
   mutation createTeam(
     $name: String!
     $startDate: String!
     $endDate: String!
     $description: String
-    $isPublish: Boolean
+    $isPublic: Boolean
     $picture: String
   ) {
     createTeam(
@@ -14,29 +50,31 @@ const addNewTeam = gql`
       startDate: $startDate
       endDate: $endDate
       description: $description
-      isPublish: $isPublish
+      isPublic: $isPublic
       picture: $picture
     ) {
       id
       name
-      description
-      ownerEmail
+      createdAt
       startDate
       endDate
       status
       picture
+      isPublic
+      description
     }
   }
 `;
 
 const updateTeam = gql`
   mutation updateTeam(
-    $id: Int!
+    $id: String!
     $name: String
     $startDate: String
     $endDate: String
     $status: String
     $picture: String
+    $isPublic: Boolean
     $description: String
   ) {
     updateTeam(
@@ -45,45 +83,58 @@ const updateTeam = gql`
       status: $status
       startDate: $startDate
       endDate: $endDate
+      isPublic: $isPublic
       picture: $picture
       description: $description
     ) {
       id
       name
-      ownerEmail
       createdAt
       startDate
       endDate
-      status
       picture
-      numOfMember
-      isPublish
+      isPublic
       description
+      status
       members {
-        isOwner
+        id
         userId
+        teamId
+        isOwner
+        isPendingInvitation
+        isGuess
+        invitedBy
         joinedAt
-        assignedBy
       }
     }
   }
 `;
 
 const deleteTeam = gql`
-  mutation deleteTeam($teamId: Int) {
+  mutation deleteTeam($teamId: String!) {
     deleteTeam(teamId: $teamId) {
-      id
-      name
-      ownerEmail
-      createdAt
-      startDate
-      endDate
-      status
-      picture
-      numOfMember
-      isPublish
-      description
+      count
     }
   }
 `;
-export { addNewTeam, updateTeam, deleteTeam };
+
+export type changeTeamAccessVars = {
+  teamId: string;
+  isPublic: boolean;
+};
+
+export type changeTeamAccessResult = {
+  changeTeamAccess: {
+    count: number;
+  };
+};
+
+const changeTeamAccess = gql`
+  mutation ChangeTeamAccess($teamId: String!, $isPublic: Boolean!) {
+    changeTeamAccess(teamId: $teamId, isPublic: $isPublic) {
+      count
+    }
+  }
+`;
+
+export { createTeam, updateTeam, deleteTeam, changeTeamAccess };

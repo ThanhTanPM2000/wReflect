@@ -8,18 +8,18 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import SignUpPage from './pages/SigupPage/signupPage';
 import ForgotPassword from './pages/ForgotPassword/forgotPassword';
 import { SideBar } from './components/SideBar';
-import { Me } from './types';
+import { User } from './types';
 import { Team } from './pages/TeamPage';
+import { ManageMembers } from './pages/ManageMembersPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { AccountSetting } from './pages/AccountSettingPage';
-import { DashBoard } from './components/DashBoard';
 import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 
 type Props = {
-  me: null | Me;
+  me: null | User;
 };
 
 const { Footer, Content } = Layout;
@@ -29,7 +29,7 @@ const Routes = ({ me }: Props): JSX.Element => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  const picture = me?.picture || null;
+  const picture = me?.profile?.picture || null;
 
   return (
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
@@ -46,23 +46,26 @@ const Routes = ({ me }: Props): JSX.Element => {
           ) : (
             <>
               <SideBar email={email} isAdmin={isAdmin} />
-              <Layout className="site-layout">
+              <Layout className="site-layout" style={{ marginLeft: '80px' }}>
                 <TopNavBar email={email} picture={picture} />
-                <Content style={{ margin: '10px 16px', height: '100%', overflow: 'auto' }}>
+                <Content className="flex flex-1" style={{ margin: '10px 16px', overflow: 'auto' }}>
                   <Switch>
                     {/* <Route exact path="/" component={Team} /> */}
                     {isAdmin ? (
                       <Switch>
-                        <Route path="/dashboard" component={DashBoard} />
                         <Route path="/user-managements" component={UserManagements} />
                         <Redirect to="/user-managements" />
                       </Switch>
                     ) : (
                       <Switch>
                         <Route path="/teams" exact component={Team} />
-                        <Route
+                        {/* <Route
                           path="/teams/:id"
                           render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
+                        /> */}
+                        <Route
+                          path="/manage-members/:teamId"
+                          render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
                         />
                         <Route path="/me" component={ProfileUser} />
                         <Route path="/account" component={AccountSetting} />

@@ -1,34 +1,78 @@
+import { StringNullableChain } from 'lodash';
 import { gql } from '@apollo/client';
+import { Team } from '../../types';
+
+export type getTeamVars = {
+  teamId: string;
+};
+
+export type getTeamsVars = {
+  input: {
+    status?: string;
+    isGettingAll?: boolean;
+    search?: string;
+    page?: number;
+    size?: number;
+  };
+};
+
+export type getTeamData = {
+  team: Team;
+};
+
+export type getTeamsData = {
+  teams: {
+    data: Team[];
+    total: number;
+    page: number;
+    size: number;
+  };
+};
 
 const getTeam = gql`
-  query getTeam($teamId: Int!, $searchText: String) {
+  query getTeam($teamId: String!) {
     team(teamId: $teamId) {
       id
       name
-      ownerEmail
       createdAt
       startDate
       endDate
-      status
       picture
-      numOfMember
-      isPublish
+      isPublic
       description
-      members(searchText: $searchText) {
-        isOwner
+      status
+      members {
+        id
         userId
         teamId
+        isOwner
+        isPendingInvitation
+        isGuess
+        invitedBy
         joinedAt
-        assignedBy
         user {
           id
-          nickname
           email
           createdAt
           updatedAt
           isAdmin
-          status
-          picture
+          userStatus
+          profile {
+            id
+            userId
+            name
+            nickname
+            picture
+            workplace
+            address
+            school
+            introduction
+            talent
+            interest
+            createdAt
+            updatedAt
+            gender
+          }
         }
       }
     }
@@ -36,25 +80,59 @@ const getTeam = gql`
 `;
 
 const getTeams = gql`
-  query teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
-    teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
+  query Teams($input: TeamsInput) {
+    teams(input: $input) {
       data {
         id
         name
-        description
+        ownerUserIds
+        createdAt
+        startDate
+        endDate
         picture
+        numOfMember
+        isPublic
+        status
+        description
         members {
+          id
           userId
+          teamId
           isOwner
-          userId
+          isPendingInvitation
+          isGuess
+          invitedBy
+          joinedAt
+          role
           user {
             id
             email
-            picture
+            createdAt
+            updatedAt
+            isAdmin
+            userStatus
+            profile {
+              id
+              name
+              nickname
+              picture
+              workplace
+              address
+              school
+              introduction
+              talent
+              interest
+              createdAt
+              updatedAt
+              gender
+              userId
+            }
           }
         }
       }
       total
+      page
+      size
     }
   }
 `;

@@ -7,6 +7,7 @@ import * as services from '../services';
 import config from '../config';
 import logger from '../logger';
 import * as validators from './validators/user';
+import { Team, User, UserProfile } from '@prisma/client';
 
 const clearCookies = (res: Response) => {
   setCookie('email', '', 0, res);
@@ -21,7 +22,11 @@ export const me = async (req: RequestWithUserInfo, res: Response): Promise<void 
     const token = cookies.token;
     // /me is unauthenticated and is the first api call from the dashboard
     // we want to clean dashboard cookies and let it know it is logged out to render the right view
-    let sanitizedUser: SanitizedUser | null;
+    let sanitizedUser:
+      | (User & {
+          profile: UserProfile | null;
+        })
+      | null;
     if (!email || !token) {
       return clearCookies(res);
     } else {

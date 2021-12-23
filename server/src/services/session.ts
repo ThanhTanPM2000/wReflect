@@ -4,9 +4,9 @@ import { addMinutes } from 'date-fns';
 import prisma from '../prisma';
 import config from '../config';
 import logger from '../logger';
-import { SanitizedUser } from '../types';
+import { Team, User, UserProfile } from '@prisma/client';
 
-export const createSession = async (userId: number, sessionDurationMinutes: number) => {
+export const createSession = async (userId: string, sessionDurationMinutes: number) => {
   const session = await prisma.session.create({
     data: {
       userId,
@@ -18,10 +18,26 @@ export const createSession = async (userId: number, sessionDurationMinutes: numb
   return session;
 };
 
-export const checkAndExtendSession = async (email: string, token: string): Promise<null | SanitizedUser> => {
+export const checkAndExtendSession = async (
+  email: string,
+  token: string,
+): Promise<
+  | (User & {
+      profile: UserProfile | null;
+    })
+  | null
+> => {
   try {
     const user = await prisma.user.findFirst({
       where: { email },
+      include: {
+        profile: true,
+        members: {
+          include: {
+            team: true,
+          },
+        },
+      },
     });
     if (!user) return null;
     const now = new Date();
@@ -29,28 +45,42 @@ export const checkAndExtendSession = async (email: string, token: string): Promi
     if (!session) return null;
     const newExpiredAt = addMinutes(now, config.SESSION_DURATION_MINUTES);
     await prisma.session.update({
-      where: { id: user.id },
+      where: {
+        id: session.id,
+      },
       data: { expiresAt: newExpiredAt },
     });
     return {
-      id: user.id,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      picture: user.picture,
-      status: user.status,
+      ...user,
     };
   } catch (error) {
     if (error instanceof Error) logger.error(error.message);
-    throw error;
+    return null;
   }
 };
 
-export const endSession = async (userId: number, token: string) => {
+export const endSession = async (userId: string, token: string) => {
   try {
-    await prisma.session.updateMany({ where: { userId, token }, data: { expiresAt: new Date() } });
+    await prisma.session.update({
+      where: {
+        userId_token: {
+          userId,
+          token,
+        },
+      },
+      data: {
+        user: {
+          update: {
+            userStatus: 'OFFLINE',
+          },
+        },
+        expiresAt: new Date(),
+      },
+    });
   } catch (error) {
     if (error instanceof Error) {
       logger.error(error.message);
     }
+    return null;
   }
 };

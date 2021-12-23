@@ -11,11 +11,11 @@ import {
   StockOutlined,
   TeamOutlined,
   CarryOutOutlined,
-  HomeOutlined,
+  TrophyOutlined,
   CalendarOutlined,
   UsergroupDeleteOutlined,
   BarChartOutlined,
-  RollbackOutlined
+  UserOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -28,20 +28,25 @@ type Props = {
 
 const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
-  const urlChangeIcon = window.location.pathname + window.location.search;
 
   return (
     <>
       {email && (
         <Sider
           className="sidebar"
+          width={150}
           onMouseEnter={() => setIsCollapse(false)}
           onMouseLeave={() => setIsCollapse(true)}
           collapsible
           collapsed={isCollapse}
           onCollapse={(collapse) => setIsCollapse(collapse)}
         >
-          <div className="ant-layout-logo"></div>
+          <div className="ant-layout-logo flex flex-dir-r flex-ai-c ">
+            <span style={{ marginLeft: '10px' }}>wR</span>
+            <span className="title" style={isCollapse ? { opacity: 0 } : { opacity: 1, transition: '0.7s' }}>
+              eflect
+            </span>
+          </div>
           <Menu className="flex flex-1" theme="dark" defaultSelectedKeys={['1']} mode="inline">
             {isAdmin ? (
               <>
@@ -56,18 +61,15 @@ const SideBar = ({ email, isAdmin }: Props) => {
                   Settings
                 </Menu.Item>
               </>
-            ) : urlChangeIcon === '/teams' ? (
-              <>
-                <Menu.Item icon={<HomeOutlined />} style={{ marginTop: 20 }} key="/WorkSpace">
-                  <Link to="/teams">Home</Link>
-                </Menu.Item>
-              </>
             ) : (
               <>
-                <Menu.Item icon={<RollbackOutlined />} style={{ marginTop: 20 }}>
-                  <Link to="/teams">Back</Link>
+                <Menu.Item icon={<TrophyOutlined />} style={{ marginTop: 20 }} key="Teams">
+                  <Link to="/teams">Teams</Link>
                 </Menu.Item>
                 <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
+                  <Menu.Item icon={<TeamOutlined />} key="ManageMembers">
+                    <Link to="/manage-members">Members</Link>
+                  </Menu.Item>
                   <Menu.Item key="3" icon={<PieChartOutlined />}>
                     Board
                   </Menu.Item>
@@ -81,6 +83,9 @@ const SideBar = ({ email, isAdmin }: Props) => {
                     Manager
                   </Menu.Item>
                 </SubMenu>
+                <Menu.Item icon={<UserOutlined />} key="account">
+                  <Link to="/me">Account</Link>
+                </Menu.Item>
               </>
             )}
 
