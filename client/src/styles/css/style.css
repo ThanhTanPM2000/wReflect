@@ -171,6 +171,13 @@ code {
 .mr-12 {
   margin-right: 12px; }
 
+.ant-layout-content {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02), 0 2px 3px 0 rgba(0, 0, 0, 0.02), 0 2px 7px 0 rgba(0, 0, 0, 0.04);
+  background: #fff;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 24px; }
+
 .flex.flex-1.homepage {
   background: white !important; }
 
@@ -236,6 +243,9 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
 .profileUser textarea {
   resize: none !important; }
 
+.ant-row.ant-form-item {
+  margin-bottom: 20px; }
+
 .login-with-social {
   display: flex;
   justify-content: center;
@@ -249,11 +259,19 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
 .login-with-social button:hover {
   box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19); }
 
-.sidebar .ant-layout-logo {
-  height: 32px;
-  background: #333;
-  border-radius: 6px;
-  margin: 16px; }
+.sidebar {
+  position: fixed;
+  height: 100%;
+  z-index: 200 !important;
+  background-color: #f7f8fa; }
+  .sidebar .ant-layout-logo {
+    height: 32px;
+    background: #f7f8fa;
+    border-radius: 10px;
+    margin: 16px; }
+    .sidebar .ant-layout-logo span {
+      font-family: "Baloo Bhai";
+      font-size: 23px; }
 
 .topNavBar {
   display: flex;
