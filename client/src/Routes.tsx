@@ -14,6 +14,8 @@ import { AccountSetting } from './pages/AccountSettingPage';
 import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
+import {boardColumn} from './pages/BoardColumn';
+
 
 type Props = {
   me: null | User;
@@ -53,6 +55,8 @@ const Routes = ({ me }: Props): JSX.Element => {
                     ) : (
                       <Switch>
                         <Route path="/teams" exact component={Team} />
+                        <Route path="/boardColumn" exact component={boardColumn}/>
+
                         {/* <Route
                           path="/teams/:id"
                           render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
