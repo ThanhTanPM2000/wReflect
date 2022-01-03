@@ -13,28 +13,22 @@ import { UserQueries } from './grapql-client/queries';
 
 const App = (): JSX.Element => {
   const [me, setMe] = useState<null | User>(null);
-  // const [loading, setLoading] = useState(loadingMe);
+  // const [constructor, setConstructor] = useState(true);
 
-  // const [getMe, { loading }] = useLazyQuery(UserQueries.me);
-  // const { data, loading } = useQuery(UserQueries.me);
-
-  setUpdateLoginState(async (newMe: null | User) => {
+  setUpdateLoginState((newMe: null | User) => {
     setMe(newMe);
     localStorage.setItem('email', newMe?.email || '');
   });
 
-  // if (!loading) {
-  //   console.log('hello');
-  //   setMe(data?.me);
-  //   localStorage.setItem('email', data?.me?.email || '');
+  // if (constructor) {
+  //   (async () => {
+  //     await user.me();
+  //     setConstructor(false);
+  //   })();
   // }
 
   useEffect(() => {
     (async function () {
-      // if (!loading) {
-      //   setMe(data.me);
-      //   localStorage.setItem('email', data?.me?.email || '');
-      // }
       await user.me();
     })();
   }, []);

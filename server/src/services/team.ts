@@ -2,17 +2,17 @@ import { StatusCodes } from 'http-status-codes';
 import config from '../config';
 import prisma from './../prisma';
 import { createTeamType, updateTeamType } from '../types';
-import { Team, TeamStatus } from '.prisma/client';
+import { Team, TeamStatus, Board, Column, Remark, Opinion, OpinionStatus } from '@prisma/client';
 import { errorName } from '../constant/errorsConstant';
 import { ForbiddenError, ApolloError } from 'apollo-server-errors';
 
 export const getTeams = async (
-  userId?: string,
-  status?: TeamStatus,
   isGettingAll = false,
   page = 1,
   size = 8,
   search = '',
+  status?: TeamStatus,
+  userId?: string,
 ) => {
   const where = userId
     ? {
@@ -42,6 +42,10 @@ export const getTeams = async (
     ...(!isGettingAll && { skip: (page - 1) * size }),
     ...(!isGettingAll && { take: size }),
     orderBy: { createdAt: 'desc' },
+
+    include: {
+      boards: true,
+    },
   });
 
   const total = await prisma.team.count({
@@ -109,6 +113,27 @@ export const createTeam = async (meId: string, data: createTeamType) => {
       ...data,
       startDate,
       endDate,
+      boards: {
+        create: {
+          createdBy: meId,
+          title: 'Default Board',
+          columns: {
+            createMany: {
+              data: [
+                {
+                  title: 'Went Well',
+                },
+                {
+                  title: 'To Improve',
+                },
+                {
+                  title: 'Action Items',
+                },
+              ],
+            },
+          },
+        },
+      },
       members: {
         create: {
           isOwner: true,

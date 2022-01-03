@@ -29,6 +29,68 @@ Table Team {
   status TeamStatus [not null, default: 'DOING']
   members Member [not null]
   InviteLink InviteLink [not null]
+  boards Board [not null]
+}
+
+Table Board {
+  id String [pk]
+  teamId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  createdBy String [not null]
+  isPublic Boolean [not null, default: true]
+  isLocked Boolean [not null, default: false]
+  disableDownVote Boolean [not null, default: false]
+  disableUpVote Boolean [not null, default: false]
+  isAnonymous Boolean [not null, default: false]
+  votesLimit Int [not null, default: 25]
+  title String [not null]
+  timerInProgress Int
+  endTime Int
+  team Team [not null]
+  columns Column [not null]
+}
+
+Table Column {
+  id String [pk]
+  color String [not null, default: 'white']
+  title String [not null]
+  isActive Boolean [not null, default: true]
+  opinions Opinion [not null]
+  boardId String [not null]
+  board Board [not null]
+}
+
+Table Opinion {
+  id String [pk]
+  columnId String [not null]
+  authorId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  text String [not null]
+  upVote String [not null]
+  downVote String [not null]
+  updatedBy String [not null]
+  isAction Boolean [not null, default: false]
+  isBookmarked Boolean [not null, default: false]
+  responsible String
+  mergedAuthors String [not null]
+  voters String [not null]
+  color String [not null, default: 'white']
+  status OpinionStatus [not null, default: 'NEW']
+  author User [not null]
+  column Column [not null]
+  remarks Remark [not null]
+}
+
+Table Remark {
+  id String [pk]
+  authorId String [not null]
+  opinionId String [not null]
+  text String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  opinion Opinion [not null]
 }
 
 Table InviteLink {
@@ -80,6 +142,7 @@ Table User {
   profile UserProfile
   members Member [not null]
   Notification Notification [not null]
+  Opinion Opinion [not null]
 }
 
 Table UserProfile {
@@ -104,6 +167,13 @@ Table UserProfile {
   }
 }
 
+Enum OpinionStatus {
+  NEW
+  IN_PROGRESS
+  DONE
+  REJECTED
+}
+
 Enum TeamStatus {
   DOING
   DONE
@@ -125,6 +195,16 @@ Enum UserStatus {
 }
 
 Ref: Session.userId > User.id
+
+Ref: Board.teamId > Team.id
+
+Ref: Column.boardId > Board.id
+
+Ref: Opinion.authorId > User.id
+
+Ref: Opinion.columnId > Column.id
+
+Ref: Remark.opinionId > Opinion.id
 
 Ref: InviteLink.teamId > Team.id
 

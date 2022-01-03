@@ -2,15 +2,13 @@ import axios from 'axios';
 import statusCodes from 'http-status-codes';
 import config from '../config';
 import { User } from '../types';
-import { UserQueries } from '../grapql-client/queries';
-import { useQuery } from '@apollo/client';
 
 // Function is dynamically added on initialization to prevent circular dependencies
 // For updating react state
 type UpdateLoginState = null | ((newEmail: null | User) => void);
 let updateLoginState: UpdateLoginState = null;
-const setUpdateLoginState = (updateLoginStateFunction: UpdateLoginState) => {
-  updateLoginState = updateLoginStateFunction;
+const setUpdateLoginState = async (updateLoginStateFunction: UpdateLoginState) => {
+  updateLoginState = await updateLoginStateFunction;
 };
 
 const instance = axios.create({

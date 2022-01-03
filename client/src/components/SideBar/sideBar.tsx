@@ -12,11 +12,14 @@ import {
   TeamOutlined,
   CarryOutOutlined,
   TrophyOutlined,
+  GoldOutlined,
   CalendarOutlined,
   UsergroupDeleteOutlined,
   BarChartOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { useQuery } from '@apollo/client';
+import { TeamQueries } from '../../grapql-client/queries';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -29,12 +32,20 @@ type Props = {
 const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
 
+  const { data } = useQuery<TeamQueries.getTeamIdsResult>(TeamQueries.getTeamIds, {
+    fetchPolicy: 'cache-first', // Used for first execution
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const teamId = data?.getTeamIds[0]?.id;
+  const boardId = data?.getTeamIds[0]?.boardIds[0];
+
   return (
     <>
       {email && (
         <Sider
           className="sidebar"
-          width={150}
+          width={200}
           onMouseEnter={() => setIsCollapse(false)}
           onMouseLeave={() => setIsCollapse(true)}
           collapsible
@@ -63,15 +74,18 @@ const SideBar = ({ email, isAdmin }: Props) => {
               </>
             ) : (
               <>
-                <Menu.Item icon={<TrophyOutlined />} style={{ marginTop: 20 }} key="Teams">
+                <Menu.Item icon={<GoldOutlined />} style={{ marginTop: 20 }} key="Teams">
                   <Link to="/teams">Teams</Link>
                 </Menu.Item>
                 <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
+                  <Menu.Item icon={<TrophyOutlined />} key="TeamDetail">
+                    <Link to={`/teams/${teamId}`}>Team Details</Link>
+                  </Menu.Item>
                   <Menu.Item icon={<TeamOutlined />} key="ManageMembers">
-                    <Link to="/manage-members">Members</Link>
+                    <Link to={`/manage-members/${teamId}`}>Members</Link>
                   </Menu.Item>
                   <Menu.Item key="3" icon={<PieChartOutlined />}>
-                    Board
+                    <Link to={`/board/${teamId}/${boardId}`}>Board</Link>
                   </Menu.Item>
                   <Menu.Item key="4" icon={<StockOutlined />}>
                     Health Check

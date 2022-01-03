@@ -10,6 +10,7 @@ import { Team } from './pages/TeamPage';
 import { ManageMembers } from './pages/ManageMembersPage';
 import { TopNavBar } from './components/TopNavBar';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
+import { Board } from './pages/BoardPage';
 import { AccountSetting } from './pages/AccountSettingPage';
 import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
@@ -32,16 +33,11 @@ const Routes = ({ me }: Props): JSX.Element => {
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
       <Router history={customHistory}>
         <Switch>
-          {!isLoggedIn ? (
-            <Switch>
-              <Route path="/" component={() => <HomePage email={email} picture={picture} />} />
-              <Redirect to="/" />
-            </Switch>
-          ) : (
+          {isLoggedIn ? (
             <>
               <SideBar email={email} isAdmin={isAdmin} />
               <Layout className="site-layout" style={{ marginLeft: '80px' }}>
-                <TopNavBar email={email} picture={picture} />
+                {/* <TopNavBar email={email} picture={picture} /> */}
                 <Content className="flex flex-1" style={{ margin: '10px 16px', overflow: 'auto' }}>
                   <Switch>
                     {/* <Route exact path="/" component={Team} /> */}
@@ -53,13 +49,13 @@ const Routes = ({ me }: Props): JSX.Element => {
                     ) : (
                       <Switch>
                         <Route path="/teams" exact component={Team} />
-                        {/* <Route
-                          path="/teams/:id"
-                          render={({ match }) => <TeamDetail teamId={parseInt(match.params.id)} />}
-                        /> */}
                         <Route
                           path="/manage-members/:teamId"
                           render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
+                        />
+                        <Route
+                          path="/board/:teamId/:boardId"
+                          render={({ match }) => <Board teamId={match.params.teamId} boardId={match.params.boardId} />}
                         />
                         <Route path="/me" component={ProfileUser} />
                         <Route path="/account" component={AccountSetting} />
@@ -70,9 +66,14 @@ const Routes = ({ me }: Props): JSX.Element => {
                     )}
                   </Switch>
                 </Content>
-                <Footer style={{ textAlign: 'center', padding: '0 0' }}>wReflect ©2022</Footer>
+                {/* <Footer style={{ textAlign: 'center', padding: '0 0' }}>wReflect ©2022</Footer> */}
               </Layout>
             </>
+          ) : (
+            <Switch>
+              <Route path="/" component={() => <HomePage email={email} picture={picture} />} />
+              <Redirect to="/" />
+            </Switch>
           )}
         </Switch>
       </Router>

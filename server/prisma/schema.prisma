@@ -38,6 +38,75 @@ model Team {
   status      TeamStatus   @default(DOING)
   members     Member[]
   InviteLink  InviteLink[]
+  boards      Board[]
+}
+
+model Board {
+  id              String   @id @default(uuid())
+  teamId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String
+  isPublic        Boolean  @default(true)
+  isLocked        Boolean  @default(false)
+  disableDownVote Boolean  @default(false)
+  disableUpVote   Boolean  @default(false)
+  isAnonymous     Boolean  @default(false)
+  votesLimit      Int      @default(25)
+  title           String
+  timerInProgress Int?
+  endTime         Int?
+  team            Team     @relation(fields: [teamId], references: [id])
+  columns         Column[]
+}
+
+model Column {
+  id       String    @id @default(uuid())
+  color    String    @default("white")
+  title    String
+  isActive Boolean   @default(true)
+  opinions Opinion[]
+  boardId  String
+  board    Board     @relation(fields: [boardId], references: [id])
+}
+
+model Opinion {
+  id            String        @id @default(uuid())
+  columnId      String
+  authorId      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  text          String
+  upVote        String[]
+  downVote      String[]
+  updatedBy     String
+  isAction      Boolean       @default(false)
+  isBookmarked  Boolean       @default(false)
+  responsible   String?
+  mergedAuthors String[]
+  voters        String[]
+  color         String        @default("white")
+  status        OpinionStatus @default(NEW)
+  author        User          @relation(fields: [authorId], references: [id])
+  column        Column        @relation(fields: [columnId], references: [id])
+  remarks       Remark[]
+}
+
+model Remark {
+  id        String   @id @default(uuid())
+  authorId  String
+  opinionId String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  opinion   Opinion  @relation(fields: [opinionId], references: [id])
+}
+
+enum OpinionStatus {
+  NEW          @map("New")
+  IN_PROGRESS  @map("In-Progress")
+  DONE         @map("Done")
+  REJECTED     @map("Rejected")
 }
 
 enum TeamStatus {
@@ -97,6 +166,7 @@ model User {
   members      Member[]
   Notification Notification[]
 
+  Opinion Opinion[]
   @@index([email])
 }
 

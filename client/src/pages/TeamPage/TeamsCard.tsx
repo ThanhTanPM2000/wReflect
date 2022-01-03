@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Card, Col, Avatar, Row, Pagination } from 'antd';
 
-import { NetworkStatus, useQuery } from '@apollo/client';
+import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { Member, Team, Teams, TeamStatus } from '../../types';
@@ -29,43 +29,20 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
     history.push(`/manage-members/${value}`);
   };
 
-  const { error, data, loading, refetch, networkStatus } = useQuery<TeamQueries.getTeamsData, TeamQueries.getTeamsVars>(
-    TeamQueries.getTeams,
-    {
-      variables: { input: { status, isGettingAll: false, search: searchText, page, size } },
-      fetchPolicy: 'cache-first', // Used for first execution
-      notifyOnNetworkStatusChange: true,
-      onCompleted: (data: TeamQueries.getTeamsData) => {
-        const { page, size } = data.teams;
-        setPage(page);
-        size && setSize(size);
-      },
-    },
-  );
-
-  useEffect(() => {
-    refetch();
-  }, [searchText, page, size]);
-
-  useEffect(() => {
-    setIsLoading(loading);
-  }, [loading]);
+  const { error, data, loading, refetch, networkStatus } = useQuery<
+    TeamQueries.getTeamsResult,
+    TeamQueries.getTeamsVars
+  >(TeamQueries.getTeams, {
+    variables: { input: { status, isGettingAll: false, search: searchText, page, size } },
+    fetchPolicy: 'cache-first', // Used for first execution
+    notifyOnNetworkStatusChange: true,
+  });
 
   const onAddMember = () => {
     setVisibleModal(true);
   };
 
   const onPaginationChanged = (page: number, pageSize: number | undefined) => {
-    console.log('page is', page);
-    refetch({
-      input: {
-        search: searchText,
-        status: 'DOING',
-        isGettingAll: false,
-        page,
-        size: 8,
-      },
-    });
     setPage(page);
     pageSize && setSize(pageSize);
   };
@@ -79,6 +56,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
         error={error}
       >
         <>
+          {/* <SearchBar placeholder="What are you looking for ?" isLoading={loading} onHandleSearch={onHandleSearch} /> */}
           <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
             <Row className="flex flex-dir-r" style={{ height: '100%', padding: '10px' }} key={`row`} gutter={[16, 16]}>
               {data?.teams?.data?.map((team: Team) => {
@@ -88,7 +66,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                     className="flex"
                     style={{ height: '100%', maxWidth: '500px', maxHeight: '200px' }}
                     span={(() => {
-                      switch (data.teams.data.length) {
+                      switch (data?.teams?.data?.length) {
                         case 1:
                           return 24;
                         case 2:
@@ -126,16 +104,18 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                           <div>
                             <div className="flex flex-dir-r flex-jc-sb">
                               <div>
-                                {team.members.map((member: Member) => {
-                                  return (
-                                    <Avatar
-                                      style={{ marginRight: '3px' }}
-                                      size="small"
-                                      key={member?.user?.email}
-                                      src={member?.user?.profile?.picture}
-                                    />
-                                  );
-                                })}
+                                <Avatar.Group maxCount={2} maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}>
+                                  {team.members.map((member: Member) => {
+                                    return (
+                                      <Avatar
+                                        style={{ marginRight: '3px' }}
+                                        size="default"
+                                        key={member?.user?.email}
+                                        src={member?.user?.profile?.picture}
+                                      />
+                                    );
+                                  })}
+                                </Avatar.Group>
                               </div>
                               <div>
                                 <span>{`${team?.members?.length}`} members</span>

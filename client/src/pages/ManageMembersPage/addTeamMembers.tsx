@@ -51,18 +51,18 @@ const AddMembersModal = ({ teamData }: Props) => {
     },
   );
 
-  const [changeTeamAccess] = useMutation<TeamMutations.changeTeamAccessResult, TeamMutations.changeTeamAccessVars>(
-    TeamMutations.changeTeamAccess,
-    {
-      refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
-      onError: () => ({}),
-      onCompleted: (data: TeamMutations.changeTeamAccessResult) => {
-        // if (data?.changeTeamAccess?.count > 0) {
-        //   setIsPublic(!isPublic);
-        // }
-      },
+  const [changeTeamAccess, { loading }] = useMutation<
+    TeamMutations.changeTeamAccessResult,
+    TeamMutations.changeTeamAccessVars
+  >(TeamMutations.changeTeamAccess, {
+    refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
+    onError: () => ({}),
+    onCompleted: (data: TeamMutations.changeTeamAccessResult) => {
+      // if (data?.changeTeamAccess?.count > 0) {
+      //   setIsPublic(!isPublic);
+      // }
     },
-  );
+  });
 
   const onAddEmail = (value: any) => {
     if (validEmail.test(value.email)) {
@@ -134,6 +134,7 @@ const AddMembersModal = ({ teamData }: Props) => {
       <h4 className="flex flex-dir-r mt-25">
         Invite via URL
         <Switch
+          loading={loading}
           style={{ marginLeft: 'auto' }}
           checkedChildren={<CheckOutlined />}
           unCheckedChildren={<CloseOutlined />}

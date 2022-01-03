@@ -10,6 +10,8 @@ import { RcFile, UploadChangeParam } from 'antd/lib/upload';
 import config from '../../config';
 import { UploadFile } from 'antd/lib/upload/interface';
 
+import { useApolloClient } from '@apollo/client';
+
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
@@ -20,11 +22,12 @@ type Props = {
 
 const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
+  const client = useApolloClient();
 
   const [addNewTeam] = useMutation<TeamMutations.createTeamResult, TeamMutations.createTeamVars>(
     TeamMutations.createTeam,
     {
-      refetchQueries: [TeamQueries.getTeams],
+      refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeamIds],
     },
   );
 
@@ -53,6 +56,7 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           isPublic: isPublic,
         },
       });
+      console.log('cache is', client.cache);
       form.resetFields();
       setIsVisible(false);
     });

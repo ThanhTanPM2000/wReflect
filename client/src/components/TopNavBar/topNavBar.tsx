@@ -2,6 +2,9 @@ import React from 'react';
 import { Avatar, Layout } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import DropDown from './components/DropDown';
+import { useQuery } from '@apollo/client';
+import { TeamQueries } from '../../grapql-client/queries';
+import { useApolloClient } from '@apollo/client';
 type Props = {
   email: string | null;
   picture: string | null;
@@ -10,6 +13,8 @@ type Props = {
 const { Header } = Layout;
 
 const TopNavBar = ({ email, picture }: Props) => {
+  
+
   return (
     <>
       <Header style={{ paddingRight: '20px' }} className="topNavBar">

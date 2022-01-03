@@ -39,7 +39,7 @@ async function startApolloServer(typeDefs, resolvers) {
   app.use('/api', apiRouter());
 
   let schema = makeExecutableSchema({
-    typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+    typeDefs: [constraintDirectiveTypeDefs, ...typeDefs],
     resolvers,
   });
   schema = constraintDirective()(schema);

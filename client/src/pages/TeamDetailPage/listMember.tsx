@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext } from 'react';
 
 import { Button, Dropdown, Menu, Modal, List, Avatar, message, notification } from 'antd';
 
@@ -41,7 +41,6 @@ export default function ListMember({ searchText, teamData }: Props) {
       refetchQueries: [TeamQueries.getTeam],
     },
   );
-  console.log('member list is', teamData?.members);
 
   return (
     <div style={{ flex: '1', overflowX: 'hidden', overflowY: 'scroll', height: '100%' }}>
@@ -93,6 +92,7 @@ export default function ListMember({ searchText, teamData }: Props) {
           return (
             <List.Item
               key={`${member?.id}`}
+              style={member?.userId === me?.id ? { backgroundColor: '#f5f5f5', padding: '10px' } : { padding: '10px' }}
               actions={
                 [
                   // <Dropdown key="list-loadmore-edit" overlay={menu}>
@@ -115,7 +115,6 @@ export default function ListMember({ searchText, teamData }: Props) {
                     src={member?.user?.profile?.picture || `${config.SERVER_BASE_URL}/uploads/avatarDefault.png`}
                   />
                 }
-                // title={<a href="https://ant.design">{member?.  member?.user?.profile?.nickname || 'unknow'}</a>}
                 title={
                   member?.isPendingInvitation ? (
                     'Pending Invitation'

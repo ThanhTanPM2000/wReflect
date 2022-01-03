@@ -8,14 +8,19 @@
 
 p {
   font-family: 'Inter', sans-serif;
-  font-weight: 400; }
+  font-weight: 400 !important; }
 
-.ant-layout.ant-layout-has-sider {
-  flex-direction: row;
+span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400 !important;
+  font-size: 12px; }
+
+.ant-layout {
+  flex-direction: column;
   width: 100%;
   padding: 0;
   margin: 0px;
-  background: #f7f8fa;
+  background: #f0f2f5;
   max-width: 100%;
   max-height: 100%;
   min-height: 100vh; }
@@ -110,9 +115,6 @@ code {
   border-radius: 0 4px 4px 0;
   cursor: pointer; }
 
-.anticon {
-  line-height: 25px; }
-
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
   color: #a4a0f1;
   text-shadow: 0 0 0.25px currentColor; }
@@ -171,12 +173,11 @@ code {
 .mr-12 {
   margin-right: 12px; }
 
-.ant-layout-content {
+.card {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02), 0 2px 3px 0 rgba(0, 0, 0, 0.02), 0 2px 7px 0 rgba(0, 0, 0, 0.04);
   background: #fff;
   border-radius: 8px;
-  background-color: #fff;
-  padding: 24px; }
+  background-color: #fff; }
 
 .ant-menu.ant-menu-dark .ant-menu-sub, .ant-layout-sider-trigger {
   background: #a4a0f1; }
@@ -236,6 +237,79 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
 
 .profileUser textarea {
   resize: none !important; }
+
+.manageMembersPage .manageMembers {
+  padding: 24px; }
+
+.manageMembersPage .addTeamMembers {
+  padding: 40px 40px 100px 70px;
+  background: linear-gradient(to right, #f9f9f9 1%, white 99%);
+  border-left: solid 1px #e7eaea; }
+
+.board {
+  align-items: flex-start;
+  justify-content: center;
+  gap: 30px; }
+  .board .column {
+    flex: 1;
+    border-radius: 8px;
+    background-color: #ffffff;
+    text-align: left;
+    padding: 24px 20px;
+    min-height: 200px; }
+    .board .column .colContent .panel.tab {
+      border-radius: 5px;
+      box-shadow: inset 0 1px 1px 0 rgba(30, 34, 47, 0.04), inset 0 1px 2px 1px rgba(30, 34, 47, 0.04);
+      border: solid 1px #e7eaea;
+      background-color: #ffffff;
+      font-size: 11px;
+      font-weight: bold;
+      line-height: 1.45;
+      letter-spacing: normal;
+      color: #1e222f; }
+    .board .column .colContent .panel.tab a {
+      float: left;
+      margin-right: 10px;
+      color: #6d7982;
+      text-decoration: none; }
+      .board .column .colContent .panel.tab a.active, .board .column .colContent .panel.tab a:hover {
+        color: #1e222f;
+        border-top: 2px solid #1e222f;
+        line-height: 39px;
+        margin-top: -13px; }
+    .board .column .colContent .panel {
+      border-radius: 5px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 4px;
+      margin-top: 4px;
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box; }
+    .board .column .colContent .opinionCol {
+      border-radius: 5px;
+      padding: 12px;
+      margin-bottom: 4px;
+      margin-top: 4px;
+      display: inline-block;
+      background-color: pink;
+      width: 100%;
+      box-sizing: border-box; }
+      .board .column .colContent .opinionCol .opinionHeader {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%; }
+      .board .column .colContent .opinionCol .opinionContent {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px; }
+      .board .column .colContent .opinionCol .opinionFooter {
+        margin-top: 15px;
+        text-align: end; }
 
 .sidebar {
   position: fixed;

@@ -1,7 +1,7 @@
-import { Button, Modal, Tabs } from 'antd';
+import { Avatar, Button, Modal, Select } from 'antd';
 import React, { useContext, useState } from 'react';
 
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { TabPane } from 'rc-tabs';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import ListMember from '../TeamDetailPage/listMember';
@@ -17,24 +17,32 @@ import { Loading } from '../../components/Loading';
 import { AddTeamMembers } from '.';
 import { Team } from '../../types';
 
+import { useApolloClient, ReadQueryOptions } from '@apollo/client';
+
 type Props = {
   teamId: string;
 };
 
 const { confirm } = Modal;
+const { Option } = Select;
 
 export default function manageMembers({ teamId }: Props) {
   const [isVisibleAddMemModal, setIsVisibleAddMemModal] = useState(false);
   const [isVisibleEditDetails, setIsVisibleEditDetails] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const client = useApolloClient();
 
   const history = useHistory();
   const me = useContext(SelfContext);
 
-  const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamData, TeamQueries.getTeamVars>(
+  const { data: teamIds } = useQuery<TeamQueries.getTeamIdsResult>(TeamQueries.getTeamIds, {
+    fetchPolicy: 'cache-first', // Used for first execution
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
     TeamQueries.getTeam,
     {
-      fetchPolicy: 'cache-first',
       variables: { teamId },
     },
   );
@@ -87,49 +95,58 @@ export default function manageMembers({ teamId }: Props) {
     </>
   );
 
-  console.log(me?.members?.find((member) => member.teamId === data?.team.id && member.isOwner) && operations);
+  const renderOptions = () => {
+    return teamIds?.getTeamIds.map((team) => (
+      <Option key={team.id} value={team.id}>
+        <Avatar className="mr-10" shape="square" size="small" src={team.picture} />
+        {`${team.name}`}
+      </Option>
+    ));
+  };
+
+  const handleSelect = (value: string) => {
+    history.push(`/manage-members/${value}`);
+  };
 
   return (
     <Loading refetch={refetch} data={!!data} loading={loading} error={error}>
-      <div>
-        <Tabs
-          type="card"
-          className="tab-inner"
-          style={{ height: '100%' }}
-          // tabBarExtraContent={
-          //   me?.members?.find((member) => member.teamId === data?.team.id && member.isOwner) && operations
-          // }
-          tabBarExtraContent={
-            data?.team.members.find((member) => member.userId === me?.id && member.isOwner) && operations
-          }
-        >
-          <TabPane tab="Member" key="1" className="flex flex-1 flex-dir-r">
-            <>
-              <div className="flex-1">
+      <>
+        <div className="flex flex-dir-r flex-ai-c " style={{ gap: '10px' }}>
+          <h2 style={{ margin: '0px' }}>Manage Members</h2>
+          <Select
+            showSearch
+            style={{ width: 200 }}
+            bordered
+            placeholder="Search to Select"
+            optionFilterProp="children"
+            defaultValue={teamId}
+            onSelect={handleSelect}
+          >
+            {renderOptions()}
+          </Select>
+        </div>
+        <div className="flex flex-1 flex-dir-r manageMembersPage card mt-10">
+          <>
+            <div className="flex-1 manageMembers">
+              <div className="mr-10">
                 <SearchBar onHandleSearch={handleSearch} isLoading={loading} placeholder="Find members" />
-                <div className="mt-25">
-                  <ListMember searchText={searchText} teamData={data?.team} />
-                </div>
               </div>
-              <div className="flex-1" style={{ padding: '40px 40px 100px 70px' }}>
-                <AddTeamMembers teamData={data?.team} />
+              <div className="mt-25">
+                <ListMember searchText={searchText} teamData={data?.team} />
               </div>
-            </>
-          </TabPane>
-          <TabPane tab="Setting" key="2" className="flex " style={{ overflow: 'auto' }}>
-            <div>hello</div>
-          </TabPane>
-          <TabPane tab="Analytics" key="3" className="flex " style={{ overflow: 'auto' }}>
-            <div>Data</div>
-          </TabPane>
-        </Tabs>
-        {/* <AddMembersModal isVisible={isVisibleAddMemModal} teamId={teamId} setIsVisible={setIsVisibleAddMemModal} /> */}
-        <EditTeamDetailModal
-          isVisible={isVisibleEditDetails}
-          teamData={data?.team}
-          setIsVisible={setIsVisibleEditDetails}
-        />
-      </div>
+            </div>
+            <div className="flex-1 addTeamMembers">
+              <AddTeamMembers teamData={data?.team} />
+            </div>
+          </>
+          {/* <AddMembersModal isVisible={isVisibleAddMemModal} teamId={teamId} setIsVisible={setIsVisibleAddMemModal} /> */}
+          <EditTeamDetailModal
+            isVisible={isVisibleEditDetails}
+            teamData={data?.team}
+            setIsVisible={setIsVisibleEditDetails}
+          />
+        </div>
+      </>
     </Loading>
   );
 }

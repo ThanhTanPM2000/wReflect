@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "OpinionStatus" AS ENUM ('New', 'In-Progress', 'Done', 'Rejected');
+
+-- CreateEnum
 CREATE TYPE "TeamStatus" AS ENUM ('DOING', 'DONE');
 
 -- CreateEnum
@@ -27,15 +30,78 @@ CREATE TABLE "Session" (
 CREATE TABLE "Team" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "ownerUserIds" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
     "picture" TEXT NOT NULL,
-    "numOfMember" INTEGER NOT NULL DEFAULT 1,
     "isPublic" BOOLEAN NOT NULL DEFAULT true,
     "description" TEXT,
     "status" "TeamStatus" NOT NULL DEFAULT E'DOING',
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Board" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "isPublic" BOOLEAN NOT NULL DEFAULT true,
+    "isLocked" BOOLEAN NOT NULL DEFAULT false,
+    "disableDownVote" BOOLEAN NOT NULL DEFAULT false,
+    "disableUpVote" BOOLEAN NOT NULL DEFAULT false,
+    "isAnonymous" BOOLEAN NOT NULL DEFAULT false,
+    "votesLimit" INTEGER NOT NULL DEFAULT 25,
+    "title" TEXT NOT NULL,
+    "timerInProgress" INTEGER,
+    "endTime" INTEGER,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Column" (
+    "id" TEXT NOT NULL,
+    "color" TEXT NOT NULL DEFAULT E'white',
+    "title" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "boardId" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Opinion" (
+    "id" TEXT NOT NULL,
+    "columnId" TEXT NOT NULL,
+    "authorId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "text" TEXT NOT NULL,
+    "upVote" TEXT[],
+    "downVote" TEXT[],
+    "updatedBy" TEXT NOT NULL,
+    "isAction" BOOLEAN NOT NULL DEFAULT false,
+    "isBookmarked" BOOLEAN NOT NULL DEFAULT false,
+    "responsible" TEXT,
+    "mergedAuthors" TEXT[],
+    "voters" TEXT[],
+    "color" TEXT NOT NULL DEFAULT E'white',
+    "status" "OpinionStatus" NOT NULL DEFAULT E'New',
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Remark" (
+    "id" TEXT NOT NULL,
+    "authorId" TEXT NOT NULL,
+    "opinionId" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -95,15 +161,15 @@ CREATE TABLE "User" (
 CREATE TABLE "UserProfile" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "nickname" TEXT NOT NULL,
-    "picture" TEXT NOT NULL,
-    "workplace" TEXT,
-    "address" TEXT,
-    "school" TEXT,
-    "introduction" TEXT,
-    "talents" TEXT,
-    "interests" TEXT,
+    "name" VARCHAR(100) NOT NULL,
+    "nickname" VARCHAR(150) NOT NULL,
+    "picture" VARCHAR(500) NOT NULL,
+    "workplace" VARCHAR(300),
+    "address" VARCHAR(300),
+    "school" VARCHAR(300),
+    "introduction" VARCHAR(500),
+    "talents" VARCHAR(500),
+    "interests" VARCHAR(500),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "gender" "Gender" NOT NULL DEFAULT E'UNSPECIFIED',
@@ -131,6 +197,21 @@ CREATE UNIQUE INDEX "UserProfile.userId_unique" ON "UserProfile"("userId");
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Opinion" ADD FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Remark" ADD FOREIGN KEY ("opinionId") REFERENCES "Opinion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "InviteLink" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -11,30 +11,16 @@ type Props = {
 };
 
 export default function loading({ children, data, refetch, loading, error }: Props) {
-  // const handleError = (code: string) => {
-  //   switch (code) {
-  //     case "404":
-  //       return (
-  //         <Result
-  //       )
-
-  //     default:
-  //       break;
-  //   }
-  // };
-
   return (
     <>
       {loading || error ? (
-        <div className="flex flex-1 flex-ai-c flex-jc-c">
+        <div className="flex flex-1 flex-ai-c flex-jc-c card">
           {loading ? (
-            <Spin tip="Loading..." />
+            <Spin size="large" tip="Loading..." />
           ) : (
             <>
-              {console.log('error of loading is ', { ...error })}
               <Result
                 status={error?.graphQLErrors[0]?.extensions?.code}
-                // title="There are some problems with your operation."
                 title={error?.graphQLErrors[0]?.extensions?.code}
                 subTitle={error?.message}
                 extra={

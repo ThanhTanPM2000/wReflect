@@ -1,61 +1,25 @@
-import { StatusCodes } from 'http-status-codes';
-import config from '../config';
-import { Response } from 'express';
-import { ForbiddenError, ApolloError } from 'apollo-server-errors';
+import { ForbiddenError } from 'apollo-server-errors';
 import { RequestWithUserInfo } from './../types';
-import { member, team, user, session } from '../services';
-
-import * as validators from '../controllers/validators/user';
-import { User, UserProfile } from '@prisma/client';
-import { setCookie } from '../helpers';
-import { ZodError } from 'zod';
-import logger from '../logger';
-
-const clearCookies = (res: Response) => {
-  setCookie('email', '', 0, res);
-  setCookie('token', '', 0, res);
-  return res.send();
-};
+import { member, team, user, board, column, opinion, remark } from '../services';
+import { createOpinionType, removeOpinionType, orderOpinionType } from './typeDefss/opinionTypeDefs';
 
 const resolvers = {
   Query: {
-    // me: async (_, args, { req, res }: { req: RequestWithUserInfo; res: Response }) => {
-    //   try {
-    //     const { cookies } = validators.me(req);
-    //     // const { cookies } = req;
-    //     const email = cookies?.email;
-    //     const token = cookies?.token;
-    //     // /me is unauthenticated and is the first api call from the dashboard
-    //     // we want to clean dashboard cookies and let it know it is logged out to render the right view
-    //     let sanitizedUser: (User & { profile: UserProfile | null }) | null;
-    //     if (!email || !token) {
-    //       return clearCookies(res);
-    //     } else {
-    //       sanitizedUser = await session.checkAndExtendSession(email, token);
-    //       if (!sanitizedUser) {
-    //         return clearCookies(res);
-    //       }
-    //     }
-
-    //     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;
-    //     // TODO: Refactor cookie adding and remove to one place
-    //     setCookie('email', email, oneDayInMilliseconds, res);
-    //     setCookie('token', token, oneDayInMilliseconds, res);
-
-    //     // return res.send(sanitizedUser);
-    //     return sanitizedUser;
-    //   } catch (err) {
-    //     if (err instanceof ZodError) {
-    //       return res.status(StatusCodes.BAD_REQUEST).send(err.errors);
-    //     }
-    //     logger.info(err);
-    //     return res.status(StatusCodes.BAD_REQUEST).send();
-    //   }
-    // },
+    getTeamIds: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id, isAdmin } = req?.user;
+      const result = await team.getTeams(true, 1, 8, '', undefined, isAdmin ? undefined : id);
+      const sanitizedTeams = result.data.map((team) => ({
+        id: team.id,
+        name: team.name,
+        picture: team.picture,
+        boardIds: team.boards.map((board) => board.id),
+      }));
+      return sanitizedTeams;
+    },
     teams: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id, isAdmin } = req?.user;
       const { status, isGettingAll, search, page, size } = args?.input;
-      const result = await team.getTeams(isAdmin ? undefined : id, status, !!isGettingAll, page, size, search);
+      const result = await team.getTeams(!!isGettingAll, page, size, search, status, isAdmin ? undefined : id);
       return result;
     },
     team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -65,12 +29,15 @@ const resolvers = {
     user: async (_, args) => {
       return await user.getUser(args.userId);
     },
-    users: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { isAdmin } = req?.user;
-      const { isGettingAll, search, page, size } = args;
-      if (!isAdmin) throw new ForbiddenError('You must admin role to access this request');
-      const users = await user.getListUsers(search, !!isGettingAll, page, size);
-      return users;
+
+    boards: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req.user;
+      return await board.getListBoardOfTeam(meId, args.teamId);
+    },
+
+    board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req.user;
+      return await board.getBoard(meId, args.boardId);
     },
   },
   Mutation: {
@@ -104,6 +71,19 @@ const resolvers = {
       const { id: meId } = req?.user;
       return await member.changeRoleMember(meId, args);
     },
+
+    createOpinion: async (_, args: createOpinionType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      return await opinion.createOpinion(meId, args);
+    },
+    removeOpinion: async (_, args: removeOpinionType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      return await opinion.removeOpinion(meId, args);
+    },
+    orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      return await 
+    },
   },
   User: {
     members: async (_) => {
@@ -112,9 +92,52 @@ const resolvers = {
     },
   },
   Team: {
+    boards: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req.user;
+      const boards = await board.getListBoardOfTeam(meId, _.id);
+      return boards;
+    },
     members: async (_) => {
       const members = await member.getListMembers(_.id);
       return members;
+    },
+  },
+  Board: {
+    team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId, isAdmin } = req.user;
+      const myTeam = await team.getTeam(_.id, isAdmin ? undefined : meId);
+      return myTeam;
+    },
+    columns: async (_) => {
+      const columns = await column.getListColumns(_.id);
+      return columns;
+    },
+  },
+  Column: {
+    board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req.user;
+      const myBoard = await board.getBoard(meId, _?.boarId);
+      return myBoard;
+    },
+    opinions: async (_) => {
+      const opinions = await opinion.getListOpinions(_.id);
+      return opinions;
+    },
+  },
+  Opinion: {
+    column: async (_) => {
+      const myColumn = await column.getColumn(_?.columnId);
+      return myColumn;
+    },
+    remarks: async (_) => {
+      const remarks = await remark.getListRemarks(_?.id);
+      return remarks;
+    },
+  },
+  Remark: {
+    opinion: async (_) => {
+      const myOpinion = await opinion.getOpinion(_?.opinionId);
+      return myOpinion;
     },
   },
   Member: {

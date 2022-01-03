@@ -1,16 +1,76 @@
-import { StatusCodes } from 'http-status-codes';
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
-  type User {
-    id: ID!
-    email: String
+  type Board {
+    id: ID
+    teamId: String
     createdAt: String
     updatedAt: String
-    isAdmin: String
-    userStatus: String
-    members: [Member]
-    profile: Profile
+    createdBy: String
+    isPublic: Boolean
+    isLocked: Boolean
+    disableDownVote: Boolean
+    disableUpVote: Boolean
+    isAnonymous: Boolean
+    votesLimit: Int
+    title: String
+    timerInProgress: Int
+    endTime: Int
+    hello: String
+    team: Team
+    columns: [Column]
+  }
+
+  type Column {
+    id: ID
+    color: String
+    title: String
+    isActive: Boolean
+    opinions: [Opinion]
+    boardId: String
+    board: Board
+  }
+
+  type Member {
+    id: ID!
+    userId: String!
+    teamId: String!
+    isOwner: Boolean!
+    isPendingInvitation: Boolean!
+    isGuess: Boolean!
+    invitedBy: String
+    joinedAt: String!
+    role: String
+    user: User
+    team: Team
+  }
+
+  type Opinion {
+    id: ID
+    columnId: String
+    authorId: String
+    createdAt: String
+    updatedAt: String
+    text: String
+    upVote: [String]
+    downVote: [String]
+    updatedBy: String
+    isAction: Boolean
+    isBookmarked: Boolean
+    responsible: String
+    mergedAuthors: [String]
+    color: String
+    status: OpinionStatus
+    author: User
+    column: Column
+    remarks: [Remark]
+  }
+
+  enum OpinionStatus {
+    New
+    In_Progress
+    Done
+    Rejected
   }
 
   type Profile {
@@ -37,18 +97,14 @@ const typeDefs = gql`
     FEMALE
   }
 
-  type Member {
-    id: ID!
-    userId: String!
-    teamId: String!
-    isOwner: Boolean!
-    isPendingInvitation: Boolean!
-    isGuess: Boolean!
-    invitedBy: String
-    joinedAt: String!
-    role: String
-    user: User
-    team: Team
+  type Remark {
+    id: ID
+    authorId: String
+    opinionId: String
+    text: String
+    createdAt: String
+    updatedAt: String
+    opinion: Opinion
   }
 
   type Team {
@@ -62,8 +118,10 @@ const typeDefs = gql`
     numOfMember: Int
     isPublic: Boolean
     status: TeamStatus
+    google: String
     description: String
     members: [Member]
+    boards: [Board]
   }
 
   enum TeamStatus {
@@ -71,22 +129,15 @@ const typeDefs = gql`
     DONE
   }
 
-  interface ListData {
-    total: Int
-  }
-
-  type Teams implements ListData {
-    data: [Team]
-    total: Int
-    page: Int
-    size: Int
-  }
-
-  type Users implements ListData {
-    data: [User]
-    total: Int
-    page: Int
-    size: Int
+  type User {
+    id: ID!
+    email: String
+    createdAt: String
+    updatedAt: String
+    isAdmin: String
+    userStatus: String
+    members: [Member]
+    profile: Profile
   }
 
   input TeamsInput {
@@ -97,13 +148,27 @@ const typeDefs = gql`
     size: Int
   }
 
+  type Teams {
+    data: [Team]
+    total: Int
+    page: Int
+    size: Int
+    hihi: Int
+  }
+
+  type getTeamIds {
+    id: String
+    name: String
+    picture: String
+  }
+
   type Query {
-    # me: User
     teams(input: TeamsInput): Teams
+    getTeamIds: [getTeamIds]
     team(teamId: String!): Team
     user(userId: String!): User
-    users(isGettingAll: Boolean, search: String, page: Int, size: Int): ListData
     members(teamId: String!): [Member]
+    boards(teamId: String!, boardId: String): [Board]
   }
 
   type AddMembersMutationResponse {
@@ -138,7 +203,6 @@ const typeDefs = gql`
     ): Team
     deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
-
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload
     changeRoleMember(memberId: String!, teamId: String!, isOwner: Boolean!): Member

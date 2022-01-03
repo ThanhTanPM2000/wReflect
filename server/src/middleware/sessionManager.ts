@@ -36,7 +36,7 @@ const sessionManager = async (
     next();
   } catch (error) {
     if (error instanceof Error) logger.info(error.message);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send();
   }
 };
 
