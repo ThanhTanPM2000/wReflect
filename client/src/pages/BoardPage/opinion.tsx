@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Dropdown, Menu, Modal } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
@@ -16,7 +16,7 @@ import {
 import { Opinion } from '../../types';
 import { useMutation } from '@apollo/client';
 import { OpinionMutations } from '../../grapql-client/mutations';
-import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
+import { BoardQueries } from '../../grapql-client/queries';
 import _ from 'lodash';
 
 type Props = {
@@ -29,6 +29,7 @@ type Props = {
 const { confirm } = Modal;
 
 export default function OpinionComponenent({ opinion, boardId, index }: Props) {
+  const [color, setColor] = useState('pink');
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
     {},
@@ -90,7 +91,12 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
   return (
     <Draggable draggableId={`${opinion.id}`} index={index} key={`${opinion.id}`}>
       {(provided) => (
-        <div className="opinionCol" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+        <div
+          className="opinionCol pink"
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+        >
           <div className="opinionHeader">
             <StarOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
             <Dropdown overlayStyle={{ width: '180px' }} overlay={menu} placement="bottomRight">

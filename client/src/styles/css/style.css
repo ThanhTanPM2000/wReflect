@@ -246,6 +246,20 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   background: linear-gradient(to right, #f9f9f9 1%, white 99%);
   border-left: solid 1px #e7eaea; }
 
+.board-header {
+  margin-bottom: 10px; }
+  .board-header .board-selector {
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px; }
+  .board-header .board-members {
+    display: flex;
+    justify-content: center;
+    align-items: center; }
+
 .board {
   align-items: flex-start;
   justify-content: center;
@@ -292,9 +306,12 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       margin-bottom: 4px;
       margin-top: 4px;
       display: inline-block;
-      background-color: pink;
       width: 100%;
       box-sizing: border-box; }
+      .board .column .colContent .opinionCol.white {
+        background-color: white; }
+      .board .column .colContent .opinionCol.pink {
+        background-color: pink; }
       .board .column .colContent .opinionCol .opinionHeader {
         display: flex;
         flex: 1;

@@ -10,17 +10,17 @@ const typeDefs = gql`
     count: Int!
   }
 
-  input orderOpinionInput {
-    destination: {
-      droppableId: String!
-      index: Int!
-    }
-    source: {
-      droppableId: String!
-      index: Int!
-    }
-    draggableId: String!
-  }
+  # input orderOpinionInput {
+  #   destination: {
+  #     droppableId: String!
+  #     index: Int!
+  #   }
+  #   source: {
+  #     droppableId: String!
+  #     index: Int!
+  #   }
+  #   draggableId: String!
+  # }
 
   type Mutation {
     createTeam(
@@ -48,7 +48,7 @@ const typeDefs = gql`
 
     createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean): Opinion
     removeOpinion(opinionId: String): BatchPayload
-    orderOpinion(input: orderOpinionInput): String
+    # orderOpinion(input: orderOpinionInput): String
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload

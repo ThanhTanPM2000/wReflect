@@ -19,7 +19,7 @@ const typeDefs = gql`
     id: String
     name: String
     picture: String
-    boardIds: [String]
+    boards: [Board]
   }
 
   type Query {

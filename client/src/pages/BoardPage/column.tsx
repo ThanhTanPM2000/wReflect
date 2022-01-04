@@ -12,7 +12,7 @@ type Props = {
 
 export default function ColumnComponent({ column, boardId, index }: Props) {
   return (
-    <Droppable key={column.id} droppableId={column.id}>
+    <Droppable isCombineEnabled key={column.id} droppableId={column.id}>
       {(provided) => (
         <div className="column flex" {...provided.droppableProps} ref={provided.innerRef}>
           <h1 className="colHead">{column.title}</h1>

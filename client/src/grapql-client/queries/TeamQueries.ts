@@ -1,6 +1,6 @@
 import { StringNullableChain } from 'lodash';
 import { gql } from '@apollo/client';
-import { Team } from '../../types';
+import { Board, Team } from '../../types';
 
 export type getTeamVars = {
   teamId: string;
@@ -230,7 +230,7 @@ export type getTeamIdsResult = {
     id: string;
     name: string;
     picture: string;
-    boardIds: string[];
+    boards: Board[];
   }[];
 };
 
@@ -240,7 +240,23 @@ const getTeamIds = gql`
       id
       name
       picture
-      boardIds
+      boards {
+        id
+        teamId
+        createdAt
+        updatedAt
+        createdBy
+        isPublic
+        isLocked
+        disableDownVote
+        disableUpVote
+        isAnonymous
+        votesLimit
+        title
+        timerInProgress
+        endTime
+        hello
+      }
     }
   }
 `;

@@ -127,6 +127,54 @@ export const getBoard = gql`
           }
         }
       }
+      team {
+        id
+        name
+        ownerUserIds
+        createdAt
+        startDate
+        endDate
+        picture
+        numOfMember
+        isPublic
+        description
+        status
+        members {
+          id
+          userId
+          teamId
+          isOwner
+          isPendingInvitation
+          isGuess
+          invitedBy
+          joinedAt
+          role
+          user {
+            id
+            email
+            createdAt
+            updatedAt
+            isAdmin
+            userStatus
+            profile {
+              id
+              userId
+              name
+              nickname
+              picture
+              workplace
+              address
+              school
+              introduction
+              talent
+              interest
+              createdAt
+              updatedAt
+              gender
+            }
+          }
+        }
+      }
     }
   }
 `;

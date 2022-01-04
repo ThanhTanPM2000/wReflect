@@ -38,7 +38,7 @@ const SideBar = ({ email, isAdmin }: Props) => {
   });
 
   const teamId = data?.getTeamIds[0]?.id;
-  const boardId = data?.getTeamIds[0]?.boardIds[0];
+  const boardId = data?.getTeamIds[0]?.boards[0].id;
 
   return (
     <>

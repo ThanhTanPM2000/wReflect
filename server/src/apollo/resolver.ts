@@ -12,7 +12,7 @@ const resolvers = {
         id: team.id,
         name: team.name,
         picture: team.picture,
-        boardIds: team.boards.map((board) => board.id),
+        boards: team.boards,
       }));
       return sanitizedTeams;
     },
@@ -80,10 +80,11 @@ const resolvers = {
       const { id: meId } = req?.user;
       return await opinion.removeOpinion(meId, args);
     },
-    orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      return await 
-    },
+    //  orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
+    //     const { id: meId } = req?.user;
+    //     console.log(args);
+    //     return await
+    //   },
   },
   User: {
     members: async (_) => {
@@ -105,7 +106,7 @@ const resolvers = {
   Board: {
     team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId, isAdmin } = req.user;
-      const myTeam = await team.getTeam(_.id, isAdmin ? undefined : meId);
+      const myTeam = await team.getTeam(_.teamId, isAdmin ? undefined : meId);
       return myTeam;
     },
     columns: async (_) => {

@@ -114,7 +114,6 @@ export default function manageMembers({ teamId }: Props) {
         <div className="flex flex-dir-r flex-ai-c " style={{ gap: '10px' }}>
           <h2 style={{ margin: '0px' }}>Manage Members</h2>
           <Select
-            showSearch
             style={{ width: 200 }}
             bordered
             placeholder="Search to Select"

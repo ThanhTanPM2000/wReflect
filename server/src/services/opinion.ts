@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
-import { createOpinionType, removeOpinionType } from '../apollo/typeDefss/opinionTypeDefs';
+import { createOpinionType, orderOpinionType, removeOpinionType } from '../apollo/typeDefss/opinionTypeDefs';
 
 export const getListOpinions = (columnId: string) => {
   const opinions = prisma.opinion.findMany({
@@ -84,3 +84,7 @@ export const removeOpinion = async (meId: string, args: removeOpinionType) => {
   if (!opinion) throw new ApolloError('You dont have permission or data not found', `${StatusCodes.FORBIDDEN}`);
   return opinion;
 };
+
+// export const orderOpinion = (id: string, args: orderOpinionType)  => {
+//   const 
+// }
