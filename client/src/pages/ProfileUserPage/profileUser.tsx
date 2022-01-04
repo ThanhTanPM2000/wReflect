@@ -97,8 +97,10 @@ const ProfileUser = () => {
               className="flex-2 site-layout-background card-workspace"
               style={{
                 background: 'white',
-                height: 730,
+                height: '730px',
+                width: '600px',
                 marginRight: 20,
+                paddingTop: 30,
                 boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
               }}
             >
@@ -124,10 +126,10 @@ const ProfileUser = () => {
                   <Form.Item label="School" name="School">
                     <Input placeholder="School..." onChange={onInputChange} value={school} name="school" />
                   </Form.Item>
-                  <Form.Item label="Work Place" name="Work Place">
+                  <Form.Item  style={{ marginTop: 15}}label="Work Place" name="Work Place">
                     <Input placeholder="Work Place..." onChange={onInputChange} value={workplace} name="workplace" />
                   </Form.Item>
-                  <Form.Item label="Phone Number" name="Phone Number">
+                  <Form.Item  style={{ marginTop: 15}}label="Phone Number" name="Phone Number">
                     <Input
                       placeholder="Phone Number..."
                       onChange={onInputChange}
@@ -135,10 +137,9 @@ const ProfileUser = () => {
                       name="phoneNumbers"
                     />
                   </Form.Item>
-                  <Form.Item label="Gender" name="Gender">
+                  <Form.Item  style={{ marginTop: 15}}label="Gender" name="Gender">
                     <Input placeholder="Gender..." onChange={onInputChange} value={gender} name="gender" />
                   </Form.Item>
-                  <Form.Item label="Team" name="Team"></Form.Item>
                 </Form>
                 {window.location.pathname + window.location.search === '/me' ? (
                   <Button
@@ -155,7 +156,7 @@ const ProfileUser = () => {
             </div>
           </div>
         </div>
-        <div style={{ width: '1100px', padding: '20px' }}>
+        <div style={{ width: '100%', padding: '20px' }}>
           <div
             className="flex-2 site-layout-background card-workspace"
             style={{
