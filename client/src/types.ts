@@ -62,6 +62,7 @@ export type Opinion = {
   mergedAuthors: string[];
   voters: string[];
   color: string;
+  position: number;
   status: OpinionStatus;
   column: Column;
   remarks: Remark[];

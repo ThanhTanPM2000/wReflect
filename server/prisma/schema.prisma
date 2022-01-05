@@ -86,6 +86,7 @@ model Opinion {
   mergedAuthors String[]
   voters        String[]
   color         String        @default("white")
+  position      Int           
   status        OpinionStatus @default(NEW)
   author        User          @relation(fields: [authorId], references: [id])
   column        Column        @relation(fields: [columnId], references: [id])

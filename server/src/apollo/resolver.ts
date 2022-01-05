@@ -80,11 +80,10 @@ const resolvers = {
       const { id: meId } = req?.user;
       return await opinion.removeOpinion(meId, args);
     },
-    //  orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
-    //     const { id: meId } = req?.user;
-    //     console.log(args);
-    //     return await
-    //   },
+    orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      await opinion.orderOpinion(meId, args);
+    },
   },
   User: {
     members: async (_) => {

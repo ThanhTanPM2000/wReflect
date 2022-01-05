@@ -255,7 +255,6 @@ const getTeamIds = gql`
         title
         timerInProgress
         endTime
-        hello
       }
     }
   }

@@ -89,6 +89,7 @@ CREATE TABLE "Opinion" (
     "mergedAuthors" TEXT[],
     "voters" TEXT[],
     "color" TEXT NOT NULL DEFAULT E'white',
+    "position" INTEGER NOT NULL,
     "status" "OpinionStatus" NOT NULL DEFAULT E'New',
 
     PRIMARY KEY ("id")

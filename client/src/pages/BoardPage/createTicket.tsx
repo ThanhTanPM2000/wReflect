@@ -14,17 +14,15 @@ type Props = {
   index: number;
   boardId: string;
   columnId: string;
+  isCreateBottom: boolean;
 };
 
-export default function createTicket({ index, boardId, columnId }: Props) {
+export default function createTicket({ index, boardId, columnId, isCreateBottom }: Props) {
   const [text, setText] = useState('');
   const [isAction, setIsAction] = useState(false);
 
   const [createOpinion] = useMutation<OpinionMutations.createOpinionResult, OpinionMutations.createOpinionVars>(
     OpinionMutations.createOpinion,
-    {
-      //   refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
-    },
   );
 
   const handleCreateTicket = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -35,8 +33,10 @@ export default function createTicket({ index, boardId, columnId }: Props) {
         columnId,
         text,
         isAction,
+        isCreateBottom,
       },
       update: async (store, { data }) => {
+        console.log('data create is', data);
         const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
           query: BoardQueries.getBoard,
           variables: {
@@ -45,7 +45,15 @@ export default function createTicket({ index, boardId, columnId }: Props) {
         });
         const newBoardData = _.cloneDeep(boardData);
 
-        newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
+        // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
+        const columns = newBoardData?.board.columns.map((column, idx) => {
+          if (idx === index) {
+            return data?.createOpinion || column;
+          }
+          return column;
+        });
+
+        // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
 
         store.writeQuery({
           query: BoardQueries.getBoard,
@@ -53,7 +61,7 @@ export default function createTicket({ index, boardId, columnId }: Props) {
             boardId,
           },
           data: {
-            board: { ...newBoardData?.board },
+            board: { ...boardData?.board, columns },
           },
         });
       },

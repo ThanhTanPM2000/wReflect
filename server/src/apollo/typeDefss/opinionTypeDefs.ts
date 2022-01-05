@@ -18,6 +18,7 @@ const typeDefs = gql`
     color: String
     status: OpinionStatus
     author: User
+    position: Int
     column: Column
     remarks: [Remark]
   }
@@ -35,6 +36,7 @@ export type createOpinionType = {
   columnId: string;
   text: string;
   isAction: boolean;
+  isCreateBottom: boolean;
 };
 
 export type removeOpinionType = {

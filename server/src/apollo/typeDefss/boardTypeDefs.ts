@@ -16,7 +16,6 @@ const typeDefs = gql`
     title: String
     timerInProgress: Int
     endTime: Int
-    hello: String
     team: Team
     columns: [Column]
   }

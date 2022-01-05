@@ -1,4 +1,4 @@
-import { Opinion } from './../../types';
+import { Column } from './../../types';
 import { gql } from '@apollo/client';
 
 export type createOpinionVars = {
@@ -6,41 +6,66 @@ export type createOpinionVars = {
   columnId: string;
   text: string;
   isAction: boolean;
+  isCreateBottom: boolean;
 };
 
 export type createOpinionResult = {
-  createOpinion: Opinion;
+  createOpinion: Column;
 };
 
 export const createOpinion = gql`
-  mutation CreateOpinion($boardId: String!, $columnId: String, $text: String, $isAction: Boolean) {
-    createOpinion(boardId: $boardId, columnId: $columnId, text: $text, isAction: $isAction) {
+  mutation Mutation($boardId: String!, $columnId: String, $text: String, $isAction: Boolean, $isCreateBottom: Boolean) {
+    createOpinion(
+      boardId: $boardId
+      columnId: $columnId
+      text: $text
+      isAction: $isAction
+      isCreateBottom: $isCreateBottom
+    ) {
       id
-      columnId
-      createdAt
-      authorId
-      updatedAt
-      text
-      downVote
-      upVote
-      updatedBy
-      isAction
-      isBookmarked
-      responsible
-      mergedAuthors
       color
-      status
-      remarks {
+      title
+      isActive
+      opinions {
         id
+        columnId
         authorId
-        text
-        opinionId
         createdAt
         updatedAt
-      }
-      author {
-        id
-        email
+        text
+        upVote
+        downVote
+        updatedBy
+        isAction
+        isBookmarked
+        responsible
+        mergedAuthors
+        color
+        status
+        position
+        remarks {
+          id
+          authorId
+          opinionId
+          text
+          createdAt
+          updatedAt
+        }
+        author {
+          id
+          email
+          createdAt
+          updatedAt
+          isAdmin
+          userStatus
+          profile {
+            id
+            userId
+            name
+            nickname
+            picture
+          }
+        }
       }
     }
   }

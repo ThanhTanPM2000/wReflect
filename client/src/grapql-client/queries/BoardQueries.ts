@@ -26,7 +26,6 @@ export const getBoards = gql`
       title
       endTime
       timerInProgress
-      hello
       columns {
         id
         color
@@ -96,8 +95,9 @@ query Board($boardId: String) {
       id
       color
       title
-      isActive
-      opinions {
+      timerInProgress
+      endTime
+      columns {
         id
         columnId
         authorId
@@ -120,14 +120,28 @@ query Board($boardId: String) {
           text
           createdAt
           updatedAt
-        }
-        author {
-          id
-          email
-          profile {
-            picture
-            name
-            nickname
+          text
+          upVote
+          downVote
+          updatedBy
+          isAction
+          isBookmarked
+          responsible
+          mergedAuthors
+          color
+          status
+          position
+          author {
+            id
+            email
+          }
+          remarks {
+            id
+            authorId
+            opinionId
+            text
+            createdAt
+            updatedAt
           }
         }
       }
