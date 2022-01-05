@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
-import { Dropdown, Menu, Modal } from 'antd';
+import { Dropdown, Menu, Modal, Input, Badge, Avatar } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import {
+  StarFilled,
   StarOutlined,
   DeleteFilled,
   EditFilled,
@@ -15,6 +16,7 @@ import {
 
 import { Opinion } from '../../types';
 import { useMutation } from '@apollo/client';
+import selfContext from '../../contexts/selfContext';
 import { OpinionMutations } from '../../grapql-client/mutations';
 import { BoardQueries } from '../../grapql-client/queries';
 import _ from 'lodash';
@@ -27,9 +29,15 @@ type Props = {
 };
 
 const { confirm } = Modal;
+const { TextArea } = Input;
 
 export default function OpinionComponenent({ opinion, boardId, index }: Props) {
-  const [color, setColor] = useState('pink');
+  const [color, setColor] = useState(opinion?.color);
+  const [isEdit, setIsEdit] = useState(false);
+  const [currentOpinion, setCurrentOpinion] = useState(opinion);
+  const [isBookmarked, setIsBookmarked] = useState(currentOpinion.isBookmarked);
+  const me = useContext(selfContext);
+
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
     {},
@@ -40,7 +48,7 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
       <Menu.Item key="3" icon={<FireFilled />}>
         Convet to Action
       </Menu.Item>
-      <Menu.Item key="2" icon={<EditFilled />}>
+      <Menu.Item onClick={() => setIsEdit(true)} key="2" icon={<EditFilled />}>
         Edit
       </Menu.Item>
       <Menu.Item
@@ -85,6 +93,17 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
       >
         Remove
       </Menu.Item>
+
+      <Menu.Item>
+        <div className="color-selector">
+          <div className="orange block-color" onClick={() => setColor('orange')} />
+          <div className="pink block-color" onClick={() => setColor('pink')} />
+          <div className="blue block-color" onClick={() => setColor('blue')} />
+          <div className="light-blue block-color" onClick={() => setColor('light-blue')} />
+          <div className="green block-color" onClick={() => setColor('green')} />
+          <div className="gray block-color" onClick={() => setColor('gray')} />
+        </div>
+      </Menu.Item>
     </Menu>
   );
 
@@ -92,21 +111,91 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
     <Draggable draggableId={`${opinion.id}`} index={index} key={`${opinion.id}`}>
       {(provided) => (
         <div
-          className="opinionCol pink"
+          className={`opinionCol ${color}`}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
           <div className="opinionHeader">
-            <StarOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
+            {isBookmarked ? (
+              <StarFilled onClick={() => setIsBookmarked(false)} style={{ fontSize: '20px', cursor: 'pointer' }} />
+            ) : (
+              <StarOutlined onClick={() => setIsBookmarked(true)} style={{ fontSize: '20px', cursor: 'pointer' }} />
+            )}
+
             <Dropdown overlayStyle={{ width: '180px' }} overlay={menu} placement="bottomRight">
               <EllipsisOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
             </Dropdown>
           </div>
-          <div className="opinionContent">{opinion.text}</div>
+
+          <div className="opinionContent">
+            {isEdit ? (
+              <TextArea
+                style={{ textAlign: 'center' }}
+                autoFocus
+                onBlur={(e) => {
+                  setIsEdit(false);
+                  setCurrentOpinion({
+                    ...opinion,
+                    text: e.target.value,
+                  });
+                }}
+                defaultValue={currentOpinion.text}
+              ></TextArea>
+            ) : (
+              <p>{currentOpinion.text}</p>
+            )}
+          </div>
+
           <div className="opinionFooter">
-            <LikeOutlined style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }} />
-            <DislikeOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
+            <div className="owner-opinion">
+              <Avatar
+                style={{ marginRight: '3px' }}
+                size="default"
+                key={currentOpinion?.author?.id}
+                src={currentOpinion?.author?.profile?.picture}
+              />
+            </div>
+            <div className="upvote">
+              <Badge size="small" count={currentOpinion.upVote.length}>
+                <LikeOutlined
+                  onClick={() => {
+                    if (me?.id && currentOpinion.upVote.find((userVoteid) => userVoteid == me.id)) {
+                      setCurrentOpinion({
+                        ...currentOpinion,
+                        upVote: currentOpinion.upVote.filter((userVoteid) => userVoteid != me.id),
+                      });
+                    } else if (me?.id) {
+                      setCurrentOpinion({
+                        ...currentOpinion,
+                        upVote: [...currentOpinion.upVote, me.id],
+                      });
+                    }
+                  }}
+                  style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }}
+                />
+              </Badge>
+            </div>
+            <div className="downvote">
+            <Badge size="small" count={currentOpinion.downVote.length}>
+                <DislikeOutlined
+                  onClick={() => {
+                    if (me?.id && currentOpinion.downVote.find((userVoteid) => userVoteid == me.id)) {
+                      setCurrentOpinion({
+                        ...currentOpinion,
+                        downVote: currentOpinion.downVote.filter((userVoteid) => userVoteid != me.id),
+                      });
+                    } else if (me?.id) {
+                      setCurrentOpinion({
+                        ...currentOpinion,
+                        downVote: [...currentOpinion.downVote, me.id],
+                      });
+                    }
+                  }}
+                  style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }}
+                />
+              </Badge>
+            </div>
           </div>
         </div>
       )}
