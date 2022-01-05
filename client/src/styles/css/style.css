@@ -179,6 +179,27 @@ code {
   border-radius: 8px;
   background-color: #fff; }
 
+.white {
+  background-color: #fed7de; }
+
+.pink {
+  background-color: #fed7de; }
+
+.orange {
+  background-color: #fff4cc; }
+
+.blue {
+  background-color: #d0edfb; }
+
+.light-blue {
+  background-color: #cdf7f0; }
+
+.green {
+  background-color: #e5f6d2; }
+
+.gray {
+  background-color: #e4ddfe; }
+
 .ant-menu.ant-menu-dark .ant-menu-sub, .ant-layout-sider-trigger {
   background: #a4a0f1; }
 
@@ -308,10 +329,6 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       display: inline-block;
       width: 100%;
       box-sizing: border-box; }
-      .board .column .colContent .opinionCol.white {
-        background-color: white; }
-      .board .column .colContent .opinionCol.pink {
-        background-color: pink; }
       .board .column .colContent .opinionCol .opinionHeader {
         display: flex;
         flex: 1;
@@ -319,14 +336,36 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         justify-content: space-between;
         width: 100%; }
       .board .column .colContent .opinionCol .opinionContent {
-        display: flex;
-        flex: 1;
-        justify-content: center;
+        overflow-wrap: break-word;
+        text-align: center;
         align-items: center;
-        margin-top: 20px; }
+        margin-top: 20px;
+        max-width: 500px; }
       .board .column .colContent .opinionCol .opinionFooter {
         margin-top: 15px;
-        text-align: end; }
+        text-align: end;
+        display: flex; }
+        .board .column .colContent .opinionCol .opinionFooter .owner-opinion {
+          margin-right: auto; }
+        .board .column .colContent .opinionCol .opinionFooter .upvote {
+          margin-right: 20px; }
+
+.color-selector {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around; }
+  .color-selector .block-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    float: left;
+    margin-right: 6px;
+    margin-top: 16px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    border: solid 1px rgba(30, 34, 47, 0.1); }
+    .color-selector .block-color:hover {
+      box-shadow: 0 0 20px 0 rgba(30, 34, 47, 0.1), 0 2px 3px 0 rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.03); }
 
 .sidebar {
   position: fixed;

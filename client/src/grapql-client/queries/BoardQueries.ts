@@ -75,106 +75,111 @@ export type getBoardVars = {
 };
 
 export const getBoard = gql`
-  query Board($boardId: String) {
-    board(boardId: $boardId) {
+query Board($boardId: String) {
+  board(boardId: $boardId) {
+    id
+    teamId
+    updatedAt
+    createdAt
+    createdBy
+    isPublic
+    isLocked
+    disableDownVote
+    disableUpVote
+    isAnonymous
+    votesLimit
+    title
+    timerInProgress
+    endTime
+    hello
+    columns {
       id
-      teamId
-      updatedAt
-      createdAt
-      createdBy
-      isPublic
-      isLocked
-      disableDownVote
-      disableUpVote
-      isAnonymous
-      votesLimit
+      color
       title
-      timerInProgress
-      endTime
-      hello
-      columns {
+      isActive
+      opinions {
         id
+        columnId
+        authorId
+        createdAt
+        updatedAt
+        text
+        upVote
+        downVote
+        updatedBy
+        isAction
+        isBookmarked
+        responsible
+        mergedAuthors
         color
-        title
-        isActive
-        opinions {
+        status
+        remarks {
           id
-          columnId
           authorId
+          opinionId
+          text
           createdAt
           updatedAt
-          text
-          upVote
-          downVote
-          updatedBy
-          isAction
-          isBookmarked
-          responsible
-          mergedAuthors
-          color
-          status
-          author {
-            id
-            email
-          }
-          remarks {
-            id
-            authorId
-            opinionId
-            text
-            createdAt
-            updatedAt
+        }
+        author {
+          id
+          email
+          profile {
+            picture
+            name
+            nickname
           }
         }
       }
-      team {
+    }
+    team {
+      id
+      name
+      ownerUserIds
+      createdAt
+      startDate
+      endDate
+      picture
+      numOfMember
+      isPublic
+      description
+      status
+      members {
         id
-        name
-        ownerUserIds
-        createdAt
-        startDate
-        endDate
-        picture
-        numOfMember
-        isPublic
-        description
-        status
-        members {
+        userId
+        teamId
+        isOwner
+        isPendingInvitation
+        isGuess
+        invitedBy
+        joinedAt
+        role
+        user {
           id
-          userId
-          teamId
-          isOwner
-          isPendingInvitation
-          isGuess
-          invitedBy
-          joinedAt
-          role
-          user {
+          email
+          createdAt
+          updatedAt
+          isAdmin
+          userStatus
+          profile {
             id
-            email
+            userId
+            name
+            nickname
+            picture
+            workplace
+            address
+            school
+            introduction
+            talent
+            interest
             createdAt
             updatedAt
-            isAdmin
-            userStatus
-            profile {
-              id
-              userId
-              name
-              nickname
-              picture
-              workplace
-              address
-              school
-              introduction
-              talent
-              interest
-              createdAt
-              updatedAt
-              gender
-            }
+            gender
           }
         }
       }
     }
   }
+}
 `;

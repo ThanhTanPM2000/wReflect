@@ -65,6 +65,7 @@ export type Opinion = {
   status: OpinionStatus;
   column: Column;
   remarks: Remark[];
+  author: User
 };
 
 export type Remark = {
