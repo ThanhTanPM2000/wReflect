@@ -341,6 +341,11 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         align-items: center;
         margin-top: 20px;
         max-width: 500px; }
+        .board .column .colContent .opinionCol .opinionContent .opinionAction {
+          display: flex;
+          gap: 5px; }
+        .board .column .colContent .opinionCol .opinionContent .select {
+          flex: 1; }
       .board .column .colContent .opinionCol .opinionFooter {
         margin-top: 15px;
         text-align: end;
