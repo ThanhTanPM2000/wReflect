@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 
-import { Dropdown, Menu, Modal, Input, Badge, Avatar } from 'antd';
+import { Dropdown, Menu, Modal, Input, Badge, Avatar, Select } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import {
   StarFilled,
@@ -28,12 +28,14 @@ type Props = {
   index: number;
 };
 
+const { Option } = Select;
 const { confirm } = Modal;
 const { TextArea } = Input;
 
 export default function OpinionComponenent({ opinion, boardId, index }: Props) {
   const [color, setColor] = useState(opinion?.color);
   const [isEdit, setIsEdit] = useState(false);
+  const [isAction, setIsAction] = useState(false);
   const [currentOpinion, setCurrentOpinion] = useState(opinion);
   const [isBookmarked, setIsBookmarked] = useState(currentOpinion.isBookmarked);
   const me = useContext(selfContext);
@@ -42,7 +44,6 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
     OpinionMutations.removeOpinion,
     {},
   );
-
   const menu = (
     <Menu>
       <Menu.Item key="3" icon={<FireFilled />}>
@@ -129,21 +130,37 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
           </div>
 
           <div className="opinionContent">
-            {isEdit ? (
-              <TextArea
-                style={{ textAlign: 'center' }}
-                autoFocus
-                onBlur={(e) => {
-                  setIsEdit(false);
-                  setCurrentOpinion({
-                    ...opinion,
-                    text: e.target.value,
-                  });
-                }}
-                defaultValue={currentOpinion.text}
-              ></TextArea>
-            ) : (
-              <p>{currentOpinion.text}</p>
+            <div className="opinionText">
+              {isEdit ? (
+                <TextArea
+                  style={{ textAlign: 'center' }}
+                  autoFocus
+                  onBlur={(e) => {
+                    setIsEdit(false);
+                    setCurrentOpinion({
+                      ...opinion,
+                      text: e.target.value,
+                    });
+                  }}
+                  defaultValue={currentOpinion.text}
+                ></TextArea>
+              ) : (
+                <p>{currentOpinion.text}</p>
+              )}
+            </div>
+            {opinion.isAction === true && (
+              <div className="opinionAction">
+                <Select className="select" defaultValue="Open" style={{ width: 120 }}>
+                  <Option value="Open">Open</Option>
+                  <Option value="inProgress">In progress</Option>
+                  <Option value="Done">Done</Option>
+                  <Option value="Rejected">Rejected</Option>
+                </Select>
+                <Select className="select" defaultValue="notAssigned" style={{ width: 120 }}>
+                  <Option value="notAssigned">Not Assigned</Option>
+                  <Option value="Team">Team</Option>
+                </Select>
+              </div>
             )}
           </div>
 
@@ -177,7 +194,7 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
               </Badge>
             </div>
             <div className="downvote">
-            <Badge size="small" count={currentOpinion.downVote.length}>
+              <Badge size="small" count={currentOpinion.downVote.length}>
                 <DislikeOutlined
                   onClick={() => {
                     if (me?.id && currentOpinion.downVote.find((userVoteid) => userVoteid == me.id)) {

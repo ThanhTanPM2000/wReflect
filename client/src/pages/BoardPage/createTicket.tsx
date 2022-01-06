@@ -68,7 +68,6 @@ export default function createTicket({ index, boardId, columnId, isCreateBottom 
     });
     setText('');
   };
-
   const handleOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.currentTarget.value);
   };

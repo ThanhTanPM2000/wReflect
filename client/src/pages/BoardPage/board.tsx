@@ -24,7 +24,6 @@ export default function board({ teamId, boardId }: Props) {
   const [columns, setColumns] = useState<Column[]>([]);
   const history = useHistory();
   console.log(board);
-  
 
   useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(BoardQueries.getBoard, {
     variables: {
