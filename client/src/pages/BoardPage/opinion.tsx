@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { Dropdown, Menu, Modal, Input, Badge, Avatar, Select } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
@@ -40,10 +40,16 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
   const [isBookmarked, setIsBookmarked] = useState(currentOpinion.isBookmarked);
   const me = useContext(selfContext);
 
+  console.log(currentOpinion.text);
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
     {},
   );
+
+  useEffect(() => {
+    setCurrentOpinion(opinion);
+  }, [opinion]);
+
   const menu = (
     <Menu>
       <Menu.Item key="3" icon={<FireFilled />}>
@@ -161,6 +167,33 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
                   <Option value="Team">Team</Option>
                 </Select>
               </div>
+            )}
+            {isEdit ? (
+              <TextArea
+                style={{ textAlign: 'center', minHeight: '180px' }}
+                autoFocus
+                bordered
+                onBlur={(e) => {
+                  setIsEdit(false);
+                  setCurrentOpinion({
+                    ...opinion,
+                    text: e.target.value,
+                  });
+                }}
+                defaultValue={currentOpinion.text}
+              />
+            ) : (
+              <p>
+                {currentOpinion.text.split('\n').map((str) => {
+                  return (
+                    <>
+                      {str}
+                      <br />
+                    </>
+                  );
+                })}
+              </p>
+              // <TextArea>{'hello\nququy'}</TextArea>
             )}
           </div>
 

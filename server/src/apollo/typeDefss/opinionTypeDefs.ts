@@ -55,4 +55,16 @@ export type orderOpinionType = {
   draggableId: string;
 };
 
+export type combineOpinionType = {
+  combine: {
+    draggableId: string;
+    droppableId: string;
+  };
+  source: {
+    droppableId: string;
+    index: number;
+  };
+  draggableId: string;
+};
+
 export default typeDefs;

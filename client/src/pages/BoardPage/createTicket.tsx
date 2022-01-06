@@ -41,6 +41,7 @@ export default function createTicket({ index, boardId, columnId, isCreateBottom 
           query: BoardQueries.getBoard,
           variables: {
             boardId,
+
           },
         });
         const newBoardData = _.cloneDeep(boardData);

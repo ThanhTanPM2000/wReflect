@@ -1,7 +1,12 @@
 import { ForbiddenError } from 'apollo-server-errors';
 import { RequestWithUserInfo } from './../types';
 import { member, team, user, board, column, opinion, remark } from '../services';
-import { createOpinionType, removeOpinionType, orderOpinionType } from './typeDefss/opinionTypeDefs';
+import {
+  createOpinionType,
+  removeOpinionType,
+  orderOpinionType,
+  combineOpinionType,
+} from './typeDefss/opinionTypeDefs';
 
 const resolvers = {
   Query: {
@@ -83,6 +88,10 @@ const resolvers = {
     orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
       await opinion.orderOpinion(meId, args);
+    },
+    combineOpinion: async (_, args: combineOpinionType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      await opinion.combineOpinion(meId, args);
     },
   },
   User: {

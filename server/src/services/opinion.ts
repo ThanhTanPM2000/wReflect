@@ -1,7 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
-import { createOpinionType, orderOpinionType, removeOpinionType } from '../apollo/typeDefss/opinionTypeDefs';
+import {
+  combineOpinionType,
+  createOpinionType,
+  orderOpinionType,
+  removeOpinionType,
+} from '../apollo/typeDefss/opinionTypeDefs';
 import { isEmpty } from 'lodash';
 
 export const getListOpinions = (columnId: string) => {
@@ -132,94 +137,135 @@ export const removeOpinion = async (meId: string, args: removeOpinionType) => {
 };
 
 export const orderOpinion = async (meId: string, args: orderOpinionType) => {
-  const columns =
-    args.destination.droppableId === args.source.droppableId
-      ? args.source.index == args.destination.index
-        ? undefined
-        : await prisma.column.update({
-            where: {
-              id: args.destination.droppableId,
+  args.destination.droppableId === args.source.droppableId
+    ? args.source.index == args.destination.index
+      ? undefined
+      : await prisma.column.update({
+          where: {
+            id: args.destination.droppableId,
+          },
+          data: {
+            opinions: {
+              updateMany: [
+                {
+                  where: {
+                    position: args.destination.index,
+                  },
+                  data: {
+                    position: args.source.index,
+                  },
+                },
+                {
+                  where: {
+                    id: args.draggableId,
+                  },
+                  data: { position: args.destination.index },
+                },
+              ],
             },
-            data: {
-              opinions: {
-                updateMany: [
-                  {
-                    where: {
-                      position: args.destination.index,
-                    },
-                    data: {
-                      position: args.source.index,
-                    },
+          },
+        })
+    : await prisma.$transaction([
+        prisma.column.update({
+          where: {
+            id: args.source.droppableId,
+          },
+          data: {
+            opinions: {
+              disconnect: {
+                id: args.draggableId,
+              },
+              updateMany: {
+                where: {
+                  position: {
+                    gt: args.source.index,
                   },
-                  {
-                    where: {
-                      id: args.draggableId,
-                    },
-                    data: { position: args.destination.index },
+                },
+                data: {
+                  position: {
+                    decrement: 1,
                   },
-                ],
+                },
               },
             },
-          })
-      : await prisma.$transaction([
-          prisma.column.update({
-            where: {
-              id: args.source.droppableId,
-            },
-            data: {
-              opinions: {
-                disconnect: {
-                  id: args.draggableId,
-                },
-                updateMany: {
+          },
+        }),
+        prisma.column.update({
+          where: {
+            id: args.destination.droppableId,
+          },
+          data: {
+            opinions: {
+              connect: {
+                id: args.draggableId,
+              },
+              updateMany: [
+                {
                   where: {
                     position: {
-                      gt: args.source.index,
+                      gte: args.destination.index,
                     },
                   },
                   data: {
                     position: {
-                      decrement: 1,
+                      increment: 1,
                     },
                   },
                 },
-              },
+                {
+                  where: {
+                    id: args.draggableId,
+                  },
+                  data: {
+                    position: args.destination.index,
+                  },
+                },
+              ],
             },
-          }),
-          prisma.column.update({
+          },
+        }),
+      ]);
+  return 'success';
+};
+
+export const combineOpinion = async (meId: string, args: combineOpinionType) => {
+  const currentOpinion = await prisma.opinion.findFirst({
+    where: {
+      id: args.draggableId,
+    },
+  });
+
+  await prisma.$transaction([
+    prisma.column.update({
+      where: {
+        id: args.source.droppableId,
+      },
+      data: {
+        opinions: {
+          disconnect: {
+            id: args.draggableId,
+          },
+        },
+      },
+    }),
+    prisma.column.update({
+      where: {
+        id: args.combine.droppableId,
+      },
+      data: {
+        opinions: {
+          update: {
             where: {
-              id: args.destination.droppableId,
+              id: args.combine.draggableId
             },
             data: {
-              opinions: {
-                connect: {
-                  id: args.draggableId,
-                },
-                updateMany: [
-                  {
-                    where: {
-                      position: {
-                        gte: args.destination.index,
-                      },
-                    },
-                    data: {
-                      position: {
-                        increment: 1,
-                      },
-                    },
-                  },
-                  {
-                    where: {
-                      id: args.draggableId,
-                    },
-                    data: {
-                      position: args.destination.index,
-                    },
-                  },
-                ],
-              },
-            },
-          }),
-        ]);
-  return 'success';
+              text: {
+                
+              }
+            }
+          }
+        }
+      }
+    })
+  ]);
 };

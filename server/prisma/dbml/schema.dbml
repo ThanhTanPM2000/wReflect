@@ -63,7 +63,7 @@ Table Column {
 
 Table Opinion {
   id String [pk]
-  columnId String [not null]
+  columnId String
   authorId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
@@ -80,7 +80,7 @@ Table Opinion {
   position Int [not null]
   status OpinionStatus [not null, default: 'NEW']
   author User [not null]
-  column Column [not null]
+  column Column
   remarks Remark [not null]
 }
 

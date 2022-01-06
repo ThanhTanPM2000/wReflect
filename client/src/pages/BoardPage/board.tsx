@@ -6,11 +6,13 @@ import { useHistory } from 'react-router-dom';
 
 import { StarOutlined, EllipsisOutlined, LikeOutlined, DislikeOutlined } from '@ant-design/icons';
 import _, { result, template } from 'lodash';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
 import ColumnComponent from './column';
 import { Board, Column } from '../../types';
 import { getTeamIdsResult } from '../../grapql-client/queries/TeamQueries';
+import { ColumnMutations, OpinionMutations } from '../../grapql-client/mutations';
+import { argsToArgsConfig } from 'graphql/type/definition';
 
 type Props = {
   teamId: string;
@@ -35,6 +37,10 @@ export default function board({ teamId, boardId }: Props) {
     },
   });
 
+  const [orderOpinion] = useMutation<ColumnMutations.orderOpinionResult, ColumnMutations.orderOpinionVars>(
+    ColumnMutations.orderOpinion,
+  );
+
   const { data } = useQuery<TeamQueries.getTeamIdsResult>(TeamQueries.getTeamIds, {
     fetchPolicy: 'cache-first', // Used for first execution
     notifyOnNetworkStatusChange: true,
@@ -44,17 +50,51 @@ export default function board({ teamId, boardId }: Props) {
     },
   });
 
-  const handleOnDragEnd = (result: DropResult) => {
-    console.log(result);
-    if (!result.destination) return;
+  const handleOnDragEnd = async (result: DropResult) => {
+    const prevList = _.cloneDeep(columns);
     const tempList = _.cloneDeep(columns);
-    const [reorderedItem] = tempList
-      .find((column) => column.id === result.source.droppableId)!
-      .opinions?.splice(result.source.index, 1);
-    tempList
-      .find((column) => column.id === result.destination?.droppableId)
-      ?.opinions.splice(result?.destination?.index, 0, reorderedItem);
-    setColumns(tempList);
+    if (result.combine) {
+      const currentColumn = tempList.find((column) => column.id === result.combine?.droppableId);
+      if (!currentColumn?.opinions) return;
+      const [sourceOpinion] = tempList
+        .find((column) => column.id == result.source?.droppableId)!
+        .opinions.splice(result.source.index, 1);
+      currentColumn.opinions = currentColumn?.opinions.map((opinion) => {
+        if (opinion.id === result.combine?.draggableId) {
+          return {
+            ...opinion,
+            text: `${opinion.text}\n${sourceOpinion.text}`,
+            mergedAuthors: [...opinion.mergedAuthors, sourceOpinion.authorId],
+            remarks: [...opinion.remarks, ...sourceOpinion.remarks],
+          };
+        }
+        return opinion;
+      });
+      setColumns(tempList);
+      console.log(tempList);
+    } else {
+      if (!result.destination) return;
+
+      const [reorderedItem] = tempList
+        .find((column) => column.id === result.source.droppableId)!
+        .opinions?.splice(result.source.index, 1);
+      tempList
+        .find((column) => column.id === result.destination?.droppableId)
+        ?.opinions.splice(result?.destination?.index, 0, reorderedItem);
+      setColumns(tempList);
+
+      orderOpinion({
+        variables: {
+          destination: result.destination,
+          source: result.source,
+          draggableId: result.draggableId,
+        },
+        onError: (err) => {
+          console.log(err);
+          setColumns(prevList);
+        },
+      });
+    }
   };
 
   const teamOptions = () => {

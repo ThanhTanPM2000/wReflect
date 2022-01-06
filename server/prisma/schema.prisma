@@ -67,12 +67,12 @@ model Column {
   isActive Boolean   @default(true)
   opinions Opinion[]
   boardId  String
-  board    Board     @relation(fields: [boardId], references: [id])
+  board    Board     @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Opinion {
   id            String        @id @default(uuid())
-  columnId      String
+  columnId      String?
   authorId      String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -86,10 +86,10 @@ model Opinion {
   mergedAuthors String[]
   voters        String[]
   color         String        @default("white")
-  position      Int           
+  position      Int
   status        OpinionStatus @default(NEW)
-  author        User          @relation(fields: [authorId], references: [id])
-  column        Column        @relation(fields: [columnId], references: [id])
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  column        Column?       @relation(fields: [columnId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   remarks       Remark[]
 }
 
@@ -100,7 +100,7 @@ model Remark {
   text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  opinion   Opinion  @relation(fields: [opinionId], references: [id])
+  opinion   Opinion  @relation(fields: [opinionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum OpinionStatus {

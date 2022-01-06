@@ -1,3 +1,4 @@
+import { orderOpinionType } from './opinionTypeDefs';
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
   type AddMembersMutationResponse {
@@ -13,6 +14,11 @@ const typeDefs = gql`
   input orderOpinion {
     droppableId: String!
     index: Int!
+  }
+
+  input combineOpinion {
+    droppableId: String!
+    draggableId: String!
   }
 
   type Mutation {
@@ -41,7 +47,8 @@ const typeDefs = gql`
 
     createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Column
     removeOpinion(opinionId: String): BatchPayload
-    orderOpinion(destination: orderOpinion, source: orderOpinion, dragableId: String): String
+    orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): String
+    mergeOpinion(combine: combineOpinion, source: orderOpinionType, draggableId: String): String
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload
