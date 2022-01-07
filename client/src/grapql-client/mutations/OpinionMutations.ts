@@ -88,3 +88,26 @@ export const removeOpinion = gql`
     }
   }
 `;
+
+export type combineOpinionResult = {
+  combineOpinion: string;
+};
+
+export type combineOpinionVars = {
+  combine: {
+    draggableId: string;
+    droppableId: string;
+  };
+  source: {
+    droppableId: string;
+    index: number;
+  };
+  draggableId: string;
+  text: string;
+};
+
+export const combineOpinion = gql`
+  mutation Mutation($combine: combineOpinion, $source: orderOpinion, $draggableId: String, $text: String) {
+    combineOpinion(combine: $combine, source: $source, draggableId: $draggableId, text: $text)
+  }
+`;

@@ -14,33 +14,34 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
-import { Opinion } from '../../types';
+import { Board, Opinion } from '../../types';
 import { useMutation } from '@apollo/client';
 import selfContext from '../../contexts/selfContext';
 import { OpinionMutations } from '../../grapql-client/mutations';
 import { BoardQueries } from '../../grapql-client/queries';
 import _ from 'lodash';
+import { current } from '@reduxjs/toolkit';
 
 type Props = {
-  boardId: string;
+  board: Board;
   opinion: Opinion;
   key: string;
   index: number;
+  currentNumVotes: number;
+  setCurrentNumVotes: (votes: number) => void;
 };
 
 const { Option } = Select;
 const { confirm } = Modal;
 const { TextArea } = Input;
 
-export default function OpinionComponenent({ opinion, boardId, index }: Props) {
+export default function OpinionComponenent({ opinion, board, index, currentNumVotes, setCurrentNumVotes }: Props) {
   const [color, setColor] = useState(opinion?.color);
   const [isEdit, setIsEdit] = useState(false);
-  const [isAction, setIsAction] = useState(false);
   const [currentOpinion, setCurrentOpinion] = useState(opinion);
   const [isBookmarked, setIsBookmarked] = useState(currentOpinion.isBookmarked);
   const me = useContext(selfContext);
 
-  console.log(currentOpinion.text);
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
     {},
@@ -49,6 +50,12 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
   useEffect(() => {
     setCurrentOpinion(opinion);
   }, [opinion]);
+
+  useEffect(() => {
+    console.log('upvote');
+  }, [currentOpinion.upVote, currentOpinion.downVote]);
+
+  console.log(currentNumVotes, board.votesLimit, currentNumVotes < board.votesLimit);
 
   const menu = (
     <Menu>
@@ -74,7 +81,7 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
                   const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
                     query: BoardQueries.getBoard,
                     variables: {
-                      boardId,
+                      boardId: board.id,
                     },
                   });
 
@@ -85,7 +92,7 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
                   store.writeQuery({
                     query: BoardQueries.getBoard,
                     variables: {
-                      boardId,
+                      boardId: board.id,
                     },
                     data: {
                       board: { ...boardData?.board, columns: newColumns },
@@ -139,8 +146,9 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
             <div className="opinionText">
               {isEdit ? (
                 <TextArea
-                  style={{ textAlign: 'center' }}
+                  style={{ textAlign: 'center', minHeight: '180px' }}
                   autoFocus
+                  bordered
                   onBlur={(e) => {
                     setIsEdit(false);
                     setCurrentOpinion({
@@ -149,52 +157,35 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
                     });
                   }}
                   defaultValue={currentOpinion.text}
-                ></TextArea>
+                />
               ) : (
-                <p>{currentOpinion.text}</p>
+                <p>
+                  {currentOpinion.text.split('\n').map((str) => {
+                    return (
+                      <>
+                        {str}
+                        <br />
+                      </>
+                    );
+                  })}
+                </p>
+                // <TextArea>{'hello\nququy'}</TextArea>
+              )}
+              {currentOpinion.isAction === true && (
+                <div className="opinionAction">
+                  <Select className="select" defaultValue="Open" style={{ width: 120 }}>
+                    <Option value="Open">Open</Option>
+                    <Option value="inProgress">In progress</Option>
+                    <Option value="Done">Done</Option>
+                    <Option value="Rejected">Rejected</Option>
+                  </Select>
+                  <Select className="select" defaultValue="notAssigned" style={{ width: 120 }}>
+                    <Option value="notAssigned">Not Assigned</Option>
+                    <Option value="Team">Team</Option>
+                  </Select>
+                </div>
               )}
             </div>
-            {opinion.isAction === true && (
-              <div className="opinionAction">
-                <Select className="select" defaultValue="Open" style={{ width: 120 }}>
-                  <Option value="Open">Open</Option>
-                  <Option value="inProgress">In progress</Option>
-                  <Option value="Done">Done</Option>
-                  <Option value="Rejected">Rejected</Option>
-                </Select>
-                <Select className="select" defaultValue="notAssigned" style={{ width: 120 }}>
-                  <Option value="notAssigned">Not Assigned</Option>
-                  <Option value="Team">Team</Option>
-                </Select>
-              </div>
-            )}
-            {isEdit ? (
-              <TextArea
-                style={{ textAlign: 'center', minHeight: '180px' }}
-                autoFocus
-                bordered
-                onBlur={(e) => {
-                  setIsEdit(false);
-                  setCurrentOpinion({
-                    ...opinion,
-                    text: e.target.value,
-                  });
-                }}
-                defaultValue={currentOpinion.text}
-              />
-            ) : (
-              <p>
-                {currentOpinion.text.split('\n').map((str) => {
-                  return (
-                    <>
-                      {str}
-                      <br />
-                    </>
-                  );
-                })}
-              </p>
-              // <TextArea>{'hello\nququy'}</TextArea>
-            )}
           </div>
 
           <div className="opinionFooter">
@@ -210,16 +201,25 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
               <Badge size="small" count={currentOpinion.upVote.length}>
                 <LikeOutlined
                   onClick={() => {
-                    if (me?.id && currentOpinion.upVote.find((userVoteid) => userVoteid == me.id)) {
+                    if (me?.id && currentNumVotes >= board.votesLimit) {
+                      let findFirst = false;
                       setCurrentOpinion({
                         ...currentOpinion,
-                        upVote: currentOpinion.upVote.filter((userVoteid) => userVoteid != me.id),
+                        upVote: currentOpinion.upVote.filter((userVoteid) => {
+                          if (userVoteid == me.id && !findFirst) {
+                            findFirst = true;
+                            return false;
+                          }
+                          return true;
+                        }),
                       });
+                      setCurrentNumVotes(currentNumVotes - 1);
                     } else if (me?.id) {
                       setCurrentOpinion({
                         ...currentOpinion,
                         upVote: [...currentOpinion.upVote, me.id],
                       });
+                      setCurrentNumVotes(currentNumVotes + 1);
                     }
                   }}
                   style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }}
@@ -230,16 +230,18 @@ export default function OpinionComponenent({ opinion, boardId, index }: Props) {
               <Badge size="small" count={currentOpinion.downVote.length}>
                 <DislikeOutlined
                   onClick={() => {
-                    if (me?.id && currentOpinion.downVote.find((userVoteid) => userVoteid == me.id)) {
+                    if (me?.id && currentNumVotes >= board.votesLimit) {
                       setCurrentOpinion({
                         ...currentOpinion,
                         downVote: currentOpinion.downVote.filter((userVoteid) => userVoteid != me.id),
                       });
+                      setCurrentNumVotes(currentNumVotes - 1);
                     } else if (me?.id) {
                       setCurrentOpinion({
                         ...currentOpinion,
                         downVote: [...currentOpinion.downVote, me.id],
                       });
+                      setCurrentNumVotes(currentNumVotes + 1);
                     }
                   }}
                   style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }}

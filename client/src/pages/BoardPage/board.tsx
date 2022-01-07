@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Tabs, Input, Select, Avatar, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Select, Avatar, Tooltip } from 'antd';
 
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useHistory } from 'react-router-dom';
 
-import { StarOutlined, EllipsisOutlined, LikeOutlined, DislikeOutlined } from '@ant-design/icons';
-import _, { result, template } from 'lodash';
 import { useMutation, useQuery } from '@apollo/client';
 import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
 import ColumnComponent from './column';
 import { Board, Column } from '../../types';
-import { getTeamIdsResult } from '../../grapql-client/queries/TeamQueries';
 import { ColumnMutations, OpinionMutations } from '../../grapql-client/mutations';
-import { argsToArgsConfig } from 'graphql/type/definition';
+import _ from 'lodash';
 
 type Props = {
   teamId: string;
@@ -24,8 +21,8 @@ const { Option } = Select;
 export default function board({ teamId, boardId }: Props) {
   const [board, setBoard] = useState<Board | null>(null);
   const [columns, setColumns] = useState<Column[]>([]);
+  const [currentNumVotes, setCurrentNumVotes] = useState(0);
   const history = useHistory();
-  console.log(board);
 
   useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(BoardQueries.getBoard, {
     variables: {
@@ -41,6 +38,10 @@ export default function board({ teamId, boardId }: Props) {
     ColumnMutations.orderOpinion,
   );
 
+  const [combineOpinion] = useMutation<OpinionMutations.combineOpinionResult, OpinionMutations.combineOpinionVars>(
+    OpinionMutations.combineOpinion,
+  );
+
   const { data } = useQuery<TeamQueries.getTeamIdsResult>(TeamQueries.getTeamIds, {
     fetchPolicy: 'cache-first', // Used for first execution
     notifyOnNetworkStatusChange: true,
@@ -54,6 +55,7 @@ export default function board({ teamId, boardId }: Props) {
     const prevList = _.cloneDeep(columns);
     const tempList = _.cloneDeep(columns);
     if (result.combine) {
+      let combineText = '';
       const currentColumn = tempList.find((column) => column.id === result.combine?.droppableId);
       if (!currentColumn?.opinions) return;
       const [sourceOpinion] = tempList
@@ -61,9 +63,10 @@ export default function board({ teamId, boardId }: Props) {
         .opinions.splice(result.source.index, 1);
       currentColumn.opinions = currentColumn?.opinions.map((opinion) => {
         if (opinion.id === result.combine?.draggableId) {
+          combineText = `${opinion.text}\n${sourceOpinion.text}`;
           return {
             ...opinion,
-            text: `${opinion.text}\n${sourceOpinion.text}`,
+            text: combineText,
             mergedAuthors: [...opinion.mergedAuthors, sourceOpinion.authorId],
             remarks: [...opinion.remarks, ...sourceOpinion.remarks],
           };
@@ -71,7 +74,18 @@ export default function board({ teamId, boardId }: Props) {
         return opinion;
       });
       setColumns(tempList);
-      console.log(tempList);
+
+      combineOpinion({
+        variables: {
+          combine: result.combine,
+          source: result.source,
+          draggableId: result.draggableId,
+          text: combineText,
+        },
+        onError: () => {
+          setColumns(prevList);
+        },
+      });
     } else {
       if (!result.destination) return;
 
@@ -127,7 +141,7 @@ export default function board({ teamId, boardId }: Props) {
             {boardOptions()}
           </Select>
         </div>
-        <div className="board-members" onClick={() => history.push(`/manage-members/${teamId}`)}>
+        <div className="board-members">
           <Avatar.Group
             maxCount={3}
             style={{
@@ -136,7 +150,7 @@ export default function board({ teamId, boardId }: Props) {
             maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
           >
             {board?.team.members.map((member) => (
-              <div key={member?.user.email} onClick={() => console.log('clicked')}>
+              <div onClick={() => history.push(`/manage-members/${teamId}`)} key={member?.user.email}>
                 <Tooltip title={member?.user.profile.name} key={member?.user.email} placement="bottom">
                   <Avatar
                     style={{ marginRight: '3px' }}
@@ -153,7 +167,16 @@ export default function board({ teamId, boardId }: Props) {
       <div className="board flex flex-dir-r">
         <DragDropContext onDragEnd={handleOnDragEnd}>
           {columns?.map((column, index) => {
-            return <ColumnComponent boardId={boardId} index={index} key={column.id} column={column} />;
+            return (
+              <ColumnComponent
+                currentNumVotes={currentNumVotes}
+                setCurrentNumVotes={setCurrentNumVotes}
+                board={board!}
+                index={index}
+                key={column.id}
+                column={column}
+              />
+            );
           })}
         </DragDropContext>
       </div>

@@ -1,16 +1,18 @@
 import React, { useRef, useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
-import { Column } from '../../types';
+import { Board, Column } from '../../types';
 import CreateTicket from './createTicket';
 import OpinionComponent from './opinion';
 
 type Props = {
   index: number;
   column: Column;
-  boardId: string;
+  board: Board;
+  currentNumVotes: number;
+  setCurrentNumVotes: (votes: number) => void;
 };
 
-export default function ColumnComponent({ column, boardId, index }: Props) {
+export default function ColumnComponent({ column, board, index, currentNumVotes, setCurrentNumVotes }: Props) {
   console.log(column);
   return (
     <Droppable isCombineEnabled key={column.id} droppableId={column.id}>
@@ -19,14 +21,21 @@ export default function ColumnComponent({ column, boardId, index }: Props) {
           <h1 className="colHead">{column.title}</h1>
           <div className="colContent">
             {column.opinions.length > 3 && (
-              <CreateTicket isCreateBottom={false} boardId={boardId} columnId={column?.id} index={index} />
+              <CreateTicket isCreateBottom={false} boardId={board.id} columnId={column?.id} index={index} />
             )}
             {column.opinions.map((opinion, index) => (
-              <OpinionComponent boardId={boardId} key={opinion?.id} index={index} opinion={opinion} />
+              <OpinionComponent
+                currentNumVotes={currentNumVotes}
+                setCurrentNumVotes={setCurrentNumVotes}
+                board={board}
+                key={opinion?.id}
+                index={index}
+                opinion={opinion}
+              />
             ))}
             {provided.placeholder}
 
-            <CreateTicket isCreateBottom={true} boardId={boardId} columnId={column?.id} index={index} />
+            <CreateTicket isCreateBottom={true} boardId={board.id} columnId={column?.id} index={index} />
           </div>
         </div>
       )}
