@@ -15,6 +15,7 @@ import { AccountSetting } from './pages/AccountSettingPage';
 import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
+import { ManageBoardPage } from './pages/ManageBoardPage'
 
 type Props = {
   me: null | User;
@@ -59,6 +60,7 @@ const Routes = ({ me }: Props): JSX.Element => {
                         />
                         <Route path="/me" component={ProfileUser} />
                         <Route path="/account" component={AccountSetting} />
+                        <Route path="/manageboard" component={ManageBoardPage}/>
                         <Redirect from="/" exact to="/teams" />
                         <Route path="/not-found" component={NotFound} />
                         <Redirect to="/not-found" />

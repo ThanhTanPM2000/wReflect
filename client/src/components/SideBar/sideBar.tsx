@@ -94,7 +94,7 @@ const SideBar = ({ email, isAdmin }: Props) => {
                     Task
                   </Menu.Item>
                   <Menu.Item key="6" icon={<CalendarOutlined />}>
-                    Manager
+                    <Link to={`/manageboard/${teamId}`}>Manager</Link>
                   </Menu.Item>
                 </SubMenu>
                 <Menu.Item icon={<UserOutlined />} key="account">
