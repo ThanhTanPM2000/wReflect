@@ -372,6 +372,36 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     .color-selector .block-color:hover {
       box-shadow: 0 0 20px 0 rgba(30, 34, 47, 0.1), 0 2px 3px 0 rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.03); }
 
+.manage-board {
+  margin: 40px 70px 0 120px !important; }
+  .manage-board h1 {
+    font-size: 20px; }
+  .manage-board .board-selector {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px; }
+  .manage-board .button-right {
+    margin: 0 10px 5px auto; }
+    .manage-board .button-right button {
+      height: 35px;
+      background-color: #0d0d0e;
+      color: white; }
+  .manage-board .board-items {
+    margin-bottom: 10px;
+    display: flex; }
+    .manage-board .board-items .board-icons {
+      margin: 0 10px 5px auto; }
+      .manage-board .board-items .board-icons span {
+        font-size: 15px;
+        font-weight: bold !important;
+        color: #6d7982; }
+        .manage-board .board-items .board-icons span:hover {
+          color: blue;
+          cursor: pointer; }
+      .manage-board .board-items .board-icons .text-button:hover {
+        color: #6d7982;
+        cursor: auto; }
+
 .sidebar {
   position: fixed;
   height: 100%;
