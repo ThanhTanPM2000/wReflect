@@ -48,7 +48,7 @@ const typeDefs = gql`
     createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Column
     removeOpinion(opinionId: String): BatchPayload
     orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): String
-    mergeOpinion(combine: combineOpinion, source: orderOpinionType, draggableId: String): String
+    combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): String
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload

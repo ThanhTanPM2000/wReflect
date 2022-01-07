@@ -8,6 +8,7 @@ import {
   removeOpinionType,
 } from '../apollo/typeDefss/opinionTypeDefs';
 import { isEmpty } from 'lodash';
+import { remark } from '.';
 
 export const getListOpinions = (columnId: string) => {
   const opinions = prisma.opinion.findMany({
@@ -233,21 +234,14 @@ export const combineOpinion = async (meId: string, args: combineOpinionType) => 
     where: {
       id: args.draggableId,
     },
+    include: {
+      remarks: true,
+    },
   });
 
+  if (!currentOpinion) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
+
   await prisma.$transaction([
-    prisma.column.update({
-      where: {
-        id: args.source.droppableId,
-      },
-      data: {
-        opinions: {
-          disconnect: {
-            id: args.draggableId,
-          },
-        },
-      },
-    }),
     prisma.column.update({
       where: {
         id: args.combine.droppableId,
@@ -256,16 +250,53 @@ export const combineOpinion = async (meId: string, args: combineOpinionType) => 
         opinions: {
           update: {
             where: {
-              id: args.combine.draggableId
+              id: args.combine.draggableId,
             },
             data: {
-              text: {
-                
-              }
-            }
-          }
-        }
-      }
-    })
+              text: args.text,
+              mergedAuthors: {
+                push: currentOpinion.authorId,
+              },
+              remarks: {
+                connect: currentOpinion.remarks.map((remark) => {
+                  return { id: remark.id };
+                }),
+              },
+              upVote: {
+                push: currentOpinion.upVote,
+              },
+              downVote: {
+                push: currentOpinion.downVote,
+              },
+            },
+          },
+        },
+      },
+    }),
+    prisma.column.update({
+      where: {
+        id: args.source.droppableId,
+      },
+      data: {
+        opinions: {
+          updateMany: {
+            where: {
+              position: {
+                gt: args.source.index,
+              },
+            },
+            data: {
+              position: {
+                decrement: 1,
+              },
+            },
+          },
+          delete: {
+            id: args.draggableId,
+          },
+        },
+      },
+    }),
   ]);
+  return 'sucess';
 };

@@ -65,6 +65,7 @@ export type combineOpinionType = {
     index: number;
   };
   draggableId: string;
+  text: string;
 };
 
 export default typeDefs;
