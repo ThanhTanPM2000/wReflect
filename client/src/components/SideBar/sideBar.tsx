@@ -103,7 +103,7 @@ const SideBar = ({ email, isAdmin }: Props) => {
               </>
             )}
 
-            <Menu.Item style={{ marginBottom: '20px' }} key="10" icon={<LogoutOutlined />}>
+            <Menu.Item  style={{ marginTop: 'auto' }} key="10" icon={<LogoutOutlined />}>
               <Logout>
                 <>Sign out</>
               </Logout>

@@ -66,7 +66,7 @@ export type Opinion = {
   status: OpinionStatus;
   column: Column;
   remarks: Remark[];
-  author: User
+  author: User;
 };
 
 export type Remark = {
@@ -77,6 +77,7 @@ export type Remark = {
   createdAt: Date;
   updatedAt: Date;
   opinion: Opinion;
+  author: User;
 };
 
 export type Member = {

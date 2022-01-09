@@ -1,26 +1,26 @@
+import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
-import dotenv from 'dotenv';
 dotenv.config();
-import express from 'express';
+import http from 'http';
 import cors from 'cors';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-
-import sessionManager from './middleware/sessionManager';
-import './prisma'; // eager load to test connection
-import config from './config';
-import apiRouter from './apiRouter';
-
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { ApolloServer } from 'apollo-server-express';
-// import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
-
-import http from 'http';
-
-import { resolvers, typeDefs } from './apollo';
-import logger from './logger';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
+
+import './prisma'; // eager load to test connection
+import logger from './logger';
+import config from './config';
+import apiRouter from './apiRouter';
+import { resolvers, typeDefs } from './apollo';
+import sessionManager from './middleware/sessionManager';
+
+// import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 
 async function startApolloServer(typeDefs, resolvers) {
   const app = express();
@@ -45,6 +45,18 @@ async function startApolloServer(typeDefs, resolvers) {
   schema = constraintDirective()(schema);
 
   const httpServer = http.createServer(app);
+  const subscriptionServer = SubscriptionServer.create(
+    {
+      schema,
+      execute,
+      subscribe,
+    },
+    {
+      server: httpServer,
+      path: '/graphql',
+    },
+  );
+
   const server = new ApolloServer({
     schema,
 
@@ -61,7 +73,17 @@ async function startApolloServer(typeDefs, resolvers) {
       }
       return err;
     },
-    // plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    plugins: [
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              subscriptionServer.close();
+            },
+          };
+        },
+      },
+    ],
   });
   await server.start();
 
@@ -75,11 +97,7 @@ async function startApolloServer(typeDefs, resolvers) {
 
   const port = config.PORT || 4000;
 
-  // httpServer.listen(port, () => {
-  //   logger.info(`server is listening on ${config.SERVER_URL}`);
-  // });
   await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
-  // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
   logger.info(`server is listening on ${config.SERVER_URL}`);
 }
 

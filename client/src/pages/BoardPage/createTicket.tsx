@@ -36,12 +36,10 @@ export default function createTicket({ index, boardId, columnId, isCreateBottom 
         isCreateBottom,
       },
       update: async (store, { data }) => {
-        console.log('data create is', data);
         const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
           query: BoardQueries.getBoard,
           variables: {
             boardId,
-
           },
         });
         const newBoardData = _.cloneDeep(boardData);

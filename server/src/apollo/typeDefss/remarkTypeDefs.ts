@@ -9,7 +9,17 @@ const typeDefs = gql`
     createdAt: String
     updatedAt: String
     opinion: Opinion
+    author: User
   }
 `;
+
+export type createRemarkType = {
+  opinionId: string;
+  text: string;
+};
+
+export type removeRemarkType = {
+  remarkId: string;
+};
 
 export default typeDefs;

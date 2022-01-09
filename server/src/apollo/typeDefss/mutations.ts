@@ -1,3 +1,4 @@
+import { Remark } from '@prisma/client';
 import { orderOpinionType } from './opinionTypeDefs';
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
@@ -46,9 +47,22 @@ const typeDefs = gql`
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
 
     createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Column
+    updateOpinion(
+      opinionId: String!
+      text: String
+      upVote: [String]
+      isAction: Boolean
+      isBookmarked: Boolean
+      responsible: Boolean
+      color: String
+      status: String
+    ): String
     removeOpinion(opinionId: String): BatchPayload
     orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): String
     combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): String
+
+    createRemark(opinionId: String, text: String): Remark
+    removeRemark(remarkId: String): BatchPayload
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload

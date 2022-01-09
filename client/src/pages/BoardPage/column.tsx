@@ -8,19 +8,18 @@ type Props = {
   index: number;
   column: Column;
   board: Board;
-  currentNumVotes: number;
+  currentNumVotes: number | undefined;
   setCurrentNumVotes: (votes: number) => void;
 };
 
 export default function ColumnComponent({ column, board, index, currentNumVotes, setCurrentNumVotes }: Props) {
-  console.log(column);
   return (
     <Droppable isCombineEnabled key={column.id} droppableId={column.id}>
       {(provided) => (
         <div className="column flex" {...provided.droppableProps} ref={provided.innerRef}>
           <h1 className="colHead">{column.title}</h1>
           <div className="colContent">
-            {column.opinions.length > 3 && (
+            {column.opinions.length > 3 && !board.isLocked && (
               <CreateTicket isCreateBottom={false} boardId={board.id} columnId={column?.id} index={index} />
             )}
             {column.opinions.map((opinion, index) => (
@@ -35,7 +34,9 @@ export default function ColumnComponent({ column, board, index, currentNumVotes,
             ))}
             {provided.placeholder}
 
-            <CreateTicket isCreateBottom={true} boardId={board.id} columnId={column?.id} index={index} />
+            {!board.isLocked && (
+              <CreateTicket isCreateBottom={true} boardId={board.id} columnId={column?.id} index={index} />
+            )}
           </div>
         </div>
       )}

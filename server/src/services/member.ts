@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { sendMail } from './nodemailer';
 import { User } from '.prisma/client';
 import config from '../config';
-import { ApolloError, ForbiddenError } from 'apollo-server-errors';
+import { ApolloError } from 'apollo-server-errors';
 import { StatusCodes } from 'http-status-codes';
 
 export const getListMembers = async (teamId?: string, userId?: string) => {
@@ -21,6 +21,17 @@ export const getListMembers = async (teamId?: string, userId?: string) => {
   });
 
   return members;
+};
+
+export const getMember = async (memberId?: string) => {
+  const member = await prisma.member.findUnique({
+    where: {
+      id: memberId,
+    },
+  });
+
+  if (!member) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
+  return member;
 };
 
 export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) => {

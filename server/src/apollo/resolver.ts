@@ -1,3 +1,4 @@
+import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
 import { ForbiddenError } from 'apollo-server-errors';
 import { RequestWithUserInfo } from './../types';
 import { member, team, user, board, column, opinion, remark } from '../services';
@@ -6,6 +7,7 @@ import {
   removeOpinionType,
   orderOpinionType,
   combineOpinionType,
+  updateOpinionType,
 } from './typeDefss/opinionTypeDefs';
 
 const resolvers = {
@@ -81,17 +83,30 @@ const resolvers = {
       const { id: meId } = req?.user;
       return await opinion.createOpinion(meId, args);
     },
+    updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      return await opinion.updateOpinion(meId, args);
+    },
     removeOpinion: async (_, args: removeOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
       return await opinion.removeOpinion(meId, args);
     },
     orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      await opinion.orderOpinion(meId, args);
+      return await opinion.orderOpinion(meId, args);
     },
     combineOpinion: async (_, args: combineOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      await opinion.combineOpinion(meId, args);
+      return await opinion.combineOpinion(meId, args);
+    },
+
+    createRemark: async (_, args: createRemarkType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      await remark.createRemark(meId, args);
+    },
+    removeRemark: async (_, args: removeRemarkType, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      await remark.removeRemark(meId, args);
     },
   },
   User: {
@@ -142,11 +157,17 @@ const resolvers = {
       const remarks = await remark.getListRemarks(_?.id);
       return remarks;
     },
+    author: async (_, args) => {
+      return await user.getUser(_.authorId);
+    },
   },
   Remark: {
     opinion: async (_) => {
       const myOpinion = await opinion.getOpinion(_?.opinionId);
       return myOpinion;
+    },
+    author: async (_) => {
+      return await user.getUser(_.authorId);
     },
   },
   Member: {

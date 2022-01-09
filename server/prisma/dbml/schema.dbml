@@ -69,14 +69,12 @@ Table Opinion {
   updatedAt DateTime [not null]
   text String [not null]
   upVote String [not null]
-  downVote String [not null]
   updatedBy String [not null]
   isAction Boolean [not null, default: false]
   isBookmarked Boolean [not null, default: false]
   responsible String
   mergedAuthors String [not null]
-  voters String [not null]
-  color String [not null, default: 'white']
+  color String [not null, default: 'pink']
   position Int [not null]
   status OpinionStatus [not null, default: 'NEW']
   author User [not null]
@@ -92,6 +90,8 @@ Table Remark {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   opinion Opinion [not null]
+  author User [not null]
+  userId String
 }
 
 Table InviteLink {
@@ -144,6 +144,7 @@ Table User {
   members Member [not null]
   Notification Notification [not null]
   Opinion Opinion [not null]
+  Remark Remark [not null]
 }
 
 Table UserProfile {
@@ -206,6 +207,8 @@ Ref: Opinion.authorId > User.id
 Ref: Opinion.columnId > Column.id
 
 Ref: Remark.opinionId > Opinion.id
+
+Ref: Remark.authorId > User.id
 
 Ref: InviteLink.teamId > Team.id
 

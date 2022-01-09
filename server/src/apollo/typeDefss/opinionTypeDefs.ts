@@ -1,3 +1,4 @@
+import { OpinionStatus } from '@prisma/client';
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
@@ -37,6 +38,17 @@ export type createOpinionType = {
   text: string;
   isAction: boolean;
   isCreateBottom: boolean;
+};
+
+export type updateOpinionType = {
+  opinionId: string;
+  text?: string;
+  upVote?: string[];
+  isAction?: boolean;
+  isBookmarked?: boolean;
+  responsible?: string;
+  color?: string;
+  status?: OpinionStatus;
 };
 
 export type removeOpinionType = {

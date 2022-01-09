@@ -78,14 +78,12 @@ model Opinion {
   updatedAt     DateTime      @updatedAt
   text          String
   upVote        String[]
-  downVote      String[]
   updatedBy     String
   isAction      Boolean       @default(false)
   isBookmarked  Boolean       @default(false)
   responsible   String?
   mergedAuthors String[]
-  voters        String[]
-  color         String        @default("white")
+  color         String        @default("pink")
   position      Int
   status        OpinionStatus @default(NEW)
   author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -101,6 +99,8 @@ model Remark {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   opinion   Opinion  @relation(fields: [opinionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String?
 }
 
 enum OpinionStatus {
@@ -168,6 +168,7 @@ model User {
   Notification Notification[]
 
   Opinion Opinion[]
+  Remark  Remark[]
   @@index([email])
 }
 

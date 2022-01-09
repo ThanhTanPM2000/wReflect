@@ -268,18 +268,103 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   border-left: solid 1px #e7eaea; }
 
 .board-header {
-  margin-bottom: 10px; }
-  .board-header .board-selector {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  inset: 0 0 auto 0; }
+  .board-header .currentLimitVotes {
+    color: white;
+    padding: 10px 20px 10px 20px;
+    background-color: rgba(30, 34, 47, 0.7);
+    border-radius: 30px; }
+  .board-header .board-tracking {
     display: flex;
-    gap: 10px;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px; }
-  .board-header .board-members {
+    flex-direction: column;
+    gap: 5px;
+    align-items: center; }
+    .board-header .board-tracking .board-selector {
+      display: flex;
+      gap: 10px;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px; }
+      .board-header .board-tracking .board-selector .ant-select-selector {
+        border-radius: 20px;
+        width: 200px;
+        height: 40px; }
+        .board-header .board-tracking .board-selector .ant-select-selector .ant-select-arrow {
+          padding-left: 10px;
+          padding-right: 10px;
+          border-left: solid 1px #e7eaea; }
+        .board-header .board-tracking .board-selector .ant-select-selector .ant-select-selection-item {
+          display: flex;
+          align-items: center;
+          font-family: 'Inter', sans-serif;
+          font-weight: 700 !important; }
+    .board-header .board-tracking .board-members {
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+  .board-header .board-action .boardPanel {
+    color: white;
+    background-color: rgba(30, 34, 47, 0.7);
+    padding: 10px 20px 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 28px;
+    box-shadow: 0 13px 20px -14px rgba(30, 34, 47, 0.24);
     display: flex;
+    gap: 5px;
     justify-content: center;
     align-items: center; }
+    .board-header .board-action .boardPanel .boardPanelIcon {
+      font-size: 15px;
+      font-weight: 200px; }
+  .board-header .board-action .boardActionPanel {
+    border-radius: 8px;
+    box-shadow: 0 10px 40px 0 rgba(30, 34, 47, 0.09);
+    background-color: #1e222f;
+    padding: 30px;
+    margin-right: 20px;
+    right: 0;
+    position: absolute;
+    top: 85px;
+    width: 0;
+    display: none;
+    z-index: 11; }
+    .board-header .board-action .boardActionPanel .boardPanelIcon {
+      font-size: 25px;
+      color: #979fa6; }
+    .board-header .board-action .boardActionPanel ul {
+      padding: 0;
+      margin: 0;
+      list-style: none; }
+    .board-header .board-action .boardActionPanel li {
+      padding: 5px;
+      margin: 0;
+      list-style: none;
+      display: flex;
+      gap: 10px;
+      align-items: center; }
+    .board-header .board-action .boardActionPanel a {
+      text-decoration: none;
+      color: #6d7982;
+      font-size: 13px; }
+  .board-header .board-action.active .boardActionPanel {
+    width: 275px;
+    display: block; }
+
+.ant-select-item-option-selected {
+  color: white !important;
+  background-color: #a4a0f1 !important; }
+
+.ant-select-item-option-content {
+  font-size: 12px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important; }
 
 .board {
   align-items: flex-start;
@@ -334,6 +419,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         flex: 1;
         flex-direction: row;
         justify-content: space-between;
+        align-items: center;
         width: 100%; }
       .board .column .colContent .opinionCol .opinionContent {
         overflow-wrap: break-word;
@@ -349,11 +435,65 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       .board .column .colContent .opinionCol .opinionFooter {
         margin-top: 15px;
         text-align: end;
-        display: flex; }
+        display: flex;
+        align-items: center; }
         .board .column .colContent .opinionCol .opinionFooter .owner-opinion {
           margin-right: auto; }
+        .board .column .colContent .opinionCol .opinionFooter .myVotes {
+          margin-right: auto;
+          margin-left: auto; }
         .board .column .colContent .opinionCol .opinionFooter .upvote {
-          margin-right: 20px; }
+          margin-right: 10px; }
+
+.remarkline {
+  display: flex;
+  flex-direction: column;
+  justify-content: baseline;
+  align-items: center;
+  gap: 5px;
+  max-height: 300px;
+  scroll-behavior: smooth;
+  overflow: scroll; }
+  .remarkline .remark {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #f3f3f3;
+    border-radius: 12px 12px 12px 0px; }
+    .remarkline .remark .remarkHeader {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center; }
+      .remarkline .remark .remarkHeader p {
+        font-size: 12px; }
+
+.headerModalText {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+
+.headerModal-white .ant-modal-header {
+  background-color: pink; }
+
+.headerModal-pink .ant-modal-header {
+  background-color: pink; }
+
+.headerModal-orange .ant-modal-header {
+  background-color: #fff4cc; }
+
+.headerModal-blue .ant-modal-header {
+  background-color: #d0edfb; }
+
+.headerModal-light-blue .ant-modal-header {
+  background-color: #cdf7f0; }
+
+.headerModal-green .ant-modal-header {
+  background-color: #e5f6d2; }
+
+.headerModal-gray .ant-modal-header {
+  background-color: #e4ddfe; }
 
 .color-selector {
   display: flex;

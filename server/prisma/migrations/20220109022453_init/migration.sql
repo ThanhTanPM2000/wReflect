@@ -81,14 +81,12 @@ CREATE TABLE "Opinion" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "text" TEXT NOT NULL,
     "upVote" TEXT[],
-    "downVote" TEXT[],
     "updatedBy" TEXT NOT NULL,
     "isAction" BOOLEAN NOT NULL DEFAULT false,
     "isBookmarked" BOOLEAN NOT NULL DEFAULT false,
     "responsible" TEXT,
     "mergedAuthors" TEXT[],
-    "voters" TEXT[],
-    "color" TEXT NOT NULL DEFAULT E'white',
+    "color" TEXT NOT NULL DEFAULT E'pink',
     "position" INTEGER NOT NULL,
     "status" "OpinionStatus" NOT NULL DEFAULT E'New',
 
@@ -103,6 +101,7 @@ CREATE TABLE "Remark" (
     "text" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT,
 
     PRIMARY KEY ("id")
 );
@@ -213,6 +212,9 @@ ALTER TABLE "Opinion" ADD FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON 
 
 -- AddForeignKey
 ALTER TABLE "Remark" ADD FOREIGN KEY ("opinionId") REFERENCES "Opinion"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Remark" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "InviteLink" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

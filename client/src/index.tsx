@@ -18,6 +18,7 @@ const httpLink = new HttpLink({
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
     graphQLErrors.forEach(({ message: messageData, extensions }) => {
+      console.log(message);
       if (extensions.code === '404') return;
       message.error(`${messageData}`);
     });
@@ -41,13 +42,6 @@ const client = new ApolloClient({
               });
             },
           },
-          // teams: {
-          //   read(existing, { args }) {
-          //     const data = existing && existing.slice(args?.offset, args?.offset + args?.limit);
-          //     console.log('list data is', data, args);
-          //     return data;
-          //   },
-          // },
         },
       },
     },

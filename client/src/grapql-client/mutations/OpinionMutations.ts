@@ -1,4 +1,4 @@
-import { Column } from './../../types';
+import { Column, Opinion } from './../../types';
 import { gql } from '@apollo/client';
 
 export type createOpinionVars = {
@@ -26,6 +26,7 @@ export const createOpinion = gql`
       color
       title
       isActive
+      boardId
       opinions {
         id
         columnId
@@ -68,6 +69,45 @@ export const createOpinion = gql`
         }
       }
     }
+  }
+`;
+
+export type updateOpinionResult = {
+  updateOpinion: string;
+};
+
+export type updateOpinionVars = {
+  opinionId: string;
+  text?: string;
+  upVote?: string[];
+  isAction?: boolean;
+  isBookmarked?: boolean;
+  responsible?: string;
+  color?: string;
+  status?: string;
+};
+
+export const updateOpinion = gql`
+  mutation Mutation(
+    $opinionId: String!
+    $text: String
+    $upVote: [String]
+    $isAction: Boolean
+    $isBookmarked: Boolean
+    $responsible: Boolean
+    $color: String
+    $status: String
+  ) {
+    updateOpinion(
+      opinionId: $opinionId
+      text: $text
+      upVote: $upVote
+      isAction: $isAction
+      isBookmarked: $isBookmarked
+      responsible: $responsible
+      color: $color
+      status: $status
+    )
   }
 `;
 

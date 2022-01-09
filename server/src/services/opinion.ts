@@ -1,3 +1,4 @@
+import { Opinion, Column } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
@@ -6,9 +7,8 @@ import {
   createOpinionType,
   orderOpinionType,
   removeOpinionType,
+  updateOpinionType,
 } from '../apollo/typeDefss/opinionTypeDefs';
-import { isEmpty } from 'lodash';
-import { remark } from '.';
 
 export const getListOpinions = (columnId: string) => {
   const opinions = prisma.opinion.findMany({
@@ -104,6 +104,44 @@ export const createOpinion = async (meId: string, args: createOpinionType) => {
 
   if (!column) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
   return column;
+};
+
+export const updateOpinion = async (meId: string, args: updateOpinionType) => {
+  const opinion = await prisma.opinion.updateMany({
+    where: {
+      id: args.opinionId,
+      OR: [
+        {
+          authorId: meId,
+        },
+        {
+          column: {
+            board: {
+              team: {
+                members: {
+                  some: {
+                    isOwner: true,
+                    userId: meId,
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+    data: {
+      text: args?.text,
+      upVote: args?.upVote,
+      isBookmarked: args?.isBookmarked,
+      isAction: args?.isAction,
+      responsible: args?.responsible,
+      color: args?.color,
+      status: args?.status,
+    },
+  });
+  if (!opinion) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
+  return 'success';
 };
 
 export const removeOpinion = async (meId: string, args: removeOpinionType) => {
@@ -264,9 +302,6 @@ export const combineOpinion = async (meId: string, args: combineOpinionType) => 
               },
               upVote: {
                 push: currentOpinion.upVote,
-              },
-              downVote: {
-                push: currentOpinion.downVote,
               },
             },
           },

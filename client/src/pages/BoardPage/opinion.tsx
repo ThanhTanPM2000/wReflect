@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 
 import { Dropdown, Menu, Modal, Input, Badge, Avatar, Select } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
@@ -8,26 +8,29 @@ import {
   DeleteFilled,
   EditFilled,
   EllipsisOutlined,
-  LikeOutlined,
   FireFilled,
-  DislikeOutlined,
+  UpCircleOutlined,
+  DownCircleOutlined,
   ExclamationCircleOutlined,
+  MessageFilled,
+  MessageOutlined,
 } from '@ant-design/icons';
 
 import { Board, Opinion } from '../../types';
-import { useMutation } from '@apollo/client';
+import { useMutation, useApolloClient } from '@apollo/client';
 import selfContext from '../../contexts/selfContext';
 import { OpinionMutations } from '../../grapql-client/mutations';
 import { BoardQueries } from '../../grapql-client/queries';
 import _ from 'lodash';
-import { current } from '@reduxjs/toolkit';
+import remark from './remark';
+import Remark from './remark';
 
 type Props = {
   board: Board;
   opinion: Opinion;
   key: string;
   index: number;
-  currentNumVotes: number;
+  currentNumVotes: number | undefined;
   setCurrentNumVotes: (votes: number) => void;
 };
 
@@ -36,15 +39,32 @@ const { confirm } = Modal;
 const { TextArea } = Input;
 
 export default function OpinionComponenent({ opinion, board, index, currentNumVotes, setCurrentNumVotes }: Props) {
-  const [color, setColor] = useState(opinion?.color);
   const [isEdit, setIsEdit] = useState(false);
   const [currentOpinion, setCurrentOpinion] = useState(opinion);
-  const [isBookmarked, setIsBookmarked] = useState(currentOpinion.isBookmarked);
+  const prevCurrentOpinion = useRef(currentOpinion);
+  const client = useApolloClient();
   const me = useContext(selfContext);
+  const [isOpenRemark, setIsOpenRemark] = useState(false);
+
+  const [updateOpinion] = useMutation<OpinionMutations.updateOpinionResult, OpinionMutations.updateOpinionVars>(
+    OpinionMutations.updateOpinion,
+    {
+      variables: {
+        opinionId: currentOpinion.id,
+        text: currentOpinion.text,
+        upVote: currentOpinion.upVote,
+        isBookmarked: currentOpinion.isBookmarked,
+        responsible: currentOpinion.responsible,
+        color: currentOpinion.color,
+        status: currentOpinion.status,
+      },
+    },
+  );
+
+  // useEffect(() => {}, []);
 
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
-    {},
   );
 
   useEffect(() => {
@@ -52,10 +72,65 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
   }, [opinion]);
 
   useEffect(() => {
-    console.log('upvote');
-  }, [currentOpinion.upVote, currentOpinion.downVote]);
-
-  console.log(currentNumVotes, board.votesLimit, currentNumVotes < board.votesLimit);
+    client.cache.modify({
+      id: client.cache.identify(currentOpinion),
+      fields: {
+        text: () => {
+          return currentOpinion.text;
+        },
+        upVote: () => {
+          return currentOpinion.upVote;
+        },
+        isBookmarked: () => {
+          return currentOpinion.isBookmarked;
+        },
+        isAction: () => {
+          return currentOpinion.isAction;
+        },
+        responsible: () => {
+          return currentOpinion.responsible;
+        },
+        status: () => {
+          return currentOpinion.status;
+        },
+      },
+    });
+    updateOpinion({
+      onError: () => {
+        client.cache.modify({
+          id: client.cache.identify(currentOpinion),
+          fields: {
+            text: () => {
+              return prevCurrentOpinion.current.text;
+            },
+            upVote: () => {
+              return prevCurrentOpinion.current.upVote;
+            },
+            isBookmarked: () => {
+              return prevCurrentOpinion.current.isBookmarked;
+            },
+            isAction: () => {
+              return prevCurrentOpinion.current.isAction;
+            },
+            responsible: () => {
+              return prevCurrentOpinion.current.responsible;
+            },
+            status: () => {
+              return prevCurrentOpinion.current.status;
+            },
+          },
+        });
+      },
+    });
+  }, [
+    currentOpinion.text,
+    currentOpinion.color,
+    currentOpinion.responsible,
+    currentOpinion.upVote,
+    currentOpinion.isBookmarked,
+    currentOpinion.isAction,
+    currentOpinion.status,
+  ]);
 
   const menu = (
     <Menu>
@@ -72,30 +147,33 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
             title: 'Do you want to delete these items?',
             centered: true,
             icon: <ExclamationCircleOutlined />,
-            onOk: async () => {
-              return await removeOpinion({
+            onOk: () => {
+              const prevBoard = board;
+              const newColumns = board.columns.map((column) => {
+                return { ...column, opinions: column.opinions.filter((x) => x.id != opinion.id) };
+              });
+
+              client.cache.writeQuery({
+                query: BoardQueries.getBoard,
+                variables: {
+                  boardId: board.id,
+                },
+                data: {
+                  board: { ...board, columns: newColumns },
+                },
+              });
+              removeOpinion({
                 variables: {
                   opinionId: opinion.id,
                 },
-                update: async (store) => {
-                  const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
-                    query: BoardQueries.getBoard,
-                    variables: {
-                      boardId: board.id,
-                    },
-                  });
-
-                  const newColumns = boardData?.board.columns.map((column) => {
-                    return { ...column, opinions: column.opinions.filter((x) => x.id != opinion.id) };
-                  });
-
-                  store.writeQuery({
+                onError: () => {
+                  client.cache.writeQuery({
                     query: BoardQueries.getBoard,
                     variables: {
                       boardId: board.id,
                     },
                     data: {
-                      board: { ...boardData?.board, columns: newColumns },
+                      board: prevBoard,
                     },
                   });
                 },
@@ -110,32 +188,57 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
 
       <Menu.Item>
         <div className="color-selector">
-          <div className="orange block-color" onClick={() => setColor('orange')} />
-          <div className="pink block-color" onClick={() => setColor('pink')} />
-          <div className="blue block-color" onClick={() => setColor('blue')} />
-          <div className="light-blue block-color" onClick={() => setColor('light-blue')} />
-          <div className="green block-color" onClick={() => setColor('green')} />
-          <div className="gray block-color" onClick={() => setColor('gray')} />
+          <div
+            className="orange block-color"
+            onClick={() => setCurrentOpinion({ ...currentOpinion, color: 'orange' })}
+          />
+          <div className="pink block-color" onClick={() => setCurrentOpinion({ ...currentOpinion, color: 'pink' })} />
+          <div className="blue block-color" onClick={() => setCurrentOpinion({ ...currentOpinion, color: 'blue' })} />
+          <div
+            className="light-blue block-color"
+            onClick={() => setCurrentOpinion({ ...currentOpinion, color: 'light-blue' })}
+          />
+          <div className="green block-color" onClick={() => setCurrentOpinion({ ...currentOpinion, color: 'green' })} />
+          <div className="gray block-color" onClick={() => setCurrentOpinion({ ...currentOpinion, color: 'gray' })} />
         </div>
       </Menu.Item>
     </Menu>
   );
 
   return (
-    <Draggable draggableId={`${opinion.id}`} index={index} key={`${opinion.id}`}>
+    <Draggable isDragDisabled={board.isLocked} draggableId={`${opinion.id}`} index={index} key={`${opinion.id}`}>
       {(provided) => (
         <div
-          className={`opinionCol ${color}`}
+          className={`opinionCol ${currentOpinion.color}`}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
         >
           <div className="opinionHeader">
-            {isBookmarked ? (
-              <StarFilled onClick={() => setIsBookmarked(false)} style={{ fontSize: '20px', cursor: 'pointer' }} />
+            {currentOpinion.isBookmarked ? (
+              <StarFilled
+                onClick={() => {
+                  setCurrentOpinion({ ...currentOpinion, isBookmarked: false });
+                }}
+                style={{ fontSize: '20px', cursor: 'pointer' }}
+              />
             ) : (
-              <StarOutlined onClick={() => setIsBookmarked(true)} style={{ fontSize: '20px', cursor: 'pointer' }} />
+              <StarOutlined
+                onClick={() => {
+                  setCurrentOpinion({ ...currentOpinion, isBookmarked: true });
+                }}
+                style={{ fontSize: '20px', cursor: 'pointer' }}
+              />
             )}
+
+            <div className="owner-opinion">
+              <Avatar
+                style={{ marginRight: '3px' }}
+                size="small"
+                key={currentOpinion?.author?.id}
+                src={currentOpinion?.author?.profile.picture}
+              />
+            </div>
 
             <Dropdown overlayStyle={{ width: '180px' }} overlay={menu} placement="bottomRight">
               <EllipsisOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
@@ -169,7 +272,6 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
                     );
                   })}
                 </p>
-                // <TextArea>{'hello\nququy'}</TextArea>
               )}
               {currentOpinion.isAction === true && (
                 <div className="opinionAction">
@@ -189,66 +291,65 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
           </div>
 
           <div className="opinionFooter">
-            <div className="owner-opinion">
-              <Avatar
-                style={{ marginRight: '3px' }}
-                size="default"
-                key={currentOpinion?.author?.id}
-                src={currentOpinion?.author?.profile?.picture}
-              />
-            </div>
             <div className="upvote">
               <Badge size="small" count={currentOpinion.upVote.length}>
-                <LikeOutlined
+                <UpCircleOutlined
                   onClick={() => {
-                    if (me?.id && currentNumVotes >= board.votesLimit) {
-                      let findFirst = false;
-                      setCurrentOpinion({
-                        ...currentOpinion,
-                        upVote: currentOpinion.upVote.filter((userVoteid) => {
-                          if (userVoteid == me.id && !findFirst) {
-                            findFirst = true;
-                            return false;
-                          }
-                          return true;
-                        }),
-                      });
-                      setCurrentNumVotes(currentNumVotes - 1);
-                    } else if (me?.id) {
+                    if (me?.id && (currentNumVotes as number) < board.votesLimit) {
                       setCurrentOpinion({
                         ...currentOpinion,
                         upVote: [...currentOpinion.upVote, me.id],
                       });
-                      setCurrentNumVotes(currentNumVotes + 1);
+                      setCurrentNumVotes((currentNumVotes as number) + 1);
+                      updateOpinion();
                     }
                   }}
-                  style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }}
+                  style={{ fontSize: '20px', cursor: 'pointer' }}
                 />
               </Badge>
             </div>
             <div className="downvote">
-              <Badge size="small" count={currentOpinion.downVote.length}>
-                <DislikeOutlined
-                  onClick={() => {
-                    if (me?.id && currentNumVotes >= board.votesLimit) {
-                      setCurrentOpinion({
-                        ...currentOpinion,
-                        downVote: currentOpinion.downVote.filter((userVoteid) => userVoteid != me.id),
-                      });
-                      setCurrentNumVotes(currentNumVotes - 1);
-                    } else if (me?.id) {
-                      setCurrentOpinion({
-                        ...currentOpinion,
-                        downVote: [...currentOpinion.downVote, me.id],
-                      });
-                      setCurrentNumVotes(currentNumVotes + 1);
-                    }
-                  }}
-                  style={{ fontSize: '20px', marginRight: '10px', cursor: 'pointer' }}
-                />
+              <DownCircleOutlined
+                onClick={() => {
+                  if (me?.id && currentOpinion.upVote.length > 0) {
+                    let findFirst = false;
+                    setCurrentOpinion({
+                      ...currentOpinion,
+                      upVote: currentOpinion.upVote.filter((userVoteid) => {
+                        if (userVoteid == me.id && !findFirst) {
+                          findFirst = true;
+                          return false;
+                        }
+                        return true;
+                      }),
+                    });
+                    setCurrentNumVotes((currentNumVotes as number) - 1);
+                    updateOpinion();
+                  }
+                }}
+                style={{ fontSize: '20px', marginLeft: '5px', cursor: 'pointer' }}
+              />
+            </div>
+            <div className="myVotes">
+              [Your votes {`${currentOpinion.upVote.filter((voteIds) => voteIds == me?.id).length}`}]
+            </div>
+            <div className="remarks">
+              <Badge size="small" count={opinion.remarks.length} showZero={false}>
+                {opinion.remarks.length > 0 ? (
+                  <MessageFilled
+                    onClick={() => setIsOpenRemark(true)}
+                    style={{ fontSize: '20px', cursor: 'pointer' }}
+                  />
+                ) : (
+                  <MessageOutlined
+                    onClick={() => setIsOpenRemark(true)}
+                    style={{ fontSize: '20px', cursor: 'pointer' }}
+                  />
+                )}
               </Badge>
             </div>
           </div>
+          <Remark isOpenRemark={isOpenRemark} setIsOpenRemark={setIsOpenRemark} opinion={currentOpinion} />
         </div>
       )}
     </Draggable>
