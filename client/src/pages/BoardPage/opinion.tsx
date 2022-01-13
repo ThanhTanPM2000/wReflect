@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 
-import { Dropdown, Menu, Modal, Input, Badge, Avatar, Select } from 'antd';
+import { Dropdown, Menu, Modal, Input, Badge, Avatar, Select, Tooltip } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import {
   StarFilled,
@@ -17,13 +17,14 @@ import {
 } from '@ant-design/icons';
 
 import { Board, Opinion } from '../../types';
-import { useMutation, useApolloClient } from '@apollo/client';
+import { useMutation, useApolloClient, useSubscription } from '@apollo/client';
 import selfContext from '../../contexts/selfContext';
 import { OpinionMutations } from '../../grapql-client/mutations';
 import { BoardQueries } from '../../grapql-client/queries';
-import _ from 'lodash';
+import _, { update } from 'lodash';
 import remark from './remark';
 import Remark from './remark';
+import { OpinionSubscription } from '../../grapql-client/subcriptions';
 
 type Props = {
   board: Board;
@@ -46,6 +47,30 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
   const me = useContext(selfContext);
   const [isOpenRemark, setIsOpenRemark] = useState(false);
 
+  useSubscription<OpinionSubscription.updateOpinionResult, OpinionSubscription.updateOpinionVars>(
+    OpinionSubscription.updateOpinion,
+    {
+      variables: {
+        opinionId: opinion.id,
+      },
+      onSubscriptionData: ({ client, subscriptionData: { data, loading } }) => {
+        if (!loading && data?.updateOpinion) {
+          client.cache.modify({
+            id: client.cache.identify(data?.updateOpinion),
+            fields: {
+              text: () => data.updateOpinion.text,
+              upVote: () => data.updateOpinion.upVote,
+              isBookmarked: () => data.updateOpinion.isBookmarked,
+              responsible: () => data.updateOpinion.responsible,
+              color: () => data.updateOpinion.color,
+              status: () => data.updateOpinion.status,
+            },
+          });
+        }
+      },
+    },
+  );
+
   const [updateOpinion] = useMutation<OpinionMutations.updateOpinionResult, OpinionMutations.updateOpinionVars>(
     OpinionMutations.updateOpinion,
     {
@@ -61,8 +86,6 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
     },
   );
 
-  // useEffect(() => {}, []);
-
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
   );
@@ -72,63 +95,50 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
   }, [opinion]);
 
   useEffect(() => {
-    client.cache.modify({
-      id: client.cache.identify(currentOpinion),
-      fields: {
-        text: () => {
-          return currentOpinion.text;
-        },
-        upVote: () => {
-          return currentOpinion.upVote;
-        },
-        isBookmarked: () => {
-          return currentOpinion.isBookmarked;
-        },
-        isAction: () => {
-          return currentOpinion.isAction;
-        },
-        responsible: () => {
-          return currentOpinion.responsible;
-        },
-        status: () => {
-          return currentOpinion.status;
-        },
-      },
-    });
-    updateOpinion({
-      onError: () => {
-        client.cache.modify({
-          id: client.cache.identify(currentOpinion),
-          fields: {
-            text: () => {
-              return prevCurrentOpinion.current.text;
+    if (
+      !_.isEqual(
+        _.pick(prevCurrentOpinion.current, ['text', 'isAction', 'upVote', 'color', 'isBookmarked']),
+        _.pick(currentOpinion, ['text', 'isAction', 'upVote', 'color', 'isBookmarked']),
+      )
+    ) {
+      updateOpinion({
+        onError: () => {
+          client.cache.modify({
+            id: client.cache.identify(currentOpinion),
+            fields: {
+              text: () => {
+                return prevCurrentOpinion.current.text;
+              },
+              upVote: () => {
+                return prevCurrentOpinion.current.upVote;
+              },
+              color: () => {
+                return prevCurrentOpinion.current.color;
+              },
+              isBookmarked: () => {
+                return prevCurrentOpinion.current.isBookmarked;
+              },
+              isAction: () => {
+                return prevCurrentOpinion.current.isAction;
+              },
+              responsible: () => {
+                return prevCurrentOpinion.current.responsible;
+              },
+              status: () => {
+                return prevCurrentOpinion.current.status;
+              },
             },
-            upVote: () => {
-              return prevCurrentOpinion.current.upVote;
-            },
-            isBookmarked: () => {
-              return prevCurrentOpinion.current.isBookmarked;
-            },
-            isAction: () => {
-              return prevCurrentOpinion.current.isAction;
-            },
-            responsible: () => {
-              return prevCurrentOpinion.current.responsible;
-            },
-            status: () => {
-              return prevCurrentOpinion.current.status;
-            },
-          },
-        });
-      },
-    });
+          });
+        },
+      });
+    }
   }, [
     currentOpinion.text,
     currentOpinion.color,
-    currentOpinion.responsible,
+    currentOpinion.isAction,
     currentOpinion.upVote,
     currentOpinion.isBookmarked,
-    currentOpinion.isAction,
+    currentOpinion.responsible,
     currentOpinion.status,
   ]);
 
@@ -213,6 +223,7 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
+          key={opinion?.id}
         >
           <div className="opinionHeader">
             {currentOpinion.isBookmarked ? (
@@ -232,12 +243,31 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
             )}
 
             <div className="owner-opinion">
-              <Avatar
-                style={{ marginRight: '3px' }}
-                size="small"
-                key={currentOpinion?.author?.id}
-                src={currentOpinion?.author?.profile.picture}
-              />
+              <Avatar.Group
+                maxCount={3}
+                style={{
+                  cursor: 'pointer',
+                }}
+                maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
+              >
+                {board?.team?.members
+                  ?.filter(
+                    (member) => opinion.mergedAuthors.includes(member?.userId) || opinion?.authorId == member?.userId,
+                  )
+                  .map((member) => (
+                    <div key={member?.user?.email}>
+                      <Tooltip title={member?.user?.profile?.name} key={member?.user?.email} placement="bottom">
+                        <Avatar
+                          style={{ marginRight: '1px' }}
+                          size="default"
+                          shape="circle"
+                          key={member?.user?.email}
+                          src={member?.user?.profile?.picture}
+                        />
+                      </Tooltip>
+                    </div>
+                  ))}
+              </Avatar.Group>
             </div>
 
             <Dropdown overlayStyle={{ width: '180px' }} overlay={menu} placement="bottomRight">
@@ -301,7 +331,6 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
                         upVote: [...currentOpinion.upVote, me.id],
                       });
                       setCurrentNumVotes((currentNumVotes as number) + 1);
-                      updateOpinion();
                     }
                   }}
                   style={{ fontSize: '20px', cursor: 'pointer' }}
@@ -324,7 +353,6 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
                       }),
                     });
                     setCurrentNumVotes((currentNumVotes as number) - 1);
-                    updateOpinion();
                   }
                 }}
                 style={{ fontSize: '20px', marginLeft: '5px', cursor: 'pointer' }}

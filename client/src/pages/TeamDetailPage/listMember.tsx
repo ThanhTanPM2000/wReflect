@@ -14,7 +14,7 @@ import config from '../../config';
 
 type Props = {
   searchText: string;
-  teamData?: Team;
+  teamData: Team;
 };
 
 const { confirm } = Modal;

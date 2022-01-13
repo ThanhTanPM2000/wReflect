@@ -1,54 +1,84 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Select, Avatar, Tooltip } from 'antd';
+import { Select, Avatar, Tooltip, Empty } from 'antd';
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useHistory } from 'react-router-dom';
 
-import { useMutation, useQuery, useApolloClient } from '@apollo/client';
+import { useMutation, useQuery, useApolloClient, useSubscription } from '@apollo/client';
 import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
 import ColumnComponent from './column';
 import { Board, Column } from '../../types';
 import { ColumnMutations, OpinionMutations } from '../../grapql-client/mutations';
-import { MenuOutlined, CloseOutlined, PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  MenuOutlined,
+  CloseOutlined,
+  PlusCircleOutlined,
+  EditOutlined,
+  BulbOutlined,
+  UngroupOutlined,
+  LikeOutlined,
+  MessageOutlined,
+} from '@ant-design/icons';
 import _ from 'lodash';
 import selfContext from '../../contexts/selfContext';
+import ConfigBoardModal from './configBoardModal';
+import { Loading } from '../../components/Loading';
+import { TopNavBar } from '../../components/TopNavBar';
+import { BoardSubscription } from '../../grapql-client/subcriptions';
 
 type Props = {
   teamId: string;
   boardId: string;
 };
 
-const { Option } = Select;
-
 export default function board({ teamId, boardId }: Props) {
-  const [board, setBoard] = useState<Board | null>(null);
-  const me = useContext(selfContext);
   const [currentNumVotes, setCurrentNumVotes] = useState(0);
   const [isBoardPanelActive, setIsBoardPanelActive] = useState(false);
+  const [isBoardModalVisible, setBoardModalVisible] = useState(false);
   const history = useHistory();
   const client = useApolloClient();
+  const me = useContext(selfContext);
+  const [board, setBoard] = useState<Board | null>(null);
 
-  console.log(board?.columns);
+  const { loading, data, error, refetch } = useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(
+    BoardQueries.getBoard,
+    {
+      variables: { boardId },
+    },
+  );
 
-  useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(BoardQueries.getBoard, {
-    variables: {
-      boardId,
+  useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
+    BoardSubscription.updateBoard,
+    {
+      variables: {
+        meId: me?.id,
+      },
+      onSubscriptionData: ({ client, subscriptionData: { data, loading } }) => {
+        if (!loading && data?.updateBoard) {
+          client.cache.modify({
+            id: client.cache.identify(data.updateBoard),
+            fields: {
+              columns: () => {
+                return data?.updateBoard.columns;
+              },
+            },
+          });
+        }
+      },
     },
-    onCompleted: (data) => {
-      setBoard(data.board);
-    },
-  });
+  );
 
   useEffect(() => {
     setCurrentNumVotes(
-      board?.columns?.reduce(
+      data?.board?.columns?.reduce(
         (prev, curr) =>
           prev +
           curr.opinions.reduce((prevOp, currOp) => prevOp + currOp.upVote.filter((id) => id === me?.id).length, 0),
         0,
       ) || 0,
     );
-  }, [board]);
+    setBoard(data?.board || null);
+  }, [boardId, data]);
 
   const [orderOpinion] = useMutation<ColumnMutations.orderOpinionResult, ColumnMutations.orderOpinionVars>(
     ColumnMutations.orderOpinion,
@@ -57,14 +87,6 @@ export default function board({ teamId, boardId }: Props) {
   const [combineOpinion] = useMutation<OpinionMutations.combineOpinionResult, OpinionMutations.combineOpinionVars>(
     OpinionMutations.combineOpinion,
   );
-
-  const { data } = useQuery<TeamQueries.getTeamIdsResult>(TeamQueries.getTeamIds, {
-    fetchPolicy: 'cache-first', // Used for first execution
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data) => {
-      data.getTeamIds;
-    },
-  });
 
   const handleOnDragEnd = async (result: DropResult) => {
     const prevList = _.cloneDeep(board?.columns);
@@ -137,7 +159,7 @@ export default function board({ teamId, boardId }: Props) {
           boardId,
         },
         data: {
-          board: { ...board, columns: tempList },
+          board: { ...data?.board, columns: tempList },
         },
       });
 
@@ -147,6 +169,16 @@ export default function board({ teamId, boardId }: Props) {
           source: result?.source,
           draggableId: result?.draggableId,
         },
+        // onCompleted: (data) => {
+        //   client.cache.modify({
+        //     id: client.cache.identify(data.orderOpinion),
+        //     fields: {
+        //       columns: () => {
+        //         return data.orderOpinion.columns;
+        //       },
+        //     },
+        //   });
+        // },
         onError: (err) => {
           client.cache.writeQuery({
             query: BoardQueries.getBoard,
@@ -162,101 +194,106 @@ export default function board({ teamId, boardId }: Props) {
     }
   };
 
-  const teamOptions = () => {
-    return data?.getTeamIds.map((team) => (
-      <Option key={team.id} value={team.id}>
-        <Avatar className="mr-10" size="small" src={team.picture} />
-        {`${team.name}`}
-      </Option>
-    ));
-  };
-
-  const boardOptions = () => {
-    return data?.getTeamIds
-      .find((team) => team.id === teamId)
-      ?.boards.map((board) => (
-        <Option key={board.id} value={board.id}>
-          {board.title}
-        </Option>
-      ));
-  };
-
   return (
     <>
-      <div className="board-header">
-        <div className="currentLimitVotes">Votes {`${currentNumVotes}/${board?.votesLimit}`}</div>
-        <div className="board-tracking">
-          <div className="board-selector">
-            <Select bordered optionFilterProp="children" defaultValue={teamId}>
-              {teamOptions()}
-            </Select>
-            <Select style={{ width: 200 }} bordered optionFilterProp="children" defaultValue={boardId}>
-              {boardOptions()}
-            </Select>
-          </div>
-          <div className="board-members">
-            <Avatar.Group
-              maxCount={3}
-              style={{
-                cursor: 'pointer',
-              }}
-              maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
-            >
-              {board?.team.members.map((member) => (
-                <div onClick={() => history.push(`/manage-members/${teamId}`)} key={member?.user.email}>
-                  <Tooltip title={member?.user.profile.name} key={member?.user.email} placement="bottom">
-                    <Avatar
-                      style={{ marginRight: '3px' }}
-                      size="default"
-                      shape="circle"
-                      key={member?.user?.email}
-                      src={member?.user?.profile?.picture}
-                    />
-                  </Tooltip>
+      <TopNavBar team={data?.board?.team} boardId={boardId} title="Do Reflect" />
+      <Loading refetch={refetch} data={!!board} loading={loading} error={error}>
+        <>
+          {data && data?.board ? (
+            <>
+              <ConfigBoardModal setVisible={setBoardModalVisible} visible={isBoardModalVisible} />
+              <div className="board-header">
+                <div className="currentLimitVotes">Votes {`${currentNumVotes}/${board?.votesLimit}`}</div>
+                <div className="board-tracking">
+                  <div className="board-members">
+                    <Avatar.Group
+                      maxCount={3}
+                      style={{
+                        cursor: 'pointer',
+                      }}
+                      maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
+                    >
+                      {data?.board?.team?.members?.map((member) => (
+                        <div onClick={() => history.push(`/manage-members/${teamId}`)} key={member?.user?.email}>
+                          <Tooltip title={member?.user?.profile?.nickname} key={member?.user?.email} placement="bottom">
+                            <Avatar
+                              style={{ marginRight: '1px' }}
+                              size="default"
+                              shape="circle"
+                              key={member?.user?.email}
+                              src={member?.user?.profile?.picture}
+                            />
+                          </Tooltip>
+                        </div>
+                      ))}
+                    </Avatar.Group>
+                  </div>
+                  <div className="board-phase">
+                    <div className="phase-step">
+                      <BulbOutlined />
+                      Reflect
+                    </div>
+                    <div className="phase-step">
+                      <UngroupOutlined />
+                      Group
+                    </div>
+                    <div className="phase-step">
+                      <LikeOutlined />
+                      Votes
+                    </div>
+                    <div className="phase-step active">
+                      <MessageOutlined />
+                      Discuss
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </Avatar.Group>
-          </div>
-        </div>
-        <div className={`board-action ${isBoardPanelActive && 'active'}`}>
-          <div className="boardPanel" onClick={() => setIsBoardPanelActive(!isBoardPanelActive)}>
-            {isBoardPanelActive ? (
-              <CloseOutlined className="boardPanelIcon" />
-            ) : (
-              <MenuOutlined className="boardPanelIcon" />
-            )}{' '}
-            {'\t \t '} Action
-          </div>
-          <div className="boardActionPanel">
-            <ul>
-              <li>
-                <PlusCircleOutlined className="boardPanelIcon " />
-                <a className="addBoard">Create New Board</a>
-              </li>
-              <li>
-                <EditOutlined className="boardPanelIcon " />
-                <a className="editBoard">Edit Board</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div className="board flex flex-dir-r">
-        <DragDropContext onDragEnd={handleOnDragEnd}>
-          {board?.columns?.map((column, index) => {
-            return (
-              <ColumnComponent
-                currentNumVotes={currentNumVotes}
-                setCurrentNumVotes={setCurrentNumVotes}
-                board={board!}
-                index={index}
-                key={column.id}
-                column={column}
-              />
-            );
-          })}
-        </DragDropContext>
-      </div>
+                <div className={`board-action ${isBoardPanelActive && 'active'}`}>
+                  <div className="boardPanel" onClick={() => setIsBoardPanelActive(!isBoardPanelActive)}>
+                    {isBoardPanelActive ? (
+                      <CloseOutlined className="boardPanelIcon" />
+                    ) : (
+                      <MenuOutlined className="boardPanelIcon" />
+                    )}{' '}
+                    {'\t \t '} Action
+                  </div>
+                  <div className="boardActionPanel">
+                    <ul>
+                      <li>
+                        <PlusCircleOutlined className="boardPanelIcon " />
+                        <a className="addBoard" onClick={() => setBoardModalVisible(true)}>
+                          Create New Board
+                        </a>
+                      </li>
+                      <li>
+                        <EditOutlined className="boardPanelIcon " />
+                        <a className="editBoard">Edit Board</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div className="board flex flex-dir-r">
+                <DragDropContext onDragEnd={handleOnDragEnd}>
+                  {board?.columns?.map((column, index) => {
+                    return (
+                      <ColumnComponent
+                        currentNumVotes={currentNumVotes}
+                        setCurrentNumVotes={setCurrentNumVotes}
+                        board={board}
+                        index={index}
+                        key={column.id}
+                        column={column}
+                      />
+                    );
+                  })}
+                </DragDropContext>
+              </div>
+            </>
+          ) : (
+            <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
+          )}
+        </>
+      </Loading>
     </>
   );
 }

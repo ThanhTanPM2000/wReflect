@@ -1,36 +1,78 @@
 import React from 'react';
-import { Avatar, Layout } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
-import DropDown from './components/DropDown';
-import { useQuery } from '@apollo/client';
-import { TeamQueries } from '../../grapql-client/queries';
-import { useApolloClient } from '@apollo/client';
+import { Button, Select, PageHeader } from 'antd';
+import { Link, useHistory } from 'react-router-dom';
+import { Team } from '../../types';
+
+const { Option } = Select;
+
 type Props = {
-  email: string | null;
-  picture: string | null;
+  title: string;
+  team?: Team;
+  boardId?: string;
 };
 
-const { Header } = Layout;
+const TopNavBar = ({ title, team, boardId }: Props) => {
+  const history = useHistory();
 
-const TopNavBar = ({ email, picture }: Props) => {
-  
+  const boardOptions = () => {
+    return team?.boards?.map((board) => (
+      <Option key={board.id} value={board.id}>
+        {board.title}
+      </Option>
+    ));
+  };
+
+  const handleRenderExtra = () => {
+    switch (title) {
+      case 'Manage Members':
+        return [];
+      case 'Do Reflect':
+        return [
+          <Select
+            placeholder="Select board"
+            key="5"
+            style={{ width: 200 }}
+            bordered
+            optionFilterProp="children"
+            defaultValue={boardId || ''}
+          >
+            {boardOptions()}
+          </Select>,
+        ];
+
+      default:
+        return [];
+    }
+  };
 
   return (
     <>
-      <Header style={{ paddingRight: '20px' }} className="topNavBar">
-        <div className="flex-1">
-          {/* <div style={{ flexGrow: 1 }} className="titleLogo">
-            wReflect
-          </div> */}
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ marginRight: '10px' }}>Hi, {`${email}`}</span>
-            <Avatar className="avatarSetting" src={`${picture}`} size="default" />
-          </div>
-          {/* <div style={{ marginRight: 20 }}>
-            <DropDown email={email} picture={picture} />
-          </div> */}
-        </div>
-      </Header>
+      <PageHeader
+        className="topNavBar"
+        onBack={() => history.replace('/teams')}
+        title={title}
+        extra={[
+          ...handleRenderExtra(),
+          <Link key="2" to={`/board/${team?.id}/${team?.boards[0]?.id}`}>
+            <Button type={title == 'Do Reflect' ? 'primary' : undefined} key="2">
+              Reflect
+            </Button>
+          </Link>,
+          <Link key="3" style={{ textDecoration: 'none' }} to={`/manage-members/${team?.id}`}>
+            <Button type={title == 'Manage Members' ? 'primary' : undefined}>Members</Button>
+          </Link>,
+          <Link key="4" style={{ textDecoration: 'none' }} to={`/manage-board/${team?.id}`}>
+            <Button type={title == 'Manage Board' ? 'primary' : undefined} key="1">
+              Board
+            </Button>
+          </Link>,
+          <Link key="1" style={{ textDecoration: 'none' }} to="/manage-members/{teamId}">
+            <Button type={title == 'Setting' ? 'primary' : undefined} key="1">
+              Setting
+            </Button>
+          </Link>,
+        ]}
+      />
     </>
   );
 };

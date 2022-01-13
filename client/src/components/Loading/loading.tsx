@@ -4,7 +4,7 @@ import { Spin, Result, Button, Empty } from 'antd';
 
 type Props = {
   children: JSX.Element;
-  data: boolean;
+  data: any;
   refetch: () => void;
   loading: boolean;
   error: any;
@@ -39,7 +39,7 @@ export default function loading({ children, data, refetch, loading, error }: Pro
           )}
         </div>
       ) : (
-        <>{data ? children : <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />}</>
+        children
       )}
     </>
   );

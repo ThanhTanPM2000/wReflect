@@ -1,5 +1,7 @@
 import { Column, Opinion } from './../../types';
 import { gql } from '@apollo/client';
+import { BOARD_FIELDS } from '../fragments/boardFragment';
+import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createOpinionVars = {
   boardId: string;
@@ -14,6 +16,7 @@ export type createOpinionResult = {
 };
 
 export const createOpinion = gql`
+  ${BOARD_FIELDS}
   mutation Mutation($boardId: String!, $columnId: String, $text: String, $isAction: Boolean, $isCreateBottom: Boolean) {
     createOpinion(
       boardId: $boardId
@@ -22,52 +25,7 @@ export const createOpinion = gql`
       isAction: $isAction
       isCreateBottom: $isCreateBottom
     ) {
-      id
-      color
-      title
-      isActive
-      boardId
-      opinions {
-        id
-        columnId
-        authorId
-        createdAt
-        updatedAt
-        text
-        upVote
-        downVote
-        updatedBy
-        isAction
-        isBookmarked
-        responsible
-        mergedAuthors
-        color
-        status
-        position
-        remarks {
-          id
-          authorId
-          opinionId
-          text
-          createdAt
-          updatedAt
-        }
-        author {
-          id
-          email
-          createdAt
-          updatedAt
-          isAdmin
-          userStatus
-          profile {
-            id
-            userId
-            name
-            nickname
-            picture
-          }
-        }
-      }
+      ...BoardFields
     }
   }
 `;
@@ -88,7 +46,8 @@ export type updateOpinionVars = {
 };
 
 export const updateOpinion = gql`
-  mutation Mutation(
+  ${OPINION_FIELDS}
+  mutation updateOpinion(
     $opinionId: String!
     $text: String
     $upVote: [String]
@@ -107,7 +66,9 @@ export const updateOpinion = gql`
       responsible: $responsible
       color: $color
       status: $status
-    )
+    ) {
+      ...OpinionFields
+    }
   }
 `;
 
@@ -122,9 +83,10 @@ export type removeOpinionVars = {
 };
 
 export const removeOpinion = gql`
+  ${BOARD_FIELDS}
   mutation RemoveOpinion($opinionId: String) {
     removeOpinion(opinionId: $opinionId) {
-      count
+      ...BoardFields
     }
   }
 `;
@@ -147,7 +109,10 @@ export type combineOpinionVars = {
 };
 
 export const combineOpinion = gql`
+  ${BOARD_FIELDS}
   mutation Mutation($combine: combineOpinion, $source: orderOpinion, $draggableId: String, $text: String) {
-    combineOpinion(combine: $combine, source: $source, draggableId: $draggableId, text: $text)
+    combineOpinion(combine: $combine, source: $source, draggableId: $draggableId, text: $text) {
+      ...BoardFields
+    }
   }
 `;

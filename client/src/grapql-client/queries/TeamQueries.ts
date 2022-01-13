@@ -2,6 +2,8 @@ import { StringNullableChain } from 'lodash';
 import { gql } from '@apollo/client';
 import { Board, Team } from '../../types';
 
+import { BOARD_FIELDS } from '../fragments/boardFragment';
+
 export type getTeamVars = {
   teamId: string;
 };
@@ -11,6 +13,7 @@ export type getTeamResult = {
 };
 
 const getTeam = gql`
+  ${BOARD_FIELDS}
   query Query($teamId: String!) {
     team(teamId: $teamId) {
       id
@@ -51,55 +54,7 @@ const getTeam = gql`
         }
       }
       boards {
-        timerInProgress
-        id
-        teamId
-        createdAt
-        updatedAt
-        createdBy
-        isPublic
-        isLocked
-        disableDownVote
-        disableUpVote
-        isAnonymous
-        votesLimit
-        title
-        endTime
-        columns {
-          id
-          color
-          title
-          isActive
-          boardId
-          opinions {
-            id
-            columnId
-            authorId
-            createdAt
-            updatedAt
-            text
-            upVote
-            downVote
-            updatedBy
-            isAction
-            isBookmarked
-            responsible
-            mergedAuthors
-            color
-            author {
-              id
-              email
-            }
-            remarks {
-              id
-              authorId
-              opinionId
-              text
-              createdAt
-              updatedAt
-            }
-          }
-        }
+        ...BoardFields
       }
     }
   }
@@ -125,6 +80,7 @@ export type getTeamsVars = {
 };
 
 const getTeams = gql`
+  ${BOARD_FIELDS}
   query Teams($input: TeamsInput) {
     teams(input: $input) {
       data {
@@ -175,89 +131,12 @@ const getTeams = gql`
           }
         }
         boards {
-          id
-          teamId
-          createdAt
-          updatedAt
-          createdBy
-          isPublic
-          isLocked
-          disableDownVote
-          disableUpVote
-          isAnonymous
-          votesLimit
-          title
-          timerInProgress
-          endTime
-          columns {
-            id
-            color
-            title
-            isActive
-            opinions {
-              id
-              columnId
-              authorId
-              createdAt
-              updatedAt
-              text
-              upVote
-              downVote
-              updatedBy
-              isAction
-              isBookmarked
-              responsible
-              mergedAuthors
-              color
-              remarks {
-                id
-                authorId
-                opinionId
-                text
-                createdAt
-                updatedAt
-              }
-            }
-          }
+          ...BoardFields
         }
       }
+      total
     }
   }
 `;
 
-export type getTeamIdsResult = {
-  getTeamIds: {
-    id: string;
-    name: string;
-    picture: string;
-    boards: Board[];
-  }[];
-};
-
-const getTeamIds = gql`
-  query GetTeamIds {
-    getTeamIds {
-      id
-      name
-      picture
-      boards {
-        id
-        teamId
-        createdAt
-        updatedAt
-        createdBy
-        isPublic
-        isLocked
-        disableDownVote
-        disableUpVote
-        isAnonymous
-        votesLimit
-        title
-        timerInProgress
-        endTime
-      }
-    }
-  }
-`;
-
-export { getTeams, getTeam, getTeamIds };
+export { getTeams, getTeam };

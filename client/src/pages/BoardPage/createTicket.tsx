@@ -35,35 +35,35 @@ export default function createTicket({ index, boardId, columnId, isCreateBottom 
         isAction,
         isCreateBottom,
       },
-      update: async (store, { data }) => {
-        const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
-          query: BoardQueries.getBoard,
-          variables: {
-            boardId,
-          },
-        });
-        const newBoardData = _.cloneDeep(boardData);
+      // update: async (store, { data }) => {
+      //   const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
+      //     query: BoardQueries.getBoard,
+      //     variables: {
+      //       boardId,
+      //     },
+      //   });
+      //   const newBoardData = _.cloneDeep(boardData);
 
-        // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
-        const columns = newBoardData?.board.columns.map((column, idx) => {
-          if (idx === index) {
-            return data?.createOpinion || column;
-          }
-          return column;
-        });
+      //   // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
+      //   const columns = newBoardData?.board.columns.map((column, idx) => {
+      //     if (idx === index) {
+      //       return data?.createOpinion || column;
+      //     }
+      //     return column;
+      //   });
 
-        // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
+      //   // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
 
-        store.writeQuery({
-          query: BoardQueries.getBoard,
-          variables: {
-            boardId,
-          },
-          data: {
-            board: { ...boardData?.board, columns },
-          },
-        });
-      },
+      //   store.writeQuery({
+      //     query: BoardQueries.getBoard,
+      //     variables: {
+      //       boardId,
+      //     },
+      //     data: {
+      //       board: { ...boardData?.board, columns },
+      //     },
+      //   });
+      // },
     });
     setText('');
   };

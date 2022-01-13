@@ -6,7 +6,7 @@
   font-family: 'Inter', sans-serif;
   font-weight: 700 !important; }
 
-p {
+p, input {
   font-family: 'Inter', sans-serif;
   font-weight: 400 !important; }
 
@@ -284,30 +284,35 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     flex-direction: column;
     gap: 5px;
     align-items: center; }
-    .board-header .board-tracking .board-selector {
-      display: flex;
-      gap: 10px;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 10px; }
-      .board-header .board-tracking .board-selector .ant-select-selector {
-        border-radius: 20px;
-        width: 200px;
-        height: 40px; }
-        .board-header .board-tracking .board-selector .ant-select-selector .ant-select-arrow {
-          padding-left: 10px;
-          padding-right: 10px;
-          border-left: solid 1px #e7eaea; }
-        .board-header .board-tracking .board-selector .ant-select-selector .ant-select-selection-item {
-          display: flex;
-          align-items: center;
-          font-family: 'Inter', sans-serif;
-          font-weight: 700 !important; }
     .board-header .board-tracking .board-members {
       display: flex;
       justify-content: center;
       align-items: center; }
+      .board-header .board-tracking .board-members .ant-avatar {
+        border-color: rgba(30, 34, 47, 0.7) !important;
+        border-style: solid !important;
+        border-width: 2px; }
+    .board-header .board-tracking .board-phase {
+      margin-top: 5px;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: auto;
+      background-color: white;
+      border-radius: 10px; }
+      .board-header .board-tracking .board-phase .phase-step {
+        padding: 10px;
+        border-radius: 10px;
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer; }
+        .board-header .board-tracking .board-phase .phase-step.active {
+          background-color: rgba(30, 34, 47, 0.7);
+          color: white; }
   .board-header .board-action .boardPanel {
     color: white;
     background-color: rgba(30, 34, 47, 0.7);
@@ -331,7 +336,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     margin-right: 20px;
     right: 0;
     position: absolute;
-    top: 85px;
+    top: 160px;
     width: 0;
     display: none;
     z-index: 11; }
@@ -445,6 +450,36 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         .board .column .colContent .opinionCol .opinionFooter .upvote {
           margin-right: 10px; }
 
+.config-board-modal {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center; }
+  .config-board-modal .edit-board-modal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: stretch;
+    align-content: center;
+    padding: 10px; }
+  .config-board-modal .setting-board-modal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: stretch;
+    align-content: center;
+    padding: 10px; }
+  .config-board-modal .config-column-board-modal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: stretch;
+    align-content: center;
+    padding: 10px; }
+
 .remarkline {
   display: flex;
   flex-direction: column;
@@ -513,17 +548,12 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       box-shadow: 0 0 20px 0 rgba(30, 34, 47, 0.1), 0 2px 3px 0 rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.03); }
 
 .manage-board {
-  margin: 40px 70px 0 120px !important; }
-  .manage-board h1 {
-    font-size: 20px; }
-  .manage-board .board-selector {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 20px; }
+  display: flex;
+  flex-direction: column;
+  gap: 10px; }
   .manage-board .button-right {
-    margin: 0 10px 5px auto; }
+    padding: 10px; }
     .manage-board .button-right button {
-      height: 35px;
       background-color: #0d0d0e;
       color: white; }
   .manage-board .board-items {
@@ -542,21 +572,17 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         color: #6d7982;
         cursor: auto; }
 
-.sidebar {
-  position: fixed;
-  height: 100%;
-  z-index: 200 !important;
-  background-color: #f7f8fa; }
-  .sidebar .ant-layout-logo {
-    height: 32px;
-    background: #f7f8fa;
-    border-radius: 10px;
-    margin: 16px; }
-    .sidebar .ant-layout-logo span {
-      font-family: "Baloo Bhai";
-      font-size: 23px; }
+.sidebar .ant-layout-logo {
+  height: 32px;
+  background: #f7f8fa;
+  border-radius: 10px;
+  margin: 16px; }
+  .sidebar .ant-layout-logo span {
+    font-family: "Baloo Bhai";
+    font-size: 23px; }
 
 .topNavBar {
-  display: flex;
-  flex-direction: row;
-  background-color: #fff; }
+  inset: 0 0 auto 0;
+    inset-position: absolute;
+  background-color: #fff;
+  backdrop-filter: saturate(200%) blur(1.875rem); }

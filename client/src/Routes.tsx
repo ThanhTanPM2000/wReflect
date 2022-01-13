@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Layout } from 'antd';
 import { Router, Switch, Redirect, Route } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
@@ -8,23 +8,23 @@ import { SideBar } from './components/SideBar';
 import { User } from './types';
 import { Team } from './pages/TeamPage';
 import { ManageMembers } from './pages/ManageMembersPage';
-import { TopNavBar } from './components/TopNavBar';
-import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { Board } from './pages/BoardPage';
 import { AccountSetting } from './pages/AccountSettingPage';
 import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
-import { ManageBoardPage } from './pages/ManageBoardPage'
+import { ManageBoardPage } from './pages/ManageBoardPage';
+import { useSubscription } from '@apollo/client';
+import { BoardSubscription } from './grapql-client/subcriptions';
 
 type Props = {
   me: null | User;
 };
 
-const { Footer, Content } = Layout;
+const { Content } = Layout;
 const customHistory = createBrowserHistory();
 
-const Routes = ({ me }: Props): JSX.Element => {
+const Routes = ({ me }: Props) => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
@@ -37,9 +37,9 @@ const Routes = ({ me }: Props): JSX.Element => {
           {isLoggedIn ? (
             <>
               <SideBar email={email} isAdmin={isAdmin} />
-              <Layout className="site-layout" style={{ marginLeft: '80px' }}>
+              <Layout className="site-layout">
                 {/* <TopNavBar email={email} picture={picture} /> */}
-                <Content className="flex flex-1" style={{ margin: '10px 16px', overflow: 'auto' }}>
+                <Content className="flex flex-1" style={{ margin: '10px 16px', gap: '10px', overflow: 'auto' }}>
                   <Switch>
                     {/* <Route exact path="/" component={Team} /> */}
                     {isAdmin ? (
@@ -50,20 +50,29 @@ const Routes = ({ me }: Props): JSX.Element => {
                     ) : (
                       <Switch>
                         <Route path="/teams" exact component={Team} />
-                        <Route
-                          path="/manage-members/:teamId"
-                          render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
-                        />
-                        <Route
-                          path="/board/:teamId/:boardId"
-                          render={({ match }) => <Board teamId={match.params.teamId} boardId={match.params.boardId} />}
-                        />
-                        <Route path="/me" component={ProfileUser} />
-                        <Route path="/account" component={AccountSetting} />
-                        <Route path="/manageboard" component={ManageBoardPage}/>
-                        <Redirect from="/" exact to="/teams" />
-                        <Route path="/not-found" component={NotFound} />
-                        <Redirect to="/not-found" />
+                        <>
+                          <Switch>
+                            <Route
+                              path="/manage-members/:teamId"
+                              render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
+                            />
+                            <Route
+                              path="/board/:teamId/:boardId"
+                              render={({ match }) => (
+                                <Board teamId={match.params.teamId} boardId={match.params.boardId} />
+                              )}
+                            />
+                            <Route path="/me" component={ProfileUser} />
+                            <Route path="/account" component={AccountSetting} />
+                            <Route
+                              path="/manage-board/:teamId"
+                              render={({ match }) => <ManageBoardPage teamId={match.params.teamId} />}
+                            />
+                            <Redirect from="/" exact to="/teams" />
+                            <Route path="/not-found" component={NotFound} />
+                            <Redirect to="/not-found" />
+                          </Switch>
+                        </>
                       </Switch>
                     )}
                   </Switch>

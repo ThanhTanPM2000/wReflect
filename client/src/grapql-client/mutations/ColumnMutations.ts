@@ -1,8 +1,9 @@
 import { gql } from '@apollo/client';
-import { Column } from '../../types';
+import { Board } from '../../types';
+import { BOARD_FIELDS } from '../fragments/boardFragment';
 
 export type orderOpinionResult = {
-  orderOpinion: Column[];
+  orderOpinion: Board;
 };
 
 export type orderOpinionVars = {
@@ -18,12 +19,12 @@ export type orderOpinionVars = {
 };
 
 const orderOpinion = gql`
-  mutation Mutation($destination: orderOpinion, $source: orderOpinion, $draggableId: String) {
-    orderOpinion(destination: $destination, source: $source, draggableId: $draggableId)
+  ${BOARD_FIELDS}
+  mutation OrderOpinion($destination: orderOpinion, $source: orderOpinion, $draggableId: String) {
+    orderOpinion(destination: $destination, source: $source, draggableId: $draggableId) {
+      ...BoardFields
+    }
   }
 `;
-
-// const combineOpinion = gql`
-// `
 
 export { orderOpinion };

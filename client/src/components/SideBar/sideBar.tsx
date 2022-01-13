@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
-import { Menu, Layout } from 'antd';
+import { Menu, Layout, Modal } from 'antd';
 import { Link } from 'react-router-dom';
 import { Logout } from '../Logout';
 
@@ -18,8 +18,12 @@ import {
   BarChartOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useQuery } from '@apollo/client';
+import { useQuery, useSubscription } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
+
+import { auth } from '../../apis';
+import { BoardSubscription } from '../../grapql-client/subcriptions';
+import selfContext from '../../contexts/selfContext';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -31,23 +35,48 @@ type Props = {
 
 const SideBar = ({ email, isAdmin }: Props) => {
   const [isCollapse, setIsCollapse] = useState(true);
+  const me = useContext(selfContext);
 
-  const { data } = useQuery<TeamQueries.getTeamIdsResult>(TeamQueries.getTeamIds, {
-    fetchPolicy: 'cache-first', // Used for first execution
-    notifyOnNetworkStatusChange: true,
-  });
+  const onClickLogout = () => {
+    Modal.confirm({
+      title: 'Are you sure want to sign out',
+      centered: true,
+      okText: 'Sign Out',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        auth.logout();
+        window.location.reload();
+      },
+    });
+  };
 
-  const teamId = data?.getTeamIds[0]?.id;
-  const boardId = data?.getTeamIds[0]?.boards[0].id;
+  // useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
+  //   BoardSubscription.updateBoard,
+  //   {
+  //     variables: {
+  //       meId: me?.id,
+  //     },
+  //     onSubscriptionData: ({ client, subscriptionData: { data, loading } }) => {
+  //       if (!loading && data?.updateBoard) {
+  //         console.log('updated board', data.updateBoard);
+  //         client.cache.modify({
+  //           id: client.cache.identify(data.updateBoard),
+  //           fields: {
+  //             columns: () => {
+  //               return data?.updateBoard.columns;
+  //             },
+  //           },
+  //         });
+  //       }
+  //     },
+  //   },
+  // );
 
   return (
     <>
       {email && (
         <Sider
           className="sidebar"
-          width={200}
-          onMouseEnter={() => setIsCollapse(false)}
-          onMouseLeave={() => setIsCollapse(true)}
           collapsible
           collapsed={isCollapse}
           onCollapse={(collapse) => setIsCollapse(collapse)}
@@ -78,23 +107,11 @@ const SideBar = ({ email, isAdmin }: Props) => {
                   <Link to="/teams">Teams</Link>
                 </Menu.Item>
                 <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
-                  <Menu.Item icon={<TrophyOutlined />} key="TeamDetail">
-                    <Link to={`/teams/${teamId}`}>Team Details</Link>
-                  </Menu.Item>
-                  <Menu.Item icon={<TeamOutlined />} key="ManageMembers">
-                    <Link to={`/manage-members/${teamId}`}>Members</Link>
-                  </Menu.Item>
-                  <Menu.Item key="3" icon={<PieChartOutlined />}>
-                    <Link to={`/board/${teamId}/${boardId}`}>Board</Link>
-                  </Menu.Item>
                   <Menu.Item key="4" icon={<StockOutlined />}>
                     Health Check
                   </Menu.Item>
                   <Menu.Item key="5" icon={<CarryOutOutlined />}>
                     Task
-                  </Menu.Item>
-                  <Menu.Item key="6" icon={<CalendarOutlined />}>
-                    <Link to={`/manageboard/${teamId}`}>Manager</Link>
                   </Menu.Item>
                 </SubMenu>
                 <Menu.Item icon={<UserOutlined />} key="account">
@@ -103,7 +120,7 @@ const SideBar = ({ email, isAdmin }: Props) => {
               </>
             )}
 
-            <Menu.Item  style={{ marginTop: 'auto' }} key="10" icon={<LogoutOutlined />}>
+            <Menu.Item onClick={() => onClickLogout()} style={{ marginTop: 'auto' }} key="10" icon={<LogoutOutlined />}>
               <Logout>
                 <>Sign out</>
               </Logout>

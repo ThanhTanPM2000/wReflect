@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useHistory } from 'react-router';
-import { Card, Col, Avatar, Row, Pagination } from 'antd';
+import { Card, Col, Avatar, Row, Pagination, PageHeader } from 'antd';
 
-import { NetworkStatus, useLazyQuery, useQuery } from '@apollo/client';
+import { NetworkStatus, useLazyQuery, useQuery, useSubscription } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { Member, Team, Teams, TeamStatus } from '../../types';
 import { Loading } from '../../components/Loading';
 import { TeamMutations } from '../../grapql-client/mutations';
+import { me } from '../../apis/user';
+import SelfContext from '../../contexts/selfContext';
 
 const { Meta } = Card;
 
@@ -24,9 +26,10 @@ type Props = {
 const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoading }: Props) => {
   const history = useHistory();
   const [isVisibleAddModal, setVisibleModal] = useState(false);
+  const me = useContext(SelfContext);
 
-  const redirect = (value: string) => {
-    history.push(`/manage-members/${value}`);
+  const redirect = (team: Team) => {
+    history.push(`/board/${team.id}/${team.boards[0].id}`);
   };
 
   const { error, data, loading, refetch, networkStatus } = useQuery<
@@ -56,7 +59,6 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
         error={error}
       >
         <>
-          {/* <SearchBar placeholder="What are you looking for ?" isLoading={loading} onHandleSearch={onHandleSearch} /> */}
           <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
             <Row className="flex flex-dir-r" style={{ height: '100%', padding: '10px' }} key={`row`} gutter={[16, 16]}>
               {data?.teams?.data?.map((team: Team) => {
@@ -79,7 +81,6 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                     })()}
                   >
                     <Card
-                      // style={{ height: '100%' }}
                       bodyStyle={{ display: 'flex', flex: 1 }}
                       className="flex flex-1 flex-dir-c"
                       hoverable
@@ -93,7 +94,7 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                       ]}
                     >
                       <>
-                        <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team.id)}>
+                        <div className="flex flex-1 flex-dir-c flex-jc-sb" onClick={() => redirect(team)}>
                           <div className="flex">
                             <Meta
                               key={team.name}

@@ -1,0 +1,34 @@
+.manage-board {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  .button-right {
+    padding: 10px;
+    button {
+      background-color: #0d0d0e;
+      color: white;
+    }
+  }
+  .board-items {
+    margin-bottom: 10px;
+    display: flex;
+    .board-icons {
+      margin: 0 10px 5px auto;
+      span {
+        font-size: 15px;
+        font-weight: bold !important;
+        color: #6d7982;
+        &:hover {
+          color: blue;
+          cursor: pointer;
+        }
+      }
+      .text-button {
+        &:hover {
+          color: #6d7982;
+          cursor: auto;
+        }
+      }
+    }
+  }
+}

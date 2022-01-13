@@ -11,6 +11,7 @@ import config from '../../config';
 import { UploadFile } from 'antd/lib/upload/interface';
 
 import { useApolloClient } from '@apollo/client';
+import { create } from 'lodash';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -24,12 +25,10 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
   const client = useApolloClient();
 
-  const [addNewTeam] = useMutation<TeamMutations.createTeamResult, TeamMutations.createTeamVars>(
-    TeamMutations.createTeam,
-    {
-      refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeamIds],
-    },
-  );
+  const [addNewTeam] = useMutation(TeamMutations.createTeam, {
+    // refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeamIds],
+    refetchQueries: [TeamQueries.getTeams],
+  });
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -56,7 +55,6 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           isPublic: isPublic,
         },
       });
-      console.log('cache is', client.cache);
       form.resetFields();
       setIsVisible(false);
     });

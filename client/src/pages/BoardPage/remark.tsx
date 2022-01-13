@@ -70,57 +70,55 @@ export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, opinion
     >
       <div className="remarkline" ref={remarkListRef}>
         {opinion.remarks?.map((remark) => (
-          <>
-            <div className="remark">
-              <div className="remarkHeader">
-                <p>{opinion.author.profile.nickname}</p>
-                <Dropdown
-                  overlayStyle={{ width: '180px' }}
-                  overlay={
-                    <Menu>
-                      <Menu.Item
-                        onClick={() => {
-                          console.log(opinion);
-                          const prevOpinion = _.cloneDeep(opinion);
-                          client.cache.modify({
-                            id: client.cache.identify(opinion),
-                            fields: {
-                              remarks(existingData, { readField }) {
-                                return existingData.filter((cur: Remark) => readField('id', cur) !== remark.id);
-                              },
+          <div key={remark?.id} className="remark">
+            <div className="remarkHeader">
+              <p>{remark?.author?.profile?.nickname}</p>
+              <Dropdown
+                overlayStyle={{ width: '180px' }}
+                overlay={
+                  <Menu>
+                    <Menu.Item
+                      onClick={() => {
+                        console.log(opinion);
+                        const prevOpinion = _.cloneDeep(opinion);
+                        client.cache.modify({
+                          id: client.cache.identify(opinion),
+                          fields: {
+                            remarks(existingData, { readField }) {
+                              return existingData.filter((cur: Remark) => readField('id', cur) !== remark.id);
                             },
-                          });
-                          removeRemark({
-                            variables: {
-                              remarkId: remark.id,
-                            },
-                            onError() {
-                              client.cache.modify({
-                                id: client.cache.identify(opinion),
-                                fields: {
-                                  remarks() {
-                                    return prevOpinion.remarks;
-                                  },
+                          },
+                        });
+                        removeRemark({
+                          variables: {
+                            remarkId: remark.id,
+                          },
+                          onError() {
+                            client.cache.modify({
+                              id: client.cache.identify(opinion),
+                              fields: {
+                                remarks() {
+                                  return prevOpinion.remarks;
                                 },
-                              });
-                            },
-                          });
-                        }}
-                        key="3"
-                        icon={<DeleteFilled />}
-                      >
-                        Remove
-                      </Menu.Item>
-                    </Menu>
-                  }
-                  placement="bottomRight"
-                >
-                  <EllipsisOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
-                </Dropdown>
-              </div>
-              <div className="remarkContent">{remark.text}</div>
+                              },
+                            });
+                          },
+                        });
+                      }}
+                      key="3"
+                      icon={<DeleteFilled />}
+                    >
+                      Remove
+                    </Menu.Item>
+                  </Menu>
+                }
+                placement="bottomRight"
+              >
+                <EllipsisOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
+              </Dropdown>
             </div>
-          </>
+            <div className="remarkContent">{remark.text}</div>
+          </div>
         ))}
       </div>
       <TextArea

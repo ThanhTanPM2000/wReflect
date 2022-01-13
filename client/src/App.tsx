@@ -20,13 +20,6 @@ const App = (): JSX.Element => {
     localStorage.setItem('email', newMe?.email || '');
   });
 
-  // if (constructor) {
-  //   (async () => {
-  //     await user.me();
-  //     setConstructor(false);
-  //   })();
-  // }
-
   useEffect(() => {
     (async function () {
       await user.me();
