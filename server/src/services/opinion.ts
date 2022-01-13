@@ -76,7 +76,7 @@ export const createOpinion = async (meId: string, args: createOpinionType) => {
         },
       };
 
-  const column = await prisma.column.update({
+  const myBoard = await prisma.column.update({
     where: {
       id: args.columnId,
     },
@@ -93,17 +93,39 @@ export const createOpinion = async (meId: string, args: createOpinionType) => {
         },
       },
     },
-    include: {
-      opinions: {
-        orderBy: {
-          position: 'asc',
+
+    select: {
+      board: {
+        include: {
+          columns: {
+            include: {
+              opinions: {
+                orderBy: {
+                  position: 'asc',
+                },
+              },
+            },
+          },
+          team: {
+            include: {
+              members: {
+                include: {
+                  user: {
+                    include: {
+                      profile: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
   });
 
-  if (!column) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
-  return column;
+  if (!myBoard) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
+  return myBoard;
 };
 
 export const updateOpinion = async (meId: string, args: updateOpinionType) => {
@@ -140,39 +162,101 @@ export const updateOpinion = async (meId: string, args: updateOpinionType) => {
       status: args?.status,
     },
   });
+
   if (!opinion) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
-  return 'success';
+
+  const myOpinion = await prisma.opinion.findUnique({
+    where: {
+      id: args.opinionId,
+    },
+    include: {
+      remarks: true,
+      column: true,
+      author: true,
+    },
+  });
+
+  return myOpinion;
 };
 
 export const removeOpinion = async (meId: string, args: removeOpinionType) => {
-  const opinion = await prisma.opinion.deleteMany({
+  const column = await prisma.column.findFirst({
     where: {
       OR: [
         {
-          column: {
-            board: {
-              team: {
-                members: {
-                  some: {
-                    userId: meId,
-                    isOwner: true,
-                  },
+          board: {
+            team: {
+              members: {
+                some: {
+                  userId: meId,
+                  isOwner: true,
                 },
               },
             },
           },
-          id: args.opinionId,
+          opinions: {
+            some: {
+              id: args.opinionId,
+            },
+          },
         },
         {
-          authorId: meId,
-          id: args.opinionId,
+          opinions: {
+            some: {
+              id: args.opinionId,
+              authorId: meId,
+            },
+          },
         },
       ],
     },
   });
 
+  if (!column) throw new ApolloError('You dont have permission or data not found', `${StatusCodes.FORBIDDEN}`);
+
+  const opinion = await prisma.opinion.delete({
+    where: {
+      id: args.opinionId,
+    },
+  });
+
   if (!opinion) throw new ApolloError('You dont have permission or data not found', `${StatusCodes.FORBIDDEN}`);
-  return opinion;
+
+  const board = prisma.board.findFirst({
+    where: {
+      columns: {
+        some: {
+          id: column.id,
+        },
+      },
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return board;
 };
 
 export const orderOpinion = async (meId: string, args: orderOpinionType) => {
@@ -264,7 +348,41 @@ export const orderOpinion = async (meId: string, args: orderOpinionType) => {
           },
         }),
       ]);
-  return 'success';
+
+  const board = await prisma.board.findFirst({
+    where: {
+      columns: {
+        some: {
+          id: args.source.droppableId,
+        },
+      },
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return board;
 };
 
 export const combineOpinion = async (meId: string, args: combineOpinionType) => {
@@ -333,5 +451,38 @@ export const combineOpinion = async (meId: string, args: combineOpinionType) => 
       },
     }),
   ]);
-  return 'sucess';
+  const board = await prisma.board.findFirst({
+    where: {
+      columns: {
+        some: {
+          id: args.source.droppableId,
+        },
+      },
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return board;
 };

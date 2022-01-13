@@ -1,7 +1,9 @@
+import { updateOpinion } from './../services/opinion';
 import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
-import { ForbiddenError } from 'apollo-server-errors';
 import { RequestWithUserInfo } from './../types';
 import { member, team, user, board, column, opinion, remark } from '../services';
+import { withFilter } from 'graphql-subscriptions';
+
 import {
   createOpinionType,
   removeOpinionType,
@@ -9,6 +11,8 @@ import {
   combineOpinionType,
   updateOpinionType,
 } from './typeDefss/opinionTypeDefs';
+import { pubsub } from '../pubSub';
+import logger from '../logger';
 
 const resolvers = {
   Query: {
@@ -50,7 +54,12 @@ const resolvers = {
   Mutation: {
     createTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await team.createTeam(meId, args);
+      const myTeam = await team.createTeam(meId, args);
+      pubsub.publish('CREATE_TEAM', {
+        createdTeam: myTeam,
+      });
+
+      return myTeam;
     },
     updateTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
@@ -68,7 +77,15 @@ const resolvers = {
 
     addMembers: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await member.addMembersToTeam(meId, args);
+      const { team, success, errors, warnings } = await member.addMembersToTeam(meId, args);
+      pubsub.publish('ADD_MEMBERS', {
+        addMembers: team,
+      });
+      return {
+        success,
+        errors,
+        warnings,
+      };
     },
     removeMember: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
@@ -81,23 +98,44 @@ const resolvers = {
 
     createOpinion: async (_, args: createOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await opinion.createOpinion(meId, args);
+      const data = await opinion.createOpinion(meId, args);
+      pubsub.publish('UPDATE_BOARD', {
+        updateBoard: data?.board,
+      });
+      return data?.board;
     },
     updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await opinion.updateOpinion(meId, args);
+      const myOpinion = await opinion.updateOpinion(meId, args);
+      pubsub.publish('UPDATE_OPINION', {
+        updateOpinion: myOpinion,
+      });
+      return myOpinion;
     },
     removeOpinion: async (_, args: removeOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await opinion.removeOpinion(meId, args);
+      const board = await opinion.removeOpinion(meId, args);
+      pubsub.publish('UPDATE_BOARD', {
+        updateBoard: board,
+      });
+      return board;
     },
     orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await opinion.orderOpinion(meId, args);
+      const board = await opinion.orderOpinion(meId, args);
+      console.log(board);
+      pubsub.publish('UPDATE_BOARD', {
+        updateBoard: board,
+      });
+      return board;
     },
     combineOpinion: async (_, args: combineOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
-      return await opinion.combineOpinion(meId, args);
+      const board = await opinion.combineOpinion(meId, args);
+      pubsub.publish('UPDATE_BOARD', {
+        updateBoard: board,
+      });
+      return board;
     },
 
     createRemark: async (_, args: createRemarkType, { req }: { req: RequestWithUserInfo }) => {
@@ -109,6 +147,27 @@ const resolvers = {
       await remark.removeRemark(meId, args);
     },
   },
+  Subscription: {
+    updateBoard: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('UPDATE_BOARD'),
+        (_, args) => {
+          return true;
+          // return !!_?.updateBoard?.team?.members?.find((member) => member?.userId == args?.meId);
+        },
+      ),
+    },
+    updateOpinion: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('UPDATE_OPINION'),
+        (_, args) => {
+          console.log(_?.updateOpinion?.id === args?.opinionId);
+          return _?.updateOpinion.id === args?.opinionId;
+        },
+      ),
+    },
+  },
+
   User: {
     members: async (_) => {
       const members = await member.getListMembers(_.id);

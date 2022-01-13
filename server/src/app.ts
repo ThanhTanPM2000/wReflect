@@ -19,6 +19,7 @@ import config from './config';
 import apiRouter from './apiRouter';
 import { resolvers, typeDefs } from './apollo';
 import sessionManager from './middleware/sessionManager';
+import { pubsub } from './pubSub';
 
 // import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 
@@ -97,7 +98,7 @@ async function startApolloServer(typeDefs, resolvers) {
 
   const port = config.PORT || 4000;
 
-  await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
+  await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
   logger.info(`server is listening on ${config.SERVER_URL}`);
 }
 

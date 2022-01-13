@@ -1,7 +1,7 @@
 import { addMemberToTeamType, setRoleMemberType } from '../types';
 import logger from '../logger';
 import prisma from '../prisma';
-import _ from 'lodash';
+import _, { update } from 'lodash';
 
 import { sendMail } from './nodemailer';
 import { User } from '.prisma/client';
@@ -124,8 +124,17 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
       }
     }
   }
+  const updatedTeam = await prisma.team.findUnique({
+    where: {
+      id: data.teamId,
+    },
+    include: {
+      members: true,
+    },
+  });
 
   return {
+    team: updatedTeam,
     success,
     warnings,
     errors,

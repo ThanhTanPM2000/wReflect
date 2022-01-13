@@ -54,8 +54,6 @@ export const getBoard = async (meId: string, boardId: string) => {
 };
 
 export const orderOpinionInBoard = async (meId: string, args: orderOpinionType) => {
-
-
   const board = await prisma.board.updateMany({
     where: {
       isLocked: false,
@@ -71,7 +69,6 @@ export const orderOpinionInBoard = async (meId: string, args: orderOpinionType) 
         },
       },
     },
-    data: {
-    },
+    data: {},
   });
 };

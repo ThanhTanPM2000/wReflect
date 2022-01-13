@@ -46,7 +46,7 @@ const typeDefs = gql`
     deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
 
-    createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Column
+    createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Board
     updateOpinion(
       opinionId: String!
       text: String
@@ -56,10 +56,10 @@ const typeDefs = gql`
       responsible: Boolean
       color: String
       status: String
-    ): String
-    removeOpinion(opinionId: String): BatchPayload
-    orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): String
-    combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): String
+    ): Opinion
+    removeOpinion(opinionId: String): Board
+    orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): Board
+    combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): Board
 
     createRemark(opinionId: String, text: String): Remark
     removeRemark(remarkId: String): BatchPayload

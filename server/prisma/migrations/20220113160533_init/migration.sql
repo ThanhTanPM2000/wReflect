@@ -1,4 +1,10 @@
 -- CreateEnum
+CREATE TYPE "BoardType" AS ENUM ('DEFAULT', 'PHASE');
+
+-- CreateEnum
+CREATE TYPE "PhaseType" AS ENUM ('REFLECT', 'GROUP', 'VOTES', 'DISCUSS');
+
+-- CreateEnum
 CREATE TYPE "OpinionStatus" AS ENUM ('New', 'In-Progress', 'Done', 'Rejected');
 
 -- CreateEnum
@@ -55,8 +61,10 @@ CREATE TABLE "Board" (
     "isAnonymous" BOOLEAN NOT NULL DEFAULT false,
     "votesLimit" INTEGER NOT NULL DEFAULT 25,
     "title" TEXT NOT NULL,
-    "timerInProgress" INTEGER,
-    "endTime" INTEGER,
+    "timerInProgress" BOOLEAN NOT NULL DEFAULT false,
+    "type" "BoardType" NOT NULL DEFAULT E'DEFAULT',
+    "currentPhase" "PhaseType" NOT NULL DEFAULT E'REFLECT',
+    "endTime" TIMESTAMP(3),
 
     PRIMARY KEY ("id")
 );

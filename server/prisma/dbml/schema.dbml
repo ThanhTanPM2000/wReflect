@@ -45,8 +45,10 @@ Table Board {
   isAnonymous Boolean [not null, default: false]
   votesLimit Int [not null, default: 25]
   title String [not null]
-  timerInProgress Int
-  endTime Int
+  timerInProgress Boolean [not null, default: false]
+  type BoardType [not null, default: 'DEFAULT']
+  currentPhase PhaseType [not null, default: 'REFLECT']
+  endTime DateTime
   team Team [not null]
   columns Column [not null]
 }
@@ -167,6 +169,18 @@ Table UserProfile {
   indexes {
     (userId) [unique]
   }
+}
+
+Enum BoardType {
+  DEFAULT
+  PHASE
+}
+
+Enum PhaseType {
+  REFLECT
+  GROUP
+  VOTES
+  DISCUSS
 }
 
 Enum OpinionStatus {

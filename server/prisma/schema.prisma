@@ -42,22 +42,36 @@ model Team {
 }
 
 model Board {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   teamId          String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   createdBy       String
-  isPublic        Boolean  @default(true)
-  isLocked        Boolean  @default(false)
-  disableDownVote Boolean  @default(false)
-  disableUpVote   Boolean  @default(false)
-  isAnonymous     Boolean  @default(false)
-  votesLimit      Int      @default(25)
+  isPublic        Boolean   @default(true)
+  isLocked        Boolean   @default(false)
+  disableDownVote Boolean   @default(false)
+  disableUpVote   Boolean   @default(false)
+  isAnonymous     Boolean   @default(false)
+  votesLimit      Int       @default(25)
   title           String
-  timerInProgress Int?
-  endTime         Int?
-  team            Team     @relation(fields: [teamId], references: [id])
+  timerInProgress Boolean   @default(false)
+  type            BoardType @default(DEFAULT)
+  currentPhase    PhaseType @default(REFLECT)
+  endTime         DateTime?
+  team            Team      @relation(fields: [teamId], references: [id])
   columns         Column[]
+}
+
+enum BoardType {
+  DEFAULT
+  PHASE
+}
+
+enum PhaseType {
+  REFLECT
+  GROUP
+  VOTES
+  DISCUSS
 }
 
 model Column {
@@ -87,8 +101,9 @@ model Opinion {
   position      Int
   status        OpinionStatus @default(NEW)
   author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  column        Column?       @relation(fields: [columnId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  remarks       Remark[]
+
+  column  Column?  @relation(fields: [columnId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  remarks Remark[]
 }
 
 model Remark {
