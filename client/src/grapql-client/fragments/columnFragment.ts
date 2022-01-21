@@ -24,10 +24,6 @@ export const COLUMN_FIELDS = gql`
       author {
         id
         email
-        createdAt
-        updatedAt
-        isAdmin
-        userStatus
         name
         nickname
         picture
@@ -43,10 +39,6 @@ export const COLUMN_FIELDS = gql`
         author {
           id
           email
-          createdAt
-          updatedAt
-          isAdmin
-          userStatus
           name
           nickname
           picture

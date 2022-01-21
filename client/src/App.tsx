@@ -8,7 +8,6 @@ import SelfContext from './contexts/selfContext';
 // import { createUploadLink } from 'apollo-upload-client';
 
 import './styles/less/ant.less';
-import { UserQueries } from './grapql-client/queries';
 // const link = createUploadLink({ uri: 'http://localhost:4000/graphql', credentials: 'include' });
 
 const App = (): JSX.Element => {

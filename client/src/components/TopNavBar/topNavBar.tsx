@@ -13,8 +13,6 @@ type Props = {
 
 const TopNavBar = ({ title, team, boardId }: Props) => {
   const history = useHistory();
-  console.log('ahihi', team);
-
   const boardOptions = () => {
     return team?.boards?.map((board) => (
       <Option key={board.id} value={board.id}>
@@ -69,7 +67,7 @@ const TopNavBar = ({ title, team, boardId }: Props) => {
           </Link>,
           <Link key="1" style={{ textDecoration: 'none' }} to="/manage-members/{teamId}">
             <Button type={title == 'Setting' ? 'primary' : undefined} key="1">
-              Setting
+              Details
             </Button>
           </Link>,
         ]}

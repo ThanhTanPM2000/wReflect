@@ -6,7 +6,7 @@ export type updateBoardResult = {
 };
 
 export type updateBoardVars = {
-  meId?: string;
+  meId: string;
 };
 
 export const updateBoard = gql`
@@ -25,6 +25,7 @@ export const updateBoard = gql`
       votesLimit
       title
       timerInProgress
+      currentPhase
       endTime
       columns {
         id

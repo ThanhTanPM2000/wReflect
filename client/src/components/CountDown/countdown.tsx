@@ -23,9 +23,9 @@ export default function Countdown({ endTime }: Props) {
   if (duration.milliseconds() <= 0) return <div>00:00:00</div>;
 
   return (
-    <div>{`${duration?.hours() / 10 < 1 ? '0' + duration.hours() : duration.hours()}:
+    <>{`${duration?.hours() / 10 < 1 ? '0' + duration.hours() : duration.hours()}:
     ${duration?.minutes() / 10 < 1 ? '0' + duration.minutes() : duration.minutes()}:${
       duration?.seconds() / 10 < 1 ? '0' + duration.seconds() : duration.seconds()
-    }`}</div>
+    }`}</>
   );
 }

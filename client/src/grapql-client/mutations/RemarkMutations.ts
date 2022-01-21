@@ -1,13 +1,14 @@
-import { Board } from './../../types';
 import { gql } from '@apollo/client';
-import { Remark } from '../../types';
-import { BOARD_FIELDS } from '../fragments/boardFragment';
+
+import { Opinion } from './../../types';
+import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createRemarkResult = {
-  createRemark: Board;
+  createRemark: Opinion;
 };
 
 export type createRemarkVars = {
+  teamId: string;
   boardId: string;
   columnId: string;
   opinionId: string;
@@ -15,19 +16,20 @@ export type createRemarkVars = {
 };
 
 export const createRemark = gql`
-  ${BOARD_FIELDS}
-  mutation Mutation($boardId: String, $columnId: String, $opinionId: String, $text: String) {
-    createRemark(boardId: $boardId, columnId: $columnId, opinionId: $opinionId, text: $text) {
-      ...BoardFields
+  ${OPINION_FIELDS}
+  mutation Mutation($teamId: String!, $boardId: String!, $columnId: String!, $opinionId: String!, $text: String!) {
+    createRemark(teamId: $teamId, boardId: $boardId, columnId: $columnId, opinionId: $opinionId, text: $text) {
+      ...OpinionFields
     }
   }
 `;
 
 export type removeRemarkResult = {
-  removeResult: Board;
+  removeResult: Opinion;
 };
 
 export type removeRemarkVars = {
+  teamId: string;
   boardId: string;
   columnId: string;
   opinionId: string;
@@ -35,10 +37,16 @@ export type removeRemarkVars = {
 };
 
 export const removeRemark = gql`
-  ${BOARD_FIELDS}
-  mutation RemoveRemark($opinionId: String!, $boardId: String, $columnId: String, $remarkId: String) {
-    removeRemark(opinionId: $opinionId, boardId: $boardId, columnId: $columnId, remarkId: $remarkId) {
-      ...BoardFields
+  ${OPINION_FIELDS}
+  mutation RemoveRemark(
+    $teamId: String!
+    $opinionId: String!
+    $boardId: String!
+    $columnId: String!
+    $remarkId: String!
+  ) {
+    removeRemark(teamId: $teamId, opinionId: $opinionId, boardId: $boardId, columnId: $columnId, remarkId: $remarkId) {
+      ...OpinionFields
     }
   }
 `;

@@ -15,6 +15,7 @@ export const BOARD_FIELDS = gql`
     title
     timerInProgress
     endTime
+    currentPhase
     columns {
       id
       color
@@ -23,6 +24,7 @@ export const BOARD_FIELDS = gql`
       opinions {
         id
         columnId
+        memberId
         authorId
         createdAt
         updatedAt
@@ -36,17 +38,6 @@ export const BOARD_FIELDS = gql`
         mergedAuthors
         status
         color
-        author {
-          id
-          email
-          createdAt
-          updatedAt
-          isAdmin
-          userStatus
-          name
-          nickname
-          picture
-        }
         position
         remarks {
           id
@@ -58,14 +49,17 @@ export const BOARD_FIELDS = gql`
           author {
             id
             email
-            createdAt
-            updatedAt
-            isAdmin
-            userStatus
             name
             nickname
             picture
           }
+        }
+        author {
+          id
+          email
+          name
+          nickname
+          picture
         }
       }
       boardId

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useMutation } from '@apollo/client';
-import { Form, Avatar, Button, Input, Modal, Upload, message, Card, Col } from 'antd';
+import { Form, Avatar, Button, Input, Upload } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import { UserMutations } from '../../grapql-client/mutations';

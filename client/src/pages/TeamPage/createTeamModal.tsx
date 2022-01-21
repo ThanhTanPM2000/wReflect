@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment';
 import { Modal, Form, Input, DatePicker, Upload, Button, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
@@ -11,7 +11,6 @@ import config from '../../config';
 import { UploadFile } from 'antd/lib/upload/interface';
 
 import { useApolloClient } from '@apollo/client';
-import { create } from 'lodash';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -23,7 +22,6 @@ type Props = {
 
 const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
-  const client = useApolloClient();
 
   const [addNewTeam] = useMutation(TeamMutations.createTeam, {
     // refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeamIds],

@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { Spin, Result, Button, Empty } from 'antd';
+import { Spin, Result, Button } from 'antd';
 
 type Props = {
   children: JSX.Element;
@@ -10,7 +9,7 @@ type Props = {
   error: any;
 };
 
-export default function loading({ children, data, refetch, loading, error }: Props) {
+export default function loading({ children, refetch, loading, error }: Props) {
   return (
     <>
       {loading || error ? (

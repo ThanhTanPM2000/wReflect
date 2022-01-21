@@ -41,6 +41,8 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
     notifyOnNetworkStatusChange: true,
   });
 
+  console.log('teams is ', data?.teams);
+
   const onAddMember = () => {
     setVisibleModal(true);
   };
@@ -120,8 +122,10 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                                         <Avatar
                                           style={{ marginRight: '3px' }}
                                           size="default"
+                                          // srcSet={member?.user?.picture}
                                           key={member?.user?.email}
                                           src={member?.user?.picture}
+                                          crossOrigin="anonymous"
                                         />
                                       );
                                     })}

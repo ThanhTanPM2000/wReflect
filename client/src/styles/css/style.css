@@ -10,7 +10,7 @@ p, input {
   font-family: 'Inter', sans-serif;
   font-weight: 400 !important; }
 
-span {
+div, span {
   font-family: 'Inter', sans-serif;
   font-weight: 400 !important;
   font-size: 12px; }
@@ -273,19 +273,82 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   background: linear-gradient(to right, #f9f9f9 1%, white 99%);
   border-left: solid 1px #e7eaea; }
 
-.board-header {
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  inset: 0 0 auto 0; }
-  .board-header .currentLimitVotes {
+.boardTools {
+  display: flex; }
+  .boardTools .currentLimitVotes {
+    margin-right: auto;
+    margin-left: auto;
     color: white;
     padding: 10px 20px 10px 20px;
     background-color: rgba(30, 34, 47, 0.7);
     border-radius: 30px;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
+  .boardTools .countDown {
+    margin-right: auto;
+    color: white;
+    padding: 10px 20px 10px 20px;
+    background-color: rgba(30, 34, 47, 0.7);
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
+  .boardTools .board-action {
+    margin-left: auto; }
+    .boardTools .board-action .boardPanel {
+      color: white;
+      background-color: rgba(30, 34, 47, 0.7);
+      padding: 10px 20px 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 28px;
+      box-shadow: 0 13px 20px -14px rgba(30, 34, 47, 0.24);
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
+      .boardTools .board-action .boardPanel .boardPanelIcon {
+        font-size: 15px;
+        font-weight: 200px; }
+    .boardTools .board-action .boardActionPanel {
+      border-radius: 8px;
+      box-shadow: 0 10px 40px 0 rgba(30, 34, 47, 0.09);
+      background-color: #1e222f;
+      padding: 30px;
+      margin-right: 20px;
+      right: 0;
+      position: absolute;
+      top: 150px;
+      width: 0;
+      display: none;
+      z-index: 11; }
+      .boardTools .board-action .boardActionPanel .boardPanelIcon {
+        font-size: 25px;
+        color: #979fa6; }
+      .boardTools .board-action .boardActionPanel ul {
+        padding: 0;
+        margin: 0;
+        list-style: none; }
+      .boardTools .board-action .boardActionPanel li {
+        padding: 5px;
+        margin: 0;
+        list-style: none;
+        display: flex;
+        gap: 10px;
+        align-items: center; }
+      .boardTools .board-action .boardActionPanel a {
+        text-decoration: none;
+        color: #6d7982;
+        font-size: 13px; }
+    .boardTools .board-action.active .boardActionPanel {
+      width: 275px;
+      display: block; }
+
+.board-header {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  inset: 0 0 auto 0; }
   .board-header .board-tracking {
     display: flex;
     flex-direction: column;
@@ -323,8 +386,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
           flex-direction: row;
           gap: 5px;
           justify-content: center;
-          align-items: center;
-          cursor: pointer; }
+          align-items: center; }
           .board-header .board-tracking .phase-header .board-phase .phase-step.active {
             background-color: rgba(30, 34, 47, 0.7);
             color: white; }
@@ -339,55 +401,6 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         background-color: white;
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
-  .board-header .board-action .boardPanel {
-    color: white;
-    background-color: rgba(30, 34, 47, 0.7);
-    padding: 10px 20px 10px 20px;
-    cursor: pointer;
-    font-size: 14px;
-    border-radius: 28px;
-    box-shadow: 0 13px 20px -14px rgba(30, 34, 47, 0.24);
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
-    .board-header .board-action .boardPanel .boardPanelIcon {
-      font-size: 15px;
-      font-weight: 200px; }
-  .board-header .board-action .boardActionPanel {
-    border-radius: 8px;
-    box-shadow: 0 10px 40px 0 rgba(30, 34, 47, 0.09);
-    background-color: #1e222f;
-    padding: 30px;
-    margin-right: 20px;
-    right: 0;
-    position: absolute;
-    top: 160px;
-    width: 0;
-    display: none;
-    z-index: 11; }
-    .board-header .board-action .boardActionPanel .boardPanelIcon {
-      font-size: 25px;
-      color: #979fa6; }
-    .board-header .board-action .boardActionPanel ul {
-      padding: 0;
-      margin: 0;
-      list-style: none; }
-    .board-header .board-action .boardActionPanel li {
-      padding: 5px;
-      margin: 0;
-      list-style: none;
-      display: flex;
-      gap: 10px;
-      align-items: center; }
-    .board-header .board-action .boardActionPanel a {
-      text-decoration: none;
-      color: #6d7982;
-      font-size: 13px; }
-  .board-header .board-action.active .boardActionPanel {
-    width: 275px;
-    display: block; }
 
 .ant-select-item-option-selected {
   color: white !important;
@@ -440,7 +453,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     background-color: #ffffff;
     text-align: left;
     padding: 24px 20px;
-    min-height: 200px;
+    min-height: 50px;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
     .board .column .colContent .panel.tab {
       border-radius: 5px;
@@ -503,7 +516,8 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         display: flex;
         align-items: center; }
         .board .column .colContent .opinionCol .opinionFooter .owner-opinion {
-          margin-right: auto; }
+          margin-right: auto;
+          text-align: center; }
         .board .column .colContent .opinionCol .opinionFooter .myVotes {
           margin-right: auto;
           margin-left: auto; }
@@ -631,6 +645,13 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       .manage-board .board-items .board-icons .text-button:hover {
         color: #6d7982;
         cursor: auto; }
+
+.configBoard .configColumn {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; }
 
 .sidebar .ant-layout-logo {
   height: 32px;

@@ -1,6 +1,5 @@
-import { StringNullableChain } from 'lodash';
 import { gql } from '@apollo/client';
-import { Board, Team } from '../../types';
+import { Team } from '../../types';
 
 import { BOARD_FIELDS } from '../fragments/boardFragment';
 

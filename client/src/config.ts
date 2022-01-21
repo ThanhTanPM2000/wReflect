@@ -9,30 +9,30 @@ const parseString = (key: string): string => {
   return value;
 };
 
-const parseNumber = (key: string): number => {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`${key} is not present`);
-  }
-  const parsed = parseInt(value);
-  if (isNaN(parsed)) {
-    throw new Error(`${key} should be a number`);
-  }
-  return parsed;
-};
+// const parseNumber = (key: string): number => {
+//   const value = process.env[key];
+//   if (!value) {
+//     throw new Error(`${key} is not present`);
+//   }
+//   const parsed = parseInt(value);
+//   if (isNaN(parsed)) {
+//     throw new Error(`${key} should be a number`);
+//   }
+//   return parsed;
+// };
 
-const parseBoolean = (key: string): boolean => {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`${key} is not present`);
-  }
-  if (value === 'TRUE' || value === 'true') {
-    return true;
-  } else if (value === 'FALSE' || value === 'false') {
-    return false;
-  }
-  throw new Error(`${key} should be TRUE or true or FALSE or false`);
-};
+// const parseBoolean = (key: string): boolean => {
+//   const value = process.env[key];
+//   if (!value) {
+//     throw new Error(`${key} is not present`);
+//   }
+//   if (value === 'TRUE' || value === 'true') {
+//     return true;
+//   } else if (value === 'FALSE' || value === 'false') {
+//     return false;
+//   }
+//   throw new Error(`${key} should be TRUE or true or FALSE or false`);
+// };
 
 export default {
   AUTH0_WEBAUTH_CONFIG: {

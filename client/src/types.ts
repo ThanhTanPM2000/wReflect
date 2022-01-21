@@ -50,8 +50,9 @@ export type Column = {
 
 export type Opinion = {
   id: string;
-  columnId: string;
+  columnId: string | null;
   authorId: string;
+  memberId: string;
   createdAt: Date;
   updatedAt: Date;
   text: string;
@@ -62,13 +63,13 @@ export type Opinion = {
   isBookmarked: boolean;
   responsible: string;
   mergedAuthors: string[];
-  voters: string[];
   color: string;
   position: number;
   status: OpinionStatus;
   column: Column;
   remarks: Remark[];
   author: User;
+  member: Member;
 };
 
 export type Remark = {
@@ -80,6 +81,7 @@ export type Remark = {
   updatedAt: Date;
   opinion: Opinion;
   author: User;
+  member: Member;
 };
 
 export type Member = {

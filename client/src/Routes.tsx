@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Layout } from 'antd';
 import { Router, Switch, Redirect, Route } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
@@ -14,8 +14,6 @@ import { UserManagements } from './components/UserManagements';
 import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
-import { useSubscription } from '@apollo/client';
-import { BoardSubscription } from './grapql-client/subcriptions';
 import { Footer } from 'antd/lib/layout/layout';
 
 type Props = {

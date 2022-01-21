@@ -1,12 +1,10 @@
-.board-header {
-  margin-bottom: 10px;
+.boardTools {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  inset: 0 0 auto 0;
-
   .currentLimitVotes {
+    // position: absolute;
+    // inset: 120px auto auto 220px;
+    margin-right: auto;
+    margin-left: auto;
     color: white;
     padding: 10px 20px 10px 20px;
     background-color: rgba(30, 34, 47, 0.7);
@@ -14,6 +12,93 @@
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
       rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
   }
+
+  .countDown {
+    margin-right: auto;
+    color: white;
+    padding: 10px 20px 10px 20px;
+    background-color: rgba(30, 34, 47, 0.7);
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
+      rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+  }
+
+  .board-action {
+    margin-left: auto;
+    .boardPanel {
+      color: white;
+      background-color: rgba(30, 34, 47, 0.7);
+      padding: 10px 20px 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 28px;
+      box-shadow: 0 13px 20px -14px rgba(30, 34, 47, 0.24);
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
+        rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+
+      .boardPanelIcon {
+        font-size: 15px;
+        font-weight: 200px;
+      }
+    }
+    .boardActionPanel {
+      border-radius: 8px;
+      box-shadow: 0 10px 40px 0 rgba(30, 34, 47, 0.09);
+      background-color: #1e222f;
+      padding: 30px;
+      margin-right: 20px;
+      right: 0;
+      position: absolute;
+      top: 150px;
+      width: 0;
+      display: none;
+      z-index: 11;
+
+      .boardPanelIcon {
+        font-size: 25px;
+        color: #979fa6;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+      li {
+        padding: 5px;
+        margin: 0;
+        list-style: none;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      a {
+        text-decoration: none;
+        color: #6d7982;
+        font-size: 13px;
+      }
+    }
+
+    &.active {
+      .boardActionPanel {
+        width: 275px;
+        display: block;
+      }
+    }
+  }
+}
+
+.board-header {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  inset: 0 0 auto 0;
 
   .board-tracking {
     display: flex;
@@ -60,7 +145,6 @@
           gap: 5px;
           justify-content: center;
           align-items: center;
-          cursor: pointer;
           &.active {
             background-color: rgba(30, 34, 47, 0.7);
             color: white;
@@ -80,73 +164,6 @@
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
           rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
-      }
-    }
-  }
-
-  .board-action {
-    .boardPanel {
-      color: white;
-      background-color: rgba(30, 34, 47, 0.7);
-      padding: 10px 20px 10px 20px;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 28px;
-      box-shadow: 0 13px 20px -14px rgba(30, 34, 47, 0.24);
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      align-items: center;
-      box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
-        rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
-
-      .boardPanelIcon {
-        font-size: 15px;
-        font-weight: 200px;
-      }
-    }
-    .boardActionPanel {
-      border-radius: 8px;
-      box-shadow: 0 10px 40px 0 rgba(30, 34, 47, 0.09);
-      background-color: #1e222f;
-      padding: 30px;
-      margin-right: 20px;
-      right: 0;
-      position: absolute;
-      top: 160px;
-      width: 0;
-      display: none;
-      z-index: 11;
-
-      .boardPanelIcon {
-        font-size: 25px;
-        color: #979fa6;
-      }
-
-      ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
-      li {
-        padding: 5px;
-        margin: 0;
-        list-style: none;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-      a {
-        text-decoration: none;
-        color: #6d7982;
-        font-size: 13px;
-      }
-    }
-
-    &.active {
-      .boardActionPanel {
-        width: 275px;
-        display: block;
       }
     }
   }
@@ -213,7 +230,7 @@
     background-color: #ffffff;
     text-align: left;
     padding: 24px 20px;
-    min-height: 200px;
+    min-height: 50px;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
       rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
 
@@ -297,6 +314,7 @@
 
           .owner-opinion {
             margin-right: auto;
+            text-align: center;
           }
           .myVotes {
             margin-right: auto;

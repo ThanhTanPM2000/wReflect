@@ -1,4 +1,4 @@
-import { Form, Input, Modal, InputNumber } from 'antd';
+import { Form, Input, Modal, InputNumber, notification } from 'antd';
 import React, { useState } from 'react';
 import { Board } from '../../types';
 import { InfoCircleOutlined } from '@ant-design/icons';
@@ -19,29 +19,30 @@ export default function ConfigTimeTrackingModal({ boardData, visible, setVisible
   const [updateBoard] = useMutation<BoardMutations.updateBoardResult, BoardMutations.updateBoardVars>(
     BoardMutations.updateBoard,
     {
-      variables: {
-        teamId: boardData?.team?.id,
-        boardId: boardData?.id,
-        timerInProgress: true,
-        endTime: `${moment().add(minutes, 'minutes').valueOf()}`,
-      },
-      update: (cache, { data }) => {
-        if (!data) return;
-        cache.modify({
-          id: cache.identify(data.updateBoard),
-          fields: {
-            timerInProgress: () => data.updateBoard.timerInProgress,
-            endTime: () => data.updateBoard.endTime,
-          },
+      onError: (error) => {
+        notification.error({
+          placement: 'bottomRight',
+          message: error?.message,
         });
       },
-      optimisticResponse: {
-        updateBoard: {
-          ...boardData,
-          timerInProgress: true,
-          endTime: moment().add(minutes, 'minutes').toDate().getTime().toString(),
-        },
-      },
+      // update: (cache, { data }) => {
+      //   if (!data) return;
+      //   cache.modify({
+      //     id: cache.identify(data.updateBoard),
+      //     fields: {
+      //       timerInProgress: () => data.updateBoard.timerInProgress,
+      //       endTime: () => data.updateBoard.endTime,
+      //     },
+      //   });
+      //   setVisible(false);
+      // },
+      // optimisticResponse: {
+      //   updateBoard: {
+      //     ...boardData,
+      //     timerInProgress: true,
+      //     endTime: moment().add(minutes, 'minutes').toDate().getTime().toString(),
+      //   },
+      // },
     },
   );
 
@@ -49,7 +50,24 @@ export default function ConfigTimeTrackingModal({ boardData, visible, setVisible
     <Modal
       centered
       visible={visible}
-      onOk={() => updateBoard()}
+      onOk={() => {
+        updateBoard({
+          variables: {
+            teamId: boardData?.team?.id,
+            boardId: boardData?.id,
+            timerInProgress: true,
+            endTime: `${moment().add(minutes, 'minutes').valueOf()}`,
+          },
+          optimisticResponse: {
+            updateBoard: {
+              ...boardData,
+              timerInProgress: true,
+              endTime: `${moment().add(minutes, 'minutes').valueOf()}`,
+            },
+          },
+        });
+        setVisible(false);
+      }}
       title="Set duration for the current phase"
       onCancel={() => setVisible(false)}
     >

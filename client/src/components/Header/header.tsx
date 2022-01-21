@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Dropdown, Button, Avatar } from 'antd';
+import { Menu, Dropdown, Button } from 'antd';
 
 import { Login } from '../Login';
 import { Logout } from '../Logout';

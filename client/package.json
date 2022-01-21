@@ -26,6 +26,7 @@
     "auth0-js": "9.14.2",
     "axios": "0.21.1",
     "date-fns": "2.16.1",
+    "emoji-picker-react": "^3.5.0",
     "graphql": "15.7.2",
     "http-status-codes": "2.1.4",
     "lodash": "^4.17.21",

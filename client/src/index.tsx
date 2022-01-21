@@ -8,9 +8,8 @@ import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from, split } fr
 import config from './config';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from '@apollo/client/link/error';
-import { message } from 'antd';
+import { notification } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
-import { Opinion, Team } from './types';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
@@ -33,15 +32,21 @@ const splitLink = split(
   httpLink,
 );
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message: messageData, extensions }) => {
-      console.log(message);
-      if (extensions?.code === '404') return;
-      message?.error(`${messageData}`);
+const errorLink = onError(({ networkError }) => {
+  try {
+    if (networkError) {
+      notification.error({
+        placement: 'bottomRight',
+        message: `[Network error]: ${networkError}`,
+      });
+    }
+    return;
+  } catch (error) {
+    notification.error({
+      message: 'Something failed with server',
+      placement: 'bottomRight',
     });
-
-  if (networkError) console.log(`[Network error]: ${networkError}`);
+  }
 });
 
 const client = new ApolloClient({
@@ -52,12 +57,8 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
-          teams: {
-            merge: true,
-          },
           team: {
             read(_, { args, toReference }) {
-              console.log('data is', args);
               return toReference({
                 __typename: 'Team',
                 id: args?.teamId,
@@ -71,27 +72,13 @@ const client = new ApolloClient({
                 id: args?.boardId,
               });
             },
-            merge: true,
-          },
-        },
-      },
-      Column: {
-        fields: {
-          opinions: {
-            merge(existing = [], incoming: Opinion[]) {
-              return [...incoming];
-            },
           },
         },
       },
       Board: {
-        fields: {
-          team: {
-            merge(existing: Team) {
-              return existing ?? null;
-            },
-          },
-        },
+        queryType: true,
+        mutationType: true,
+        subscriptionType: true,
       },
     },
   }),

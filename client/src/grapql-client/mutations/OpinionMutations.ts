@@ -1,8 +1,10 @@
-import { Board, Column, Opinion } from './../../types';
+import { Board, Column, Opinion, OpinionStatus } from './../../types';
 import { gql } from '@apollo/client';
 import { BOARD_FIELDS } from '../fragments/boardFragment';
+import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createOpinionVars = {
+  teamId: string;
   boardId: string;
   columnId: string;
   text: string;
@@ -16,8 +18,16 @@ export type createOpinionResult = {
 
 export const createOpinion = gql`
   ${BOARD_FIELDS}
-  mutation Mutation($boardId: String!, $columnId: String, $text: String, $isAction: Boolean, $isCreateBottom: Boolean) {
+  mutation Mutation(
+    $teamId: String!
+    $boardId: String!
+    $columnId: String!
+    $text: String
+    $isAction: Boolean
+    $isCreateBottom: Boolean
+  ) {
     createOpinion(
+      teamId: $teamId
       boardId: $boardId
       columnId: $columnId
       text: $text
@@ -30,49 +40,55 @@ export const createOpinion = gql`
 `;
 
 export type updateOpinionResult = {
-  updateOpinion: string;
+  updateOpinion: Opinion;
 };
 
 export type updateOpinionVars = {
+  teamId: string;
   boardId: string;
   columnId: string;
   opinionId: string;
   text?: string;
   upVote?: string[];
+  downVote?: string[];
   isAction?: boolean;
   isBookmarked?: boolean;
   responsible?: string;
   color?: string;
-  status?: string;
+  status?: OpinionStatus;
 };
 
 export const updateOpinion = gql`
-  ${BOARD_FIELDS}
+  ${OPINION_FIELDS}
   mutation updateOpinion(
+    $teamId: String!
     $boardId: String!
     $columnId: String!
     $opinionId: String!
     $text: String
     $upVote: [String]
+    $downVote: [String]
     $isAction: Boolean
     $isBookmarked: Boolean
-    $responsible: Boolean
+    $responsible: String
     $color: String
-    $status: String
+    $status: OpinionStatus
   ) {
     updateOpinion(
+      teamId: $teamId
       boardId: $boardId
       columnId: $columnId
       opinionId: $opinionId
       text: $text
       upVote: $upVote
+      downVote: $downVote
       isAction: $isAction
       isBookmarked: $isBookmarked
       responsible: $responsible
       color: $color
       status: $status
     ) {
-      ...BoardFields
+      ...OpinionFields
     }
   }
 `;
@@ -82,6 +98,7 @@ export type removeOpinionResult = {
 };
 
 export type removeOpinionVars = {
+  teamId: string;
   boardId: string;
   columnId: string;
   opinionId: string;
@@ -89,8 +106,8 @@ export type removeOpinionVars = {
 
 export const removeOpinion = gql`
   ${BOARD_FIELDS}
-  mutation RemoveOpinion($boardId: String, $columnId: String, $opinionId: String) {
-    removeOpinion(boardId: $boardId, columnId: $columnId, opinionId: $opinionId) {
+  mutation RemoveOpinion($teamId: String!, $boardId: String!, $columnId: String!, $opinionId: String!) {
+    removeOpinion(teamId: $teamId, boardId: $boardId, columnId: $columnId, opinionId: $opinionId) {
       ...BoardFields
     }
   }

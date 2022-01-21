@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import H from 'history';
 import auth0, { AuthOptions } from 'auth0-js';
-import { useHistory } from 'react-router-dom';
 
 import config from '../../config';
-import { auth, user } from '../../apis';
+import { auth } from '../../apis';
 import EmailVerificationNotice from './EmailVerificationNotice';
 
 type Props = {
@@ -18,7 +16,6 @@ const handleLogin = async (
   state: string,
   setEmail: React.Dispatch<null | string>,
   setNeedsEmailVerification: React.Dispatch<null | boolean>,
-  history: H.History,
 ) => {
   const res = await auth.login(code, state);
   if (!res) {
@@ -40,7 +37,6 @@ const handleLogin = async (
 };
 
 const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
-  const history = useHistory();
   const [email, setEmail] = useState<null | string>(null);
   const [needsEmailVerification, setNeedsEmailVerification] = useState<null | boolean>(null);
   const params = new URLSearchParams(location.search);
@@ -55,7 +51,7 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
       const code = params.get('code');
       const state = params.get('state');
       if (code && state) {
-        handleLogin(code, state, setEmail, setNeedsEmailVerification, history);
+        handleLogin(code, state, setEmail, setNeedsEmailVerification);
       }
     }
   }, []);

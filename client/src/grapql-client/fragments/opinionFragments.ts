@@ -16,21 +16,6 @@ export const OPINION_FIELDS = gql`
     mergedAuthors
     status
     color
-    author {
-      id
-      email
-      createdAt
-      updatedAt
-      isAdmin
-      userStatus
-      profile {
-        id
-        userId
-        name
-        nickname
-        picture
-      }
-    }
     position
     remarks {
       id
@@ -39,6 +24,20 @@ export const OPINION_FIELDS = gql`
       text
       createdAt
       updatedAt
+      author {
+        id
+        email
+        name
+        nickname
+        picture
+      }
+    }
+    author {
+      id
+      email
+      name
+      nickname
+      picture
     }
   }
 `;

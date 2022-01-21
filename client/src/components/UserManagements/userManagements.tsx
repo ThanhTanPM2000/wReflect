@@ -11,7 +11,7 @@ const UserManagements = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(8);
 
-  const { error, data, loading, refetch } = useQuery(UserQueries.getUsers, {
+  const { data, loading, refetch } = useQuery(UserQueries.getUsers, {
     variables: { isGettingAll: false, search: searchText, page, size },
   });
 
