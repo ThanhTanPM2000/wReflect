@@ -18,6 +18,7 @@ import {
   UngroupOutlined,
   LikeOutlined,
   MessageOutlined,
+  FieldTimeOutlined,
 } from '@ant-design/icons';
 import _ from 'lodash';
 import selfContext from '../../contexts/selfContext';
@@ -25,6 +26,8 @@ import ConfigBoardModal from './configBoardModal';
 import { Loading } from '../../components/Loading';
 import { TopNavBar } from '../../components/TopNavBar';
 import { BoardSubscription } from '../../grapql-client/subcriptions';
+import ConfigTimeTrackingModal from './configTimeTrackingModal';
+import { CountDown } from '../../components/CountDown';
 
 type Props = {
   teamId: string;
@@ -35,6 +38,7 @@ export default function board({ teamId, boardId }: Props) {
   const [currentNumVotes, setCurrentNumVotes] = useState(0);
   const [isBoardPanelActive, setIsBoardPanelActive] = useState(false);
   const [isBoardModalVisible, setBoardModalVisible] = useState(false);
+  const [isTimeTrackingModalVisible, setTimeTrackingModalVisible] = useState(false);
   const history = useHistory();
   const client = useApolloClient();
   const me = useContext(selfContext);
@@ -47,23 +51,25 @@ export default function board({ teamId, boardId }: Props) {
     },
   );
 
+  console.log('huhu', data);
+
   useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
     BoardSubscription.updateBoard,
     {
       variables: {
         meId: me?.id,
       },
-      onSubscriptionData: ({ client, subscriptionData: { data, loading } }) => {
-        if (!loading && data?.updateBoard) {
-          client.cache.modify({
-            id: client.cache.identify(data.updateBoard),
-            fields: {
-              columns: () => {
-                return data?.updateBoard.columns;
-              },
-            },
-          });
-        }
+      onSubscriptionData: ({ client, subscriptionData: { data } }) => {
+        console.log('updated data');
+        client.cache.writeQuery({
+          query: BoardQueries.getBoard,
+          variables: {
+            boardId,
+          },
+          data: {
+            board: data?.updateBoard,
+          },
+        });
       },
     },
   );
@@ -169,16 +175,6 @@ export default function board({ teamId, boardId }: Props) {
           source: result?.source,
           draggableId: result?.draggableId,
         },
-        // onCompleted: (data) => {
-        //   client.cache.modify({
-        //     id: client.cache.identify(data.orderOpinion),
-        //     fields: {
-        //       columns: () => {
-        //         return data.orderOpinion.columns;
-        //       },
-        //     },
-        //   });
-        // },
         onError: (err) => {
           client.cache.writeQuery({
             query: BoardQueries.getBoard,
@@ -202,6 +198,11 @@ export default function board({ teamId, boardId }: Props) {
           {data && data?.board ? (
             <>
               <ConfigBoardModal setVisible={setBoardModalVisible} visible={isBoardModalVisible} />
+              <ConfigTimeTrackingModal
+                boardData={data?.board}
+                setVisible={setTimeTrackingModalVisible}
+                visible={isTimeTrackingModalVisible}
+              />
               <div className="board-header">
                 <div className="currentLimitVotes">Votes {`${currentNumVotes}/${board?.votesLimit}`}</div>
                 <div className="board-tracking">
@@ -215,35 +216,41 @@ export default function board({ teamId, boardId }: Props) {
                     >
                       {data?.board?.team?.members?.map((member) => (
                         <div onClick={() => history.push(`/manage-members/${teamId}`)} key={member?.user?.email}>
-                          <Tooltip title={member?.user?.profile?.nickname} key={member?.user?.email} placement="bottom">
+                          <Tooltip title={member?.user?.nickname} key={member?.user?.email} placement="bottom">
                             <Avatar
                               style={{ marginRight: '1px' }}
                               size="default"
                               shape="circle"
                               key={member?.user?.email}
-                              src={member?.user?.profile?.picture}
+                              src={member?.user?.picture}
                             />
                           </Tooltip>
                         </div>
                       ))}
                     </Avatar.Group>
                   </div>
-                  <div className="board-phase">
-                    <div className="phase-step">
-                      <BulbOutlined />
-                      Reflect
+                  <div className="phase-header">
+                    <div className="board-phase">
+                      <div className="phase-step">
+                        <BulbOutlined />
+                        Reflect
+                      </div>
+                      <div className="phase-step">
+                        <UngroupOutlined />
+                        Group
+                      </div>
+                      <div className="phase-step">
+                        <LikeOutlined />
+                        Votes
+                      </div>
+                      <div className="phase-step active">
+                        <MessageOutlined />
+                        Discuss
+                      </div>
                     </div>
-                    <div className="phase-step">
-                      <UngroupOutlined />
-                      Group
-                    </div>
-                    <div className="phase-step">
-                      <LikeOutlined />
-                      Votes
-                    </div>
-                    <div className="phase-step active">
-                      <MessageOutlined />
-                      Discuss
+                    <div className="phase-action-btn" onClick={() => setTimeTrackingModalVisible(true)}>
+                      <FieldTimeOutlined />
+                      Start Time
                     </div>
                   </div>
                 </div>
@@ -272,6 +279,7 @@ export default function board({ teamId, boardId }: Props) {
                   </div>
                 </div>
               </div>
+              {data.board.timerInProgress && data.board.endTime && <CountDown endTime={data.board.endTime} />}
               <div className="board flex flex-dir-r">
                 <DragDropContext onDragEnd={handleOnDragEnd}>
                   {board?.columns?.map((column, index) => {

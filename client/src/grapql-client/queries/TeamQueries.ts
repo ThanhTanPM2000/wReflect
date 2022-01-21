@@ -44,13 +44,9 @@ const getTeam = gql`
           updatedAt
           isAdmin
           userStatus
-          profile {
-            id
-            userId
-            name
-            nickname
-            picture
-          }
+          name
+          nickname
+          picture
         }
       }
       boards {
@@ -81,8 +77,8 @@ export type getTeamsVars = {
 
 const getTeams = gql`
   ${BOARD_FIELDS}
-  query Teams($input: TeamsInput) {
-    teams(input: $input) {
+  query Teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
+    teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
       data {
         id
         name
@@ -112,12 +108,12 @@ const getTeams = gql`
             updatedAt
             isAdmin
             userStatus
+            name
+            nickname
+            picture
             profile {
               id
               userId
-              name
-              nickname
-              picture
               workplace
               address
               school

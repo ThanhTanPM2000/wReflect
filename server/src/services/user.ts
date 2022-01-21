@@ -9,24 +9,16 @@ export const findOrCreateUserByEmail = async (email: string, picture: string, na
       update: {
         email,
         userStatus: 'ONLINE',
-        profile: {
-          update: {
-            nickname,
-            name,
-            picture,
-          },
-        },
+        nickname,
+        name,
+        picture,
       },
       create: {
         email,
         userStatus: 'ONLINE',
-        profile: {
-          create: {
-            name,
-            picture,
-            nickname,
-          },
-        },
+        name,
+        picture,
+        nickname,
       },
       include: {
         profile: true,
@@ -92,8 +84,7 @@ export const getUser = async (userId: string) => {
         profile: true,
       },
     });
-
-    if (!user) throw new Error(errorName.NOTFOUND);
+    // if (!user) throw new Error(errorName.NOTFOUND);
 
     return user;
   } catch (error) {
@@ -109,11 +100,7 @@ export const updateUser = async (userId: string, args: any) => {
         id: userId,
       },
       data: {
-        profile: {
-          update: {
-            picture: args?.picture,
-          },
-        },
+        picture: args?.picture,
       },
     });
 

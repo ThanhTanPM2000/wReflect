@@ -82,12 +82,11 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
               },
             },
             profile: {
-              create: {
-                picture: `${config.SERVER_URL}/uploads/avatarDefault.png`,
-                nickname: 'Unknown',
-                name: 'Unknown',
-              },
+              create: {},
             },
+            nickname: 'Unregistered',
+            name: 'Unregistered',
+            picture: `${config.SERVER_URL}/uploads/avatarDefault.png`,
           },
         });
       } catch (error) {

@@ -107,7 +107,7 @@ const ProfileUser = () => {
               <div className="flex flex-ai-c flex-jc-sb">
                 <Avatar
                   className="avatarSetting"
-                  src={`${me?.profile?.picture}`}
+                  src={`${me?.picture}`}
                   style={{ height: 150, width: 150, marginTop: 20 }}
                 />
                 <Upload {...props}>
@@ -126,10 +126,10 @@ const ProfileUser = () => {
                   <Form.Item label="School" name="School">
                     <Input placeholder="School..." onChange={onInputChange} value={school} name="school" />
                   </Form.Item>
-                  <Form.Item  style={{ marginTop: 15}}label="Work Place" name="Work Place">
+                  <Form.Item style={{ marginTop: 15 }} label="Work Place" name="Work Place">
                     <Input placeholder="Work Place..." onChange={onInputChange} value={workplace} name="workplace" />
                   </Form.Item>
-                  <Form.Item  style={{ marginTop: 15}}label="Phone Number" name="Phone Number">
+                  <Form.Item style={{ marginTop: 15 }} label="Phone Number" name="Phone Number">
                     <Input
                       placeholder="Phone Number..."
                       onChange={onInputChange}
@@ -137,7 +137,7 @@ const ProfileUser = () => {
                       name="phoneNumbers"
                     />
                   </Form.Item>
-                  <Form.Item  style={{ marginTop: 15}}label="Gender" name="Gender">
+                  <Form.Item style={{ marginTop: 15 }} label="Gender" name="Gender">
                     <Input placeholder="Gender..." onChange={onInputChange} value={gender} name="gender" />
                   </Form.Item>
                 </Form>
@@ -185,7 +185,7 @@ const ProfileUser = () => {
               height: '350px',
               boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
               overflowY: 'scroll',
-              overflowX: 'hidden'
+              overflowX: 'hidden',
             }}
           >
             <div style={{ flex: 3 }} className="tab-inner">

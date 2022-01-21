@@ -13,6 +13,7 @@ type Props = {
 
 const TopNavBar = ({ title, team, boardId }: Props) => {
   const history = useHistory();
+  console.log('ahihi', team);
 
   const boardOptions = () => {
     return team?.boards?.map((board) => (

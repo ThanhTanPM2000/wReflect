@@ -16,7 +16,7 @@ import {
   MessageOutlined,
 } from '@ant-design/icons';
 
-import { Board, Opinion } from '../../types';
+import { Board, Column, Opinion } from '../../types';
 import { useMutation, useApolloClient, useSubscription } from '@apollo/client';
 import selfContext from '../../contexts/selfContext';
 import { OpinionMutations } from '../../grapql-client/mutations';
@@ -28,6 +28,7 @@ import { OpinionSubscription } from '../../grapql-client/subcriptions';
 
 type Props = {
   board: Board;
+  column: Column;
   opinion: Opinion;
   key: string;
   index: number;
@@ -39,7 +40,14 @@ const { Option } = Select;
 const { confirm } = Modal;
 const { TextArea } = Input;
 
-export default function OpinionComponenent({ opinion, board, index, currentNumVotes, setCurrentNumVotes }: Props) {
+export default function OpinionComponenent({
+  opinion,
+  board,
+  column,
+  index,
+  currentNumVotes,
+  setCurrentNumVotes,
+}: Props) {
   const [isEdit, setIsEdit] = useState(false);
   const [currentOpinion, setCurrentOpinion] = useState(opinion);
   const prevCurrentOpinion = useRef(currentOpinion);
@@ -47,34 +55,12 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
   const me = useContext(selfContext);
   const [isOpenRemark, setIsOpenRemark] = useState(false);
 
-  useSubscription<OpinionSubscription.updateOpinionResult, OpinionSubscription.updateOpinionVars>(
-    OpinionSubscription.updateOpinion,
-    {
-      variables: {
-        opinionId: opinion.id,
-      },
-      onSubscriptionData: ({ client, subscriptionData: { data, loading } }) => {
-        if (!loading && data?.updateOpinion) {
-          client.cache.modify({
-            id: client.cache.identify(data?.updateOpinion),
-            fields: {
-              text: () => data.updateOpinion.text,
-              upVote: () => data.updateOpinion.upVote,
-              isBookmarked: () => data.updateOpinion.isBookmarked,
-              responsible: () => data.updateOpinion.responsible,
-              color: () => data.updateOpinion.color,
-              status: () => data.updateOpinion.status,
-            },
-          });
-        }
-      },
-    },
-  );
-
   const [updateOpinion] = useMutation<OpinionMutations.updateOpinionResult, OpinionMutations.updateOpinionVars>(
     OpinionMutations.updateOpinion,
     {
       variables: {
+        boardId: board.id,
+        columnId: column.id,
         opinionId: currentOpinion.id,
         text: currentOpinion.text,
         upVote: currentOpinion.upVote,
@@ -127,6 +113,9 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
               status: () => {
                 return prevCurrentOpinion.current.status;
               },
+              remarks: () => {
+                return prevCurrentOpinion.current.remarks;
+              },
             },
           });
         },
@@ -140,6 +129,7 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
     currentOpinion.isBookmarked,
     currentOpinion.responsible,
     currentOpinion.status,
+    currentOpinion.remarks,
   ]);
 
   const menu = (
@@ -174,6 +164,8 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
               });
               removeOpinion({
                 variables: {
+                  boardId: board.id,
+                  columnId: column.id,
                   opinionId: opinion.id,
                 },
                 onError: () => {
@@ -256,13 +248,13 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
                   )
                   .map((member) => (
                     <div key={member?.user?.email}>
-                      <Tooltip title={member?.user?.profile?.name} key={member?.user?.email} placement="bottom">
+                      <Tooltip title={member?.user?.name} key={member?.user?.email} placement="bottom">
                         <Avatar
                           style={{ marginRight: '1px' }}
                           size="default"
                           shape="circle"
                           key={member?.user?.email}
-                          src={member?.user?.profile?.picture}
+                          src={member?.user?.picture}
                         />
                       </Tooltip>
                     </div>
@@ -377,7 +369,13 @@ export default function OpinionComponenent({ opinion, board, index, currentNumVo
               </Badge>
             </div>
           </div>
-          <Remark isOpenRemark={isOpenRemark} setIsOpenRemark={setIsOpenRemark} opinion={currentOpinion} />
+          <Remark
+            board={board}
+            column={column}
+            isOpenRemark={isOpenRemark}
+            setIsOpenRemark={setIsOpenRemark}
+            opinion={currentOpinion}
+          />
         </div>
       )}
     </Draggable>

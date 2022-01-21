@@ -9,7 +9,6 @@ import { TeamQueries } from '../../grapql-client/queries';
 import EditTeamDetailModal from '../TeamDetailPage/editTeamDetailModal';
 import SelfContext from '../../contexts/selfContext';
 
-import { ExclamationCircleOutlined, PlusCircleOutlined, EditFilled, DeleteOutlined } from '@ant-design/icons';
 import { TeamMutations } from '../../grapql-client/mutations';
 import { useHistory } from 'react-router-dom';
 import { Loading } from '../../components/Loading';
@@ -26,13 +25,13 @@ const { confirm } = Modal;
 const { Option } = Select;
 
 export default function manageMembers({ teamId }: Props) {
-  const [isVisibleAddMemModal, setIsVisibleAddMemModal] = useState(false);
   const [isVisibleEditDetails, setIsVisibleEditDetails] = useState(false);
   const [searchText, setSearchText] = useState('');
   const client = useApolloClient();
 
   const history = useHistory();
   const me = useContext(SelfContext);
+  console.log(teamId);
 
   const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
     TeamQueries.getTeam,

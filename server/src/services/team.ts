@@ -1,7 +1,8 @@
+import { addMembersToTeam } from './member';
 import { StatusCodes } from 'http-status-codes';
 import config from '../config';
 import prisma from './../prisma';
-import { createTeamType, updateTeamType } from '../types';
+import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
 import { Team, TeamStatus, Board, Column, Remark, Opinion, OpinionStatus } from '@prisma/client';
 import { errorName } from '../constant/errorsConstant';
 import { ForbiddenError, ApolloError } from 'apollo-server-errors';
@@ -103,7 +104,9 @@ export const getTeam = async (teamId: string, userId?: string) => {
   return team;
 };
 
-export const createTeam = async (meId: string, data: createTeamType) => {
+export const createTeam = async (req: RequestWithUserInfo, data: createTeamType) => {
+  const { id: meId } = req.user;
+
   const startDate = data.startDate ? new Date(data.startDate) : new Date();
   const endDate = data.endDate ? new Date(data.endDate) : new Date();
 
@@ -113,6 +116,7 @@ export const createTeam = async (meId: string, data: createTeamType) => {
       ...data,
       startDate,
       endDate,
+      ownerId: meId,
       boards: {
         create: {
           createdBy: meId,
@@ -146,7 +150,8 @@ export const createTeam = async (meId: string, data: createTeamType) => {
   return team;
 };
 
-export const updateTeam = async (meId: string, data: updateTeamType): Promise<Team> => {
+export const updateTeam = async (req: RequestWithUserInfo, data: updateTeamType): Promise<Team> => {
+  const { id: meId } = req?.user;
   const startDate = data.startDate ? new Date(data.startDate) : undefined;
   const endDate = data.endDate ? new Date(data.endDate) : undefined;
 
@@ -176,7 +181,8 @@ export const updateTeam = async (meId: string, data: updateTeamType): Promise<Te
   return team[0];
 };
 
-export const changeTeamAccess = async (meId: string, teamId: string, isPublic: boolean) => {
+export const changeTeamAccess = async (req: RequestWithUserInfo, teamId: string, isPublic: boolean) => {
+  const { id: meId } = req?.user;
   const team = await prisma.team.updateMany({
     where: {
       id: teamId,
@@ -196,7 +202,8 @@ export const changeTeamAccess = async (meId: string, teamId: string, isPublic: b
   return team;
 };
 
-export const deleteTeam = async (meId: string, teamId: string) => {
+export const deleteTeam = async (req: RequestWithUserInfo, teamId: string) => {
+  const { id: meId } = req?.user;
   const batchPayload = await prisma.team.deleteMany({
     where: {
       id: teamId,

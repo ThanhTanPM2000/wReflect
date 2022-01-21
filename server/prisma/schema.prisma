@@ -29,6 +29,7 @@ model Session {
 model Team {
   id          String       @id @default(uuid())
   name        String
+  ownerId     String
   createdAt   DateTime     @default(now())
   startDate   DateTime
   endDate     DateTime
@@ -39,6 +40,7 @@ model Team {
   members     Member[]
   InviteLink  InviteLink[]
   boards      Board[]
+  Owner       User         @relation(fields: [ownerId], references: [id])
 }
 
 model Board {
@@ -53,13 +55,23 @@ model Board {
   disableUpVote   Boolean   @default(false)
   isAnonymous     Boolean   @default(false)
   votesLimit      Int       @default(25)
+  currentColumnId String?
   title           String
   timerInProgress Boolean   @default(false)
   type            BoardType @default(DEFAULT)
   currentPhase    PhaseType @default(REFLECT)
   endTime         DateTime?
   team            Team      @relation(fields: [teamId], references: [id])
-  columns         Column[]
+  column1Id       String?
+  column2Id       String?
+  column3Id       String?
+  column4Id       String?
+  column5Id       String?
+  column1         Column?   @relation("column1", fields: [column1Id], references: [id])
+  column2         Column?   @relation("column2", fields: [column2Id], references: [id])
+  column3         Column?   @relation("column3", fields: [column3Id], references: [id])
+  column4         Column?   @relation("column4", fields: [column4Id], references: [id])
+  column5         Column?   @relation("column5", fields: [column5Id], references: [id])
 }
 
 enum BoardType {
@@ -75,39 +87,54 @@ enum PhaseType {
 }
 
 model Column {
-  id       String    @id @default(uuid())
-  color    String    @default("white")
-  title    String
-  isActive Boolean   @default(true)
-  opinions Opinion[]
-  boardId  String
-  board    Board     @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id             String    @id @default(uuid())
+  color          String    @default("white")
+  title          String
+  isActive       Boolean   @default(true)
+  opinions       Opinion[]
+  boardId        String
+  column1OfBoard Board[]   @relation("column1")
+  column2OfBoard Board[]   @relation("column2")
+  column3OfBoard Board[]   @relation("column3")
+  column4OfBoard Board[]   @relation("column4")
+  column5OfBoard Board[]   @relation("column5")
+
 }
 
 model Opinion {
   id            String        @id @default(uuid())
   columnId      String?
   authorId      String
+  memberId      String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   text          String
   upVote        String[]
+  downVote      String[]
   updatedBy     String
   isAction      Boolean       @default(false)
   isBookmarked  Boolean       @default(false)
-  responsible   String?
+  responsible   String        @default("not-assigned")
   mergedAuthors String[]
   color         String        @default("pink")
   position      Int
   status        OpinionStatus @default(NEW)
   author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  column  Column?  @relation(fields: [columnId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  remarks Remark[]
+  member        Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  column        Column?       @relation(fields: [columnId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  remarks       Remark[]
 }
+
+// enum ColorPicker {
+//   PINK
+//   GRAY
+//   GREEN
+
+// }
 
 model Remark {
   id        String   @id @default(uuid())
+  memberId  String
   authorId  String
   opinionId String
   text      String
@@ -115,14 +142,14 @@ model Remark {
   updatedAt DateTime @updatedAt
   opinion   Opinion  @relation(fields: [opinionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId    String?
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum OpinionStatus {
-  NEW          @map("New")
-  IN_PROGRESS  @map("In-Progress")
-  DONE         @map("Done")
-  REJECTED     @map("Rejected")
+  NEW
+  IN_PROGRESS
+  DONE
+  REJECTED
 }
 
 enum TeamStatus {
@@ -145,17 +172,19 @@ enum TypeToken {
 }
 
 model Member {
-  id                  String   @id @default(uuid())
+  id                  String    @id @default(uuid())
   userId              String
   teamId              String
-  isOwner             Boolean  @default(false)
-  isPendingInvitation Boolean  @default(false)
-  isGuess             Boolean  @default(false)
+  isOwner             Boolean   @default(false)
+  isPendingInvitation Boolean   @default(false)
+  isGuess             Boolean   @default(false)
   invitedBy           String?
-  joinedAt            DateTime @default(now())
+  joinedAt            DateTime  @default(now())
   role                String?
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  team                Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  team                Team      @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Opinion             Opinion[]
+  Remark              Remark[]
 
   @@unique([userId, teamId])
 }
@@ -177,11 +206,15 @@ model User {
   updatedAt    DateTime       @updatedAt
   isAdmin      Boolean        @default(false)
   userStatus   UserStatus     @default(OFFLINE)
+  name         String         @db.VarChar(100)
+  nickname     String         @db.VarChar(150)
+  picture      String         @db.VarChar(500)
   session      Session[]
   profile      UserProfile?
   members      Member[]
   Notification Notification[]
 
+  Team    Team[]
   Opinion Opinion[]
   Remark  Remark[]
   @@index([email])
@@ -190,9 +223,6 @@ model User {
 model UserProfile {
   id           String   @id @default(uuid())
   userId       String
-  name         String   @db.VarChar(100)
-  nickname     String   @db.VarChar(150)
-  picture      String   @db.VarChar(500)
   workplace    String?  @db.VarChar(300)
   address      String?  @db.VarChar(300)
   school       String?  @db.VarChar(300)

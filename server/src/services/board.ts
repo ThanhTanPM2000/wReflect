@@ -1,9 +1,13 @@
+import { RequestWithUserInfo } from './../types';
+import { updateBoardType } from './../apollo/typeDefss/boardTypeDefs';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
-import { orderOpinionType } from '../apollo/typeDefss/opinionTypeDefs';
+import _, { now } from 'lodash';
+import { NotFound } from '../errorsManagement';
 
-export const getListBoardOfTeam = async (meId: string, teamId: string) => {
+export const getListBoardOfTeam = async (req: RequestWithUserInfo, teamId: string) => {
+  const { id } = req?.user;
   const boards = await prisma.board.findMany({
     where: {
       teamId,
@@ -12,7 +16,7 @@ export const getListBoardOfTeam = async (meId: string, teamId: string) => {
           {
             members: {
               some: {
-                userId: meId,
+                userId: id,
               },
             },
           },
@@ -27,7 +31,8 @@ export const getListBoardOfTeam = async (meId: string, teamId: string) => {
   return boards;
 };
 
-export const getBoard = async (meId: string, boardId: string) => {
+export const getBoard = async (req: RequestWithUserInfo, boardId: string) => {
+  const { id: meId } = req.user;
   const board = await prisma.board.findFirst({
     where: {
       id: boardId,
@@ -46,29 +51,93 @@ export const getBoard = async (meId: string, boardId: string) => {
         ],
       },
     },
-  });
-
-  if (!board) throw new ApolloError('You dont have permission, or data not found', `${StatusCodes.FORBIDDEN}`);
-
-  return board;
-};
-
-export const orderOpinionInBoard = async (meId: string, args: orderOpinionType) => {
-  const board = await prisma.board.updateMany({
-    where: {
-      isLocked: false,
+    include: {
       columns: {
-        some: {
-          id: args.source.droppableId,
+        include: {
           opinions: {
-            some: {
-              id: args.draggableId,
-              authorId: meId,
+            include: {
+              remarks: true,
+              author: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
             },
           },
         },
       },
     },
-    data: {},
   });
+
+  !board && NotFound();
+
+  return board;
+};
+
+export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardType) => {
+  const { id: meId } = req?.user;
+
+  const team = await prisma.team.findFirst({
+    where: {
+      id: args.teamId,
+      ownerId: meId,
+    },
+  });
+
+  // if (!team) throw new ApolloError('You dont have permission, or data not found', `${StatusCodes.FORBIDDEN}`);
+  !team && NotFound();
+
+  const board = await prisma.board.update({
+    where: {
+      id: args.boardId,
+    },
+    data: {
+      isPublic: args?.isPublic,
+      isLocked: args?.isLocked,
+      disableDownVote: args?.disableDownVote,
+      disableUpVote: args?.disableUpVote,
+      isAnonymous: args?.isAnonymous,
+      votesLimit: args?.votesLimit,
+      title: args?.title,
+      timerInProgress: args?.timerInProgress,
+      type: args?.type,
+      currentPhase: args?.currentPhase,
+      endTime: args?.endTime ? new Date(+args.endTime) : new Date(),
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return board;
 };

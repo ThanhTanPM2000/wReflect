@@ -1,7 +1,6 @@
-import { Column, Opinion } from './../../types';
+import { Board, Column, Opinion } from './../../types';
 import { gql } from '@apollo/client';
 import { BOARD_FIELDS } from '../fragments/boardFragment';
-import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createOpinionVars = {
   boardId: string;
@@ -35,6 +34,8 @@ export type updateOpinionResult = {
 };
 
 export type updateOpinionVars = {
+  boardId: string;
+  columnId: string;
   opinionId: string;
   text?: string;
   upVote?: string[];
@@ -46,8 +47,10 @@ export type updateOpinionVars = {
 };
 
 export const updateOpinion = gql`
-  ${OPINION_FIELDS}
+  ${BOARD_FIELDS}
   mutation updateOpinion(
+    $boardId: String!
+    $columnId: String!
     $opinionId: String!
     $text: String
     $upVote: [String]
@@ -58,6 +61,8 @@ export const updateOpinion = gql`
     $status: String
   ) {
     updateOpinion(
+      boardId: $boardId
+      columnId: $columnId
       opinionId: $opinionId
       text: $text
       upVote: $upVote
@@ -67,25 +72,25 @@ export const updateOpinion = gql`
       color: $color
       status: $status
     ) {
-      ...OpinionFields
+      ...BoardFields
     }
   }
 `;
 
 export type removeOpinionResult = {
-  removeOpinion: {
-    count: number;
-  };
+  removeOpinion: Board;
 };
 
 export type removeOpinionVars = {
+  boardId: string;
+  columnId: string;
   opinionId: string;
 };
 
 export const removeOpinion = gql`
   ${BOARD_FIELDS}
-  mutation RemoveOpinion($opinionId: String) {
-    removeOpinion(opinionId: $opinionId) {
+  mutation RemoveOpinion($boardId: String, $columnId: String, $opinionId: String) {
+    removeOpinion(boardId: $boardId, columnId: $columnId, opinionId: $opinionId) {
       ...BoardFields
     }
   }

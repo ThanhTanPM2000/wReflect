@@ -5,7 +5,7 @@ CREATE TYPE "BoardType" AS ENUM ('DEFAULT', 'PHASE');
 CREATE TYPE "PhaseType" AS ENUM ('REFLECT', 'GROUP', 'VOTES', 'DISCUSS');
 
 -- CreateEnum
-CREATE TYPE "OpinionStatus" AS ENUM ('New', 'In-Progress', 'Done', 'Rejected');
+CREATE TYPE "OpinionStatus" AS ENUM ('NEW', 'IN_PROGRESS', 'DONE', 'REJECTED');
 
 -- CreateEnum
 CREATE TYPE "TeamStatus" AS ENUM ('DOING', 'DONE');
@@ -36,6 +36,7 @@ CREATE TABLE "Session" (
 CREATE TABLE "Team" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "ownerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
@@ -85,18 +86,20 @@ CREATE TABLE "Opinion" (
     "id" TEXT NOT NULL,
     "columnId" TEXT,
     "authorId" TEXT NOT NULL,
+    "memberId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "text" TEXT NOT NULL,
     "upVote" TEXT[],
+    "downVote" TEXT[],
     "updatedBy" TEXT NOT NULL,
     "isAction" BOOLEAN NOT NULL DEFAULT false,
     "isBookmarked" BOOLEAN NOT NULL DEFAULT false,
-    "responsible" TEXT,
+    "responsible" TEXT NOT NULL DEFAULT E'not-assigned',
     "mergedAuthors" TEXT[],
     "color" TEXT NOT NULL DEFAULT E'pink',
     "position" INTEGER NOT NULL,
-    "status" "OpinionStatus" NOT NULL DEFAULT E'New',
+    "status" "OpinionStatus" NOT NULL DEFAULT E'NEW',
 
     PRIMARY KEY ("id")
 );
@@ -104,12 +107,12 @@ CREATE TABLE "Opinion" (
 -- CreateTable
 CREATE TABLE "Remark" (
     "id" TEXT NOT NULL,
+    "memberId" TEXT NOT NULL,
     "authorId" TEXT NOT NULL,
     "opinionId" TEXT NOT NULL,
     "text" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT,
 
     PRIMARY KEY ("id")
 );
@@ -161,6 +164,9 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "userStatus" "UserStatus" NOT NULL DEFAULT E'OFFLINE',
+    "name" VARCHAR(100) NOT NULL,
+    "nickname" VARCHAR(150) NOT NULL,
+    "picture" VARCHAR(500) NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -169,9 +175,6 @@ CREATE TABLE "User" (
 CREATE TABLE "UserProfile" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "name" VARCHAR(100) NOT NULL,
-    "nickname" VARCHAR(150) NOT NULL,
-    "picture" VARCHAR(500) NOT NULL,
     "workplace" VARCHAR(300),
     "address" VARCHAR(300),
     "school" VARCHAR(300),
@@ -207,6 +210,9 @@ CREATE UNIQUE INDEX "UserProfile.userId_unique" ON "UserProfile"("userId");
 ALTER TABLE "Session" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Team" ADD FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -216,6 +222,9 @@ ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DEL
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Opinion" ADD FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -223,6 +232,9 @@ ALTER TABLE "Remark" ADD FOREIGN KEY ("opinionId") REFERENCES "Opinion"("id") ON
 
 -- AddForeignKey
 ALTER TABLE "Remark" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Remark" ADD FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "InviteLink" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

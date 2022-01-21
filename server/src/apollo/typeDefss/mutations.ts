@@ -1,4 +1,4 @@
-import { Remark } from '@prisma/client';
+import { Remark, Opinion } from '@prisma/client';
 import { orderOpinionType } from './opinionTypeDefs';
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
@@ -20,6 +20,18 @@ const typeDefs = gql`
   input combineOpinion {
     droppableId: String!
     draggableId: String!
+  }
+
+  enum PhaseType {
+    DEFAULT
+    PHASE
+  }
+
+  enum OpinionStatus {
+    NEW
+    IN_PROGRESS
+    DONE
+    REJECTED
   }
 
   type Mutation {
@@ -46,23 +58,57 @@ const typeDefs = gql`
     deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
 
-    createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Board
+    updateBoard(
+      teamId: String!
+      boardId: String!
+      isPublic: Boolean
+      isLocked: Boolean
+      disableDownVote: Boolean
+      disableUpVote: Boolean
+      isAnonymous: Boolean
+      votesLimit: Int
+      title: String
+      timerInProgress: Boolean
+      type: Boolean
+      currentPhase: PhaseType
+      endTime: String
+    ): Board
+
+    createOpinion(
+      teamId: String!
+      boardId: String!
+      columnId: String!
+      text: String
+      isAction: Boolean
+      isCreateBottom: Boolean
+    ): Board
     updateOpinion(
+      teamId: String!
+      boardId: String!
+      columnId: String!
       opinionId: String!
       text: String
       upVote: [String]
+      downVote: [String]
       isAction: Boolean
       isBookmarked: Boolean
-      responsible: Boolean
+      responsible: String
       color: String
-      status: String
+      status: OpinionStatus
     ): Opinion
-    removeOpinion(opinionId: String): Board
+    removeOpinion(teamId: String!, boardId: String!, columnId: String!, opinionId: String!): Board
     orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): Board
     combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): Board
 
-    createRemark(opinionId: String, text: String): Remark
-    removeRemark(remarkId: String): BatchPayload
+    createRemark(
+      teamId: String!
+      boardId: String!
+      columnId: String!
+      opinionId: String!
+      opinionId: String
+      text: String!
+    ): Opinion
+    removeRemark(teamId: String!, boardId: String!, columnId: String!, opinionId: String!, remarkId: String!): Opinion
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload

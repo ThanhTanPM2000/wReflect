@@ -16,6 +16,7 @@ import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
 import { useSubscription } from '@apollo/client';
 import { BoardSubscription } from './grapql-client/subcriptions';
+import { Footer } from 'antd/lib/layout/layout';
 
 type Props = {
   me: null | User;
@@ -28,7 +29,7 @@ const Routes = ({ me }: Props) => {
   const isLoggedIn = !!me;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  const picture = me?.profile?.picture || null;
+  const picture = me?.picture || null;
 
   return (
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
@@ -77,7 +78,9 @@ const Routes = ({ me }: Props) => {
                     )}
                   </Switch>
                 </Content>
-                {/* <Footer style={{ textAlign: 'center', padding: '0 0' }}>wReflect ©2022</Footer> */}
+                <Footer>
+                  <span>wReflect ©2022</span>
+                </Footer>
               </Layout>
             </>
           ) : (

@@ -31,6 +31,7 @@ export const updateBoard = gql`
         color
         title
         isActive
+        boardId
         opinions {
           id
           columnId
@@ -54,13 +55,9 @@ export const updateBoard = gql`
             updatedAt
             isAdmin
             userStatus
-            profile {
-              id
-              userId
-              name
-              nickname
-              picture
-            }
+            name
+            nickname
+            picture
           }
           position
           remarks {
@@ -75,13 +72,9 @@ export const updateBoard = gql`
               email
               createdAt
               updatedAt
-              profile {
-                id
-                userId
-                name
-                nickname
-                picture
-              }
+              name
+              nickname
+              picture
             }
           }
         }

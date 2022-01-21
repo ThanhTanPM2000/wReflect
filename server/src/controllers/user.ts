@@ -41,6 +41,7 @@ export const me = async (req: RequestWithUserInfo, res: Response): Promise<void 
     setCookie('email', email, oneDayInMilliseconds, res);
     setCookie('token', token, oneDayInMilliseconds, res);
 
+    console.log(sanitizedUser);
     return res.send(sanitizedUser);
   } catch (err) {
     if (err instanceof ZodError) {

@@ -27,6 +27,7 @@ export default function ColumnComponent({ column, board, index, currentNumVotes,
                 currentNumVotes={currentNumVotes}
                 setCurrentNumVotes={setCurrentNumVotes}
                 board={board}
+                column={column}
                 key={opinion?.id}
                 index={index}
                 opinion={opinion}

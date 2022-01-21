@@ -30,8 +30,10 @@ export type Board = {
   isAnonymous: boolean;
   votesLimit: number;
   title: string;
-  timerInProgress: number | null;
-  endTime: number | null;
+  timerInProgress: boolean;
+  type: BoardType;
+  currentPhase: PhaseType;
+  endTime: string;
   team: Team;
   columns: Column[];
 };
@@ -97,9 +99,6 @@ export type Member = {
 export type UserProfile = {
   id: string;
   userId: string;
-  name: string;
-  nickname: string;
-  picture: string;
   workplace: string | null;
   address: string | null;
   school: string | null;
@@ -128,6 +127,8 @@ export type TeamStatus = 'DOING' | 'DONE';
 export type UserStatus = 'ONLINE' | 'OFFLINE';
 export type Gender = 'UNSPECIFIED' | 'MALE' | 'FEMALE';
 export type OpinionStatus = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
+export type BoardType = 'DEFAULT' | 'PHASE';
+export type PhaseType = 'REFLECT' | 'GROUP' | 'VOTES' | 'DISCUSS';
 
 export type User = {
   id: string;
@@ -135,6 +136,9 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   isAdmin: boolean;
+  name: string;
+  nickname: string;
+  picture: string;
   userStatus: UserStatus;
   profile: UserProfile;
   members: [Member];

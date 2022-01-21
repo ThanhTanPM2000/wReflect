@@ -43,13 +43,9 @@ export const BOARD_FIELDS = gql`
           updatedAt
           isAdmin
           userStatus
-          profile {
-            id
-            userId
-            name
-            nickname
-            picture
-          }
+          name
+          nickname
+          picture
         }
         position
         remarks {
@@ -59,6 +55,17 @@ export const BOARD_FIELDS = gql`
           text
           createdAt
           updatedAt
+          author {
+            id
+            email
+            createdAt
+            updatedAt
+            isAdmin
+            userStatus
+            name
+            nickname
+            picture
+          }
         }
       }
       boardId
@@ -92,13 +99,9 @@ export const BOARD_FIELDS = gql`
           isAdmin
           updatedAt
           userStatus
-          profile {
-            id
-            userId
-            name
-            nickname
-            picture
-          }
+          name
+          nickname
+          picture
         }
       }
       boards {

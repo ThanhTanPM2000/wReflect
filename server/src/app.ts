@@ -19,7 +19,7 @@ import config from './config';
 import apiRouter from './apiRouter';
 import { resolvers, typeDefs } from './apollo';
 import sessionManager from './middleware/sessionManager';
-import { pubsub } from './pubSub';
+import depthLimit from 'graphql-depth-limit';
 
 // import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 
@@ -60,20 +60,22 @@ async function startApolloServer(typeDefs, resolvers) {
 
   const server = new ApolloServer({
     schema,
-
     context: ({ req, res }) => ({ req, res }),
     formatError: (err) => {
-      if (err.extensions?.code === `INTERNAL_SERVER_ERROR`) {
-        return new ApolloError('Something failed with server', `${StatusCodes.INTERNAL_SERVER_ERROR}`, {
-          messageDetail: err.message,
-        });
-      } else if (err.extensions?.code === `BAD_USER_INPUT`) {
+      const errorsList = ['403', '404'];
+      if (err.extensions?.code === `BAD_USER_INPUT`) {
         return new ApolloError(`Invalid argument value`, `${StatusCodes.BAD_REQUEST}`, {
           messageDetail: err.message,
         });
+      } else if (errorsList.includes(err?.extensions?.code)) return err;
+      else {
+        return new ApolloError('Something failed with server', `${StatusCodes.INTERNAL_SERVER_ERROR}`, {
+          messageDetail: err.message,
+        });
       }
-      return err;
     },
+    validationRules: [depthLimit(10)],
+    introspection: process.env.NODE_ENV !== 'production',
     plugins: [
       {
         async serverWillStart() {

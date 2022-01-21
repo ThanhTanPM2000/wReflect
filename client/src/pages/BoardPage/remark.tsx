@@ -1,6 +1,6 @@
 import { Dropdown, Input, Menu, Modal } from 'antd';
 import React, { KeyboardEvent, useEffect, useState, useRef } from 'react';
-import { Opinion, Remark } from '../../types';
+import { Opinion, Remark, Column, Board } from '../../types';
 import { EllipsisOutlined, DeleteFilled } from '@ant-design/icons';
 import { useMutation, useApolloClient } from '@apollo/client';
 import { RemarkMutations } from '../../grapql-client/mutations';
@@ -9,12 +9,14 @@ import _ from 'lodash';
 type Props = {
   isOpenRemark: boolean;
   setIsOpenRemark: (closeRemark: boolean) => void;
+  board: Board;
+  column: Column;
   opinion: Opinion;
 };
 
 const { TextArea } = Input;
 
-export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, opinion }: Props) {
+export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, board, column, opinion }: Props) {
   const [textRemark, setTextRemark] = useState('');
   const remarkListRef = useRef<HTMLDivElement>(null);
   const client = useApolloClient();
@@ -36,6 +38,8 @@ export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, opinion
     if (e.currentTarget.value !== '') {
       createRemark({
         variables: {
+          boardId: board.id,
+          columnId: column.id,
           opinionId: opinion.id,
           text: e.currentTarget.value,
         },
@@ -72,7 +76,8 @@ export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, opinion
         {opinion.remarks?.map((remark) => (
           <div key={remark?.id} className="remark">
             <div className="remarkHeader">
-              <p>{remark?.author?.profile?.nickname}</p>
+              {console.log(remark)}
+              <p>{remark?.author?.name}</p>
               <Dropdown
                 overlayStyle={{ width: '180px' }}
                 overlay={
@@ -91,6 +96,9 @@ export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, opinion
                         });
                         removeRemark({
                           variables: {
+                            boardId: board.id,
+                            columnId: column.id,
+                            opinionId: opinion.id,
                             remarkId: remark.id,
                           },
                           onError() {

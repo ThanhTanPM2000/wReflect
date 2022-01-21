@@ -10,6 +10,7 @@ import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from '@apollo/client/link/error';
 import { message } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { Opinion, Team } from './types';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
@@ -69,6 +70,25 @@ const client = new ApolloClient({
                 __typename: 'Board',
                 id: args?.boardId,
               });
+            },
+            merge: true,
+          },
+        },
+      },
+      Column: {
+        fields: {
+          opinions: {
+            merge(existing = [], incoming: Opinion[]) {
+              return [...incoming];
+            },
+          },
+        },
+      },
+      Board: {
+        fields: {
+          team: {
+            merge(existing: Team) {
+              return existing ?? null;
             },
           },
         },

@@ -20,6 +20,7 @@ Table Session {
 Table Team {
   id String [pk]
   name String [not null]
+  ownerId String [not null]
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
@@ -30,6 +31,7 @@ Table Team {
   members Member [not null]
   InviteLink InviteLink [not null]
   boards Board [not null]
+  Owner User [not null]
 }
 
 Table Board {
@@ -67,25 +69,29 @@ Table Opinion {
   id String [pk]
   columnId String
   authorId String [not null]
+  memberId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   text String [not null]
   upVote String [not null]
+  downVote String [not null]
   updatedBy String [not null]
   isAction Boolean [not null, default: false]
   isBookmarked Boolean [not null, default: false]
-  responsible String
+  responsible String [not null, default: 'not-assigned']
   mergedAuthors String [not null]
   color String [not null, default: 'pink']
   position Int [not null]
   status OpinionStatus [not null, default: 'NEW']
   author User [not null]
+  member Member [not null]
   column Column
   remarks Remark [not null]
 }
 
 Table Remark {
   id String [pk]
+  memberId String [not null]
   authorId String [not null]
   opinionId String [not null]
   text String [not null]
@@ -93,7 +99,7 @@ Table Remark {
   updatedAt DateTime [not null]
   opinion Opinion [not null]
   author User [not null]
-  userId String
+  member Member [not null]
 }
 
 Table InviteLink {
@@ -118,6 +124,8 @@ Table Member {
   role String
   user User [not null]
   team Team [not null]
+  Opinion Opinion [not null]
+  Remark Remark [not null]
 
   indexes {
     (userId, teamId) [unique]
@@ -141,10 +149,14 @@ Table User {
   updatedAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
   userStatus UserStatus [not null, default: 'OFFLINE']
+  name String [not null]
+  nickname String [not null]
+  picture String [not null]
   session Session [not null]
   profile UserProfile
   members Member [not null]
   Notification Notification [not null]
+  Team Team [not null]
   Opinion Opinion [not null]
   Remark Remark [not null]
 }
@@ -152,9 +164,6 @@ Table User {
 Table UserProfile {
   id String [pk]
   userId String [not null]
-  name String [not null]
-  nickname String [not null]
-  picture String [not null]
   workplace String
   address String
   school String
@@ -212,17 +221,23 @@ Enum UserStatus {
 
 Ref: Session.userId > User.id
 
+Ref: Team.ownerId > User.id
+
 Ref: Board.teamId > Team.id
 
 Ref: Column.boardId > Board.id
 
 Ref: Opinion.authorId > User.id
 
+Ref: Opinion.memberId > Member.id
+
 Ref: Opinion.columnId > Column.id
 
 Ref: Remark.opinionId > Opinion.id
 
 Ref: Remark.authorId > User.id
+
+Ref: Remark.memberId > Member.id
 
 Ref: InviteLink.teamId > Team.id
 

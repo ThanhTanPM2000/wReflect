@@ -10,15 +10,23 @@ const typeDefs = gql`
     updatedAt: String
     opinion: Opinion
     author: User
+    member: Member
   }
 `;
 
 export type createRemarkType = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
   opinionId: string;
   text: string;
 };
 
 export type removeRemarkType = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
+  opinionId: string;
   remarkId: string;
 };
 

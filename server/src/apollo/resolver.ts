@@ -13,23 +13,13 @@ import {
 } from './typeDefss/opinionTypeDefs';
 import { pubsub } from '../pubSub';
 import logger from '../logger';
+import { updateBoardType } from './typeDefss/boardTypeDefs';
 
 const resolvers = {
   Query: {
-    getTeamIds: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id, isAdmin } = req?.user;
-      const result = await team.getTeams(true, 1, 8, '', undefined, isAdmin ? undefined : id);
-      const sanitizedTeams = result.data.map((team) => ({
-        id: team.id,
-        name: team.name,
-        picture: team.picture,
-        boards: team.boards,
-      }));
-      return sanitizedTeams;
-    },
     teams: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id, isAdmin } = req?.user;
-      const { status, isGettingAll, search, page, size } = args?.input;
+      const { status, isGettingAll, search, page, size } = args;
       const result = await team.getTeams(!!isGettingAll, page, size, search, status, isAdmin ? undefined : id);
       return result;
     },
@@ -42,19 +32,17 @@ const resolvers = {
     },
 
     boards: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req.user;
-      return await board.getListBoardOfTeam(meId, args.teamId);
+      return await board.getListBoardOfTeam(req, args.teamId);
     },
 
     board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req.user;
-      return await board.getBoard(meId, args.boardId);
+      const myBoard = await board.getBoard(req, args.boardId);
+      return myBoard;
     },
   },
   Mutation: {
     createTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const myTeam = await team.createTeam(meId, args);
+      const myTeam = await team.createTeam(req, args);
       pubsub.publish('CREATE_TEAM', {
         createdTeam: myTeam,
       });
@@ -62,17 +50,22 @@ const resolvers = {
       return myTeam;
     },
     updateTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      return await team.updateTeam(meId, args);
+      return await team.updateTeam(req, args);
     },
     deleteTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      return await team.deleteTeam(meId, args?.teamId);
+      return await team.deleteTeam(req, args?.teamId);
     },
     changeTeamAccess: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
       const { teamId, isPublic } = args;
-      return await team.changeTeamAccess(meId, teamId, isPublic);
+      return await team.changeTeamAccess(req, teamId, isPublic);
+    },
+
+    updateBoard: async (_, args: updateBoardType, { req }: { req: RequestWithUserInfo }) => {
+      const myBoard = await board.updateBoard(req, args);
+      pubsub.publish('UPDATE_BOARD', {
+        updateBoard: myBoard,
+      });
+      return myBoard;
     },
 
     addMembers: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -97,41 +90,35 @@ const resolvers = {
     },
 
     createOpinion: async (_, args: createOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const data = await opinion.createOpinion(meId, args);
+      const data = await opinion.createOpinion(req, args);
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: data?.board,
       });
       return data?.board;
     },
     updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const myOpinion = await opinion.updateOpinion(meId, args);
+      const myOpinion = await opinion.updateOpinion(req, args);
       pubsub.publish('UPDATE_OPINION', {
-        updateOpinion: myOpinion,
+        updateOpinion: { ...myOpinion },
       });
       return myOpinion;
     },
     removeOpinion: async (_, args: removeOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const board = await opinion.removeOpinion(meId, args);
+      const board = await opinion.removeOpinion(req, args);
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: board,
       });
       return board;
     },
     orderOpinion: async (_, args: orderOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const board = await opinion.orderOpinion(meId, args);
-      console.log(board);
-      pubsub.publish('UPDATE_BOARD', {
+      const board = await opinion.orderOpinion(req, args);
+      pubsub.publish('ORDER_OPINION', {
         updateBoard: board,
       });
       return board;
     },
     combineOpinion: async (_, args: combineOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const board = await opinion.combineOpinion(meId, args);
+      const board = await opinion.combineOpinion(req, args);
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: board,
       });
@@ -139,21 +126,26 @@ const resolvers = {
     },
 
     createRemark: async (_, args: createRemarkType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      await remark.createRemark(meId, args);
+      const opinion = await remark.createRemark(req, args);
+      pubsub.publish('UPDATE_OPINION', {
+        updateOpinion: { ...opinion },
+      });
+      return opinion;
     },
     removeRemark: async (_, args: removeRemarkType, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      await remark.removeRemark(meId, args);
+      const opinion = await remark.removeRemark(req, args);
+      pubsub.publish('UPDATE_OPINION', {
+        updateOpinion: { ...opinion },
+      });
+      return opinion;
     },
   },
   Subscription: {
     updateBoard: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator('UPDATE_BOARD'),
+        () => pubsub.asyncIterator(['UPDATE_BOARD', 'ORDER_OPINION']),
         (_, args) => {
           return true;
-          // return !!_?.updateBoard?.team?.members?.find((member) => member?.userId == args?.meId);
         },
       ),
     },
@@ -161,8 +153,7 @@ const resolvers = {
       subscribe: withFilter(
         () => pubsub.asyncIterator('UPDATE_OPINION'),
         (_, args) => {
-          console.log(_?.updateOpinion?.id === args?.opinionId);
-          return _?.updateOpinion.id === args?.opinionId;
+          return true;
         },
       ),
     },
@@ -176,8 +167,7 @@ const resolvers = {
   },
   Team: {
     boards: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req.user;
-      const boards = await board.getListBoardOfTeam(meId, _.id);
+      const boards = await board.getListBoardOfTeam(req, _.id);
       return boards;
     },
     members: async (_) => {
@@ -198,8 +188,7 @@ const resolvers = {
   },
   Column: {
     board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req.user;
-      const myBoard = await board.getBoard(meId, _?.boarId);
+      const myBoard = await board.getBoard(req, _?.boarId);
       return myBoard;
     },
     opinions: async (_) => {
@@ -216,8 +205,11 @@ const resolvers = {
       const remarks = await remark.getListRemarks(_?.id);
       return remarks;
     },
-    author: async (_, args) => {
+    author: async (_) => {
       return await user.getUser(_.authorId);
+    },
+    member: async (_) => {
+      return await member.getMember(_.authorId);
     },
   },
   Remark: {
@@ -225,8 +217,11 @@ const resolvers = {
       const myOpinion = await opinion.getOpinion(_?.opinionId);
       return myOpinion;
     },
-    author: async (_) => {
+    author: async (_, args) => {
       return await user.getUser(_.authorId);
+    },
+    member: async (_) => {
+      return await member.getMember(_.authorId);
     },
   },
   Member: {

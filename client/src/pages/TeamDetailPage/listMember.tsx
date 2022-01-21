@@ -110,16 +110,12 @@ export default function ListMember({ searchText, teamData }: Props) {
               }
             >
               <List.Item.Meta
-                avatar={
-                  <Avatar
-                    src={member?.user?.profile?.picture || `${config.SERVER_BASE_URL}/uploads/avatarDefault.png`}
-                  />
-                }
+                avatar={<Avatar src={member?.user?.picture || `${config.SERVER_BASE_URL}/uploads/avatarDefault.png`} />}
                 title={
                   member?.isPendingInvitation ? (
                     'Pending Invitation'
                   ) : (
-                    <a href="https://ant.design">{member?.user?.profile?.nickname || 'Unknown'}</a>
+                    <a href="https://ant.design">{member?.user?.nickname || 'Unknown'}</a>
                   )
                 }
                 description={member?.user?.email}
