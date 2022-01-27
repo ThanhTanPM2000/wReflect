@@ -21,6 +21,7 @@ export const BOARD_FIELDS = gql`
       color
       title
       isActive
+      position
       opinions {
         id
         columnId

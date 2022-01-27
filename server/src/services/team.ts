@@ -126,12 +126,28 @@ export const createTeam = async (req: RequestWithUserInfo, data: createTeamType)
               data: [
                 {
                   title: 'Went Well',
+                  isActive: true,
+                  position: 1,
                 },
                 {
                   title: 'To Improve',
+                  isActive: true,
+                  position: 2,
                 },
                 {
                   title: 'Action Items',
+                  isActive: true,
+                  position: 3,
+                },
+                {
+                  title: '',
+                  isActive: false,
+                  position: 4,
+                },
+                {
+                  title: '',
+                  isActive: false,
+                  position: 5,
                 },
               ],
             },
@@ -219,3 +235,7 @@ export const deleteTeam = async (req: RequestWithUserInfo, teamId: string) => {
   if (!batchPayload) throw new ForbiddenError(`You are not the owner of Team ${teamId}`);
   return batchPayload;
 };
+
+// export const createBoard = async (req: RequestWithUserInfo, teamId: string) => {
+//   const {id: }
+// }

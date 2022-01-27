@@ -58,20 +58,11 @@ model Board {
   currentColumnId String?
   title           String
   timerInProgress Boolean   @default(false)
-  type            BoardType @default(DEFAULT)
+  type            BoardType @default(PHASE)
   currentPhase    PhaseType @default(REFLECT)
   endTime         DateTime?
   team            Team      @relation(fields: [teamId], references: [id])
-  column1Id       String?
-  column2Id       String?
-  column3Id       String?
-  column4Id       String?
-  column5Id       String?
-  column1         Column?   @relation("column1", fields: [column1Id], references: [id])
-  column2         Column?   @relation("column2", fields: [column2Id], references: [id])
-  column3         Column?   @relation("column3", fields: [column3Id], references: [id])
-  column4         Column?   @relation("column4", fields: [column4Id], references: [id])
-  column5         Column?   @relation("column5", fields: [column5Id], references: [id])
+  columns         Column[]
 }
 
 enum BoardType {
@@ -87,18 +78,14 @@ enum PhaseType {
 }
 
 model Column {
-  id             String    @id @default(uuid())
-  color          String    @default("white")
-  title          String
-  isActive       Boolean   @default(true)
-  opinions       Opinion[]
-  boardId        String
-  column1OfBoard Board[]   @relation("column1")
-  column2OfBoard Board[]   @relation("column2")
-  column3OfBoard Board[]   @relation("column3")
-  column4OfBoard Board[]   @relation("column4")
-  column5OfBoard Board[]   @relation("column5")
-
+  id       String    @id @default(uuid())
+  color    String    @default("white")
+  title    String
+  isActive Boolean   @default(true)
+  position Int
+  opinions Opinion[]
+  boardId  String
+  board    Board     @relation(fields: [boardId], references: [id])
 }
 
 model Opinion {

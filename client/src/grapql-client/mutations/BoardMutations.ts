@@ -20,6 +20,16 @@ export type updateBoardVars = {
   type?: BoardType;
   currentPhase?: PhaseType;
   endTime?: string;
+  column1?: string;
+  column2?: string;
+  column3?: string;
+  column4?: string;
+  column5?: string;
+  isActiveCol1?: boolean;
+  isActiveCol2?: boolean;
+  isActiveCol3?: boolean;
+  isActiveCol4?: boolean;
+  isActiveCol5?: boolean;
 };
 
 const updateBoard = gql`
@@ -35,9 +45,19 @@ const updateBoard = gql`
     $votesLimit: Int
     $title: String
     $timerInProgress: Boolean
-    $type: Boolean
+    $type: BoardType
     $currentPhase: PhaseType
     $endTime: String
+    $column1: String
+    $column2: String
+    $column3: String
+    $column4: String
+    $column5: String
+    $isActiveCol1: Boolean
+    $isActiveCol2: Boolean
+    $isActiveCol3: Boolean
+    $isActiveCol4: Boolean
+    $isActiveCol5: Boolean
   ) {
     updateBoard(
       teamId: $teamId
@@ -53,6 +73,16 @@ const updateBoard = gql`
       type: $type
       currentPhase: $currentPhase
       endTime: $endTime
+      column1: $column1
+      column2: $column2
+      column3: $column3
+      column4: $column4
+      column5: $column5
+      isActiveCol1: $isActiveCol1
+      isActiveCol2: $isActiveCol2
+      isActiveCol3: $isActiveCol3
+      isActiveCol4: $isActiveCol4
+      isActiveCol5: $isActiveCol5
     ) {
       ...BoardFields
     }

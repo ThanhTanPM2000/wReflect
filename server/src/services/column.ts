@@ -5,6 +5,9 @@ export const getListColumns = (boardId: string) => {
     where: {
       boardId,
     },
+    orderBy: {
+      position: 'asc',
+    },
   });
   return columns;
 };

@@ -64,14 +64,17 @@ export type getTeamsResult = {
   };
 };
 
+enum statusOfTeam {
+  DOING,
+  DONE,
+}
+
 export type getTeamsVars = {
-  input: {
-    status?: string;
-    isGettingAll?: boolean;
-    search?: string;
-    page?: number;
-    size?: number;
-  };
+  status?: statusOfTeam;
+  isGettingAll?: boolean;
+  search?: string;
+  page?: number;
+  size?: number;
 };
 
 const getTeams = gql`

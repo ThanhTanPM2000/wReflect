@@ -37,8 +37,6 @@ const Team = () => {
     </>
   );
 
-  
-
   return (
     <div className="flex-1 site-layout-background card" style={{ padding: 24 }}>
       <Tabs

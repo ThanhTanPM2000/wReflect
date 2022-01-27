@@ -61,9 +61,10 @@ CREATE TABLE "Board" (
     "disableUpVote" BOOLEAN NOT NULL DEFAULT false,
     "isAnonymous" BOOLEAN NOT NULL DEFAULT false,
     "votesLimit" INTEGER NOT NULL DEFAULT 25,
+    "currentColumnId" TEXT,
     "title" TEXT NOT NULL,
     "timerInProgress" BOOLEAN NOT NULL DEFAULT false,
-    "type" "BoardType" NOT NULL DEFAULT E'DEFAULT',
+    "type" "BoardType" NOT NULL DEFAULT E'PHASE',
     "currentPhase" "PhaseType" NOT NULL DEFAULT E'REFLECT',
     "endTime" TIMESTAMP(3),
 
@@ -76,6 +77,7 @@ CREATE TABLE "Column" (
     "color" TEXT NOT NULL DEFAULT E'white',
     "title" TEXT NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "position" INTEGER NOT NULL,
     "boardId" TEXT NOT NULL,
 
     PRIMARY KEY ("id")
@@ -216,7 +218,7 @@ ALTER TABLE "Team" ADD FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE
 ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

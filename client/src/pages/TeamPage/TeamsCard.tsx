@@ -4,7 +4,7 @@ import { Card, Col, Avatar, Row, Pagination, PageHeader, Empty } from 'antd';
 
 import { NetworkStatus, useLazyQuery, useQuery, useSubscription } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
-import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined, AimOutlined } from '@ant-design/icons';
 import { Member, Team, Teams, TeamStatus } from '../../types';
 import { Loading } from '../../components/Loading';
 import { TeamMutations } from '../../grapql-client/mutations';
@@ -36,12 +36,10 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
     TeamQueries.getTeamsResult,
     TeamQueries.getTeamsVars
   >(TeamQueries.getTeams, {
-    variables: { input: { status, isGettingAll: false, search: searchText, page, size } },
+    variables: { isGettingAll: false, search: searchText, page, size },
     fetchPolicy: 'cache-first', // Used for first execution
     notifyOnNetworkStatusChange: true,
   });
-
-  console.log('teams is ', data?.teams);
 
   const onAddMember = () => {
     setVisibleModal(true);
@@ -96,9 +94,15 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                         size="small"
                         loading={loading}
                         actions={[
-                          <SettingOutlined key="setting" />,
-                          <UsergroupAddOutlined key="edit" onClick={() => onAddMember()} />,
-                          <EllipsisOutlined key="ellipsis" />,
+                          <AimOutlined
+                            key="reflect"
+                            onClick={() => history.push(`/board/${team.id}/${team.boards[0].id}`)}
+                          />,
+                          <SettingOutlined key="setting" onClick={() => history.push(`/manage-board/${team.id}`)} />,
+                          <UsergroupAddOutlined
+                            key="edit"
+                            onClick={() => history.push(`/manage-members/${team.id}`)}
+                          />,
                         ]}
                       >
                         <>

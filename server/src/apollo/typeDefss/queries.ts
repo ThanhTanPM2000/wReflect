@@ -1,12 +1,6 @@
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
-  # input TeamsInput {
-  #   status: String @constraint(pattern: "^(DOING|DONE)$")
-  #   isGettingAll: Boolean
-  #   search: String
-  #   page: Int
-  #   size: Int
-  # }
+  
 
   type Teams {
     data: [Team]

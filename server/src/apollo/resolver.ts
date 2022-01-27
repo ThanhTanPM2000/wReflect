@@ -13,7 +13,7 @@ import {
 } from './typeDefss/opinionTypeDefs';
 import { pubsub } from '../pubSub';
 import logger from '../logger';
-import { updateBoardType } from './typeDefss/boardTypeDefs';
+import { updateBoardType, createBoardType } from './typeDefss/boardTypeDefs';
 
 const resolvers = {
   Query: {
@@ -59,6 +59,10 @@ const resolvers = {
       const { teamId, isPublic } = args;
       return await team.changeTeamAccess(req, teamId, isPublic);
     },
+
+    // createBoard: async (_, args:createBoardType, {req}: {req: RequestWithUserInfo} ) => {
+    //   const myTeam = await team.
+    // },
 
     updateBoard: async (_, args: updateBoardType, { req }: { req: RequestWithUserInfo }) => {
       const myBoard = await board.updateBoard(req, args);

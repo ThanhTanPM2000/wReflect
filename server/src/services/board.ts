@@ -112,9 +112,61 @@ export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardTyp
       type: args?.type,
       currentPhase: args?.currentPhase,
       endTime: args?.endTime ? new Date(+args.endTime) : new Date(),
+      columns: {
+        updateMany: [
+          {
+            where: {
+              position: 1,
+            },
+            data: {
+              title: args?.column1,
+              isActive: args?.isActiveCol1,
+            },
+          },
+          {
+            where: {
+              position: 2,
+            },
+            data: {
+              title: args?.column2,
+              isActive: args?.isActiveCol2,
+            },
+          },
+          {
+            where: {
+              position: 3,
+            },
+            data: {
+              title: args?.column3,
+              isActive: args?.isActiveCol3,
+            },
+          },
+          {
+            where: {
+              position: 4,
+            },
+            data: {
+              title: args?.column4,
+              isActive: args?.isActiveCol4,
+            },
+          },
+          {
+            where: {
+              position: 5,
+            },
+            data: {
+              title: args?.column5,
+              isActive: args?.isActiveCol5,
+            },
+          },
+        ],
+      },
     },
     include: {
       columns: {
+        orderBy: {
+          position: 'asc',
+        },
         include: {
           opinions: {
             include: {

@@ -646,12 +646,22 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         color: #6d7982;
         cursor: auto; }
 
-.configBoard .configColumn {
-  margin-top: 10px;
+.configBoard .listColumn {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   gap: 10px; }
+  .configBoard .listColumn .configColumn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px; }
+
+.configBoard .buttonGenerate {
+  margin-top: 20px;
+  text-align: center; }
+
+.configBoard .fieldsConfig {
+  margin-top: 10px; }
 
 .sidebar .ant-layout-logo {
   height: 32px;

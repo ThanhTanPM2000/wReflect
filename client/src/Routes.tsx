@@ -15,6 +15,7 @@ import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
 import { Footer } from 'antd/lib/layout/layout';
+import TeamDetail from './pages/TeamDetailPage/teamDetail';
 
 type Props = {
   me: null | User;
@@ -60,6 +61,10 @@ const Routes = ({ me }: Props) => {
                               render={({ match }) => (
                                 <Board teamId={match.params.teamId} boardId={match.params.boardId} />
                               )}
+                            />
+                            <Route
+                              path="/team-details/:teamId"
+                              render={({ match }) => <TeamDetail teamId={match.params.teamId} />}
                             />
                             <Route path="/me" component={ProfileUser} />
                             <Route path="/account" component={AccountSetting} />

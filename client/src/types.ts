@@ -44,6 +44,7 @@ export type Column = {
   title: string;
   isActive: boolean;
   boardId: string;
+  position: number;
   board: Board;
   opinions: Opinion[];
 };

@@ -31,7 +31,6 @@ export default function manageMembers({ teamId }: Props) {
 
   const history = useHistory();
   const me = useContext(SelfContext);
-  console.log(teamId);
 
   const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
     TeamQueries.getTeam,
@@ -64,7 +63,6 @@ export default function manageMembers({ teamId }: Props) {
                   <AddTeamMembers teamData={data.team} />
                 </div>
               </>
-              {/* <AddMembersModal isVisible={isVisibleAddMemModal} teamId={teamId} setIsVisible={setIsVisibleAddMemModal} /> */}
               <EditTeamDetailModal
                 isVisible={isVisibleEditDetails}
                 teamData={data.team}

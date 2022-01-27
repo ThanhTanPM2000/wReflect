@@ -65,7 +65,7 @@ const TopNavBar = ({ title, team, boardId }: Props) => {
               Board
             </Button>
           </Link>,
-          <Link key="1" style={{ textDecoration: 'none' }} to="/manage-members/{teamId}">
+          <Link key="1" style={{ textDecoration: 'none' }} to={`/team-details/${team?.id}`}>
             <Button type={title == 'Setting' ? 'primary' : undefined} key="1">
               Details
             </Button>

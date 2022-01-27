@@ -58,6 +58,32 @@ const typeDefs = gql`
     deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
 
+    createBoard(
+      teamId: String!
+      boardId: String!
+      isPublic: Boolean
+      isLocked: Boolean
+      disableDownVote: Boolean
+      disableUpVote: Boolean
+      isAnonymous: Boolean
+      votesLimit: Int
+      title: String
+      timerInProgress: Boolean
+      type: BoardType
+      currentPhase: PhaseType
+      endTime: String
+      column1: String
+      column2: String
+      column3: String
+      column4: String
+      column5: String
+      isActiveCol1: Boolean
+      isActiveCol2: Boolean
+      isActiveCol3: Boolean
+      isActiveCol4: Boolean
+      isActiveCol5: Boolean
+    ): Team
+
     updateBoard(
       teamId: String!
       boardId: String!
@@ -69,9 +95,19 @@ const typeDefs = gql`
       votesLimit: Int
       title: String
       timerInProgress: Boolean
-      type: Boolean
+      type: BoardType
       currentPhase: PhaseType
       endTime: String
+      column1: String
+      column2: String
+      column3: String
+      column4: String
+      column5: String
+      isActiveCol1: Boolean
+      isActiveCol2: Boolean
+      isActiveCol3: Boolean
+      isActiveCol4: Boolean
+      isActiveCol5: Boolean
     ): Board
 
     createOpinion(

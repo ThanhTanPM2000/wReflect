@@ -5,7 +5,7 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useHistory } from 'react-router-dom';
 
 import { useMutation, useQuery, useApolloClient, useSubscription } from '@apollo/client';
-import { BoardQueries } from '../../grapql-client/queries';
+import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
 import ColumnComponent from './column';
 import { BoardMutations, ColumnMutations, OpinionMutations } from '../../grapql-client/mutations';
 import {
@@ -28,6 +28,7 @@ import { TopNavBar } from '../../components/TopNavBar';
 import { BoardSubscription } from '../../grapql-client/subcriptions';
 import ConfigTimeTrackingModal from './configTimeTrackingModal';
 import { CountDown } from '../../components/CountDown';
+import { Board } from '../../types';
 
 type Props = {
   teamId: string;
@@ -35,22 +36,38 @@ type Props = {
 };
 
 export default function board({ teamId, boardId }: Props) {
-  const { loading, data, error, refetch } = useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(
-    BoardQueries.getBoard,
-    {
-      variables: { boardId },
-    },
-  );
-
+  const [board, setBoard] = useState<Board | null>(null);
   const [isBoardPanelActive, setIsBoardPanelActive] = useState(false);
-  const [isBoardModalVisible, setBoardModalVisible] = useState(false);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isTimeTrackingModalVisible, setTimeTrackingModalVisible] = useState(false);
   const history = useHistory();
   const client = useApolloClient();
   const me = useContext(selfContext);
   const [currentNumVotes, setCurrentNumVotes] = useState(0);
 
-  const iMember = data?.board?.team?.members.find((member) => member.userId === me?.id);
+  // const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
+  //   BoardQueries.getBoard,
+  //   {
+  //     variables: { teamId },
+  //     onCompleted: (data) => {
+  //       if (data?.team?.boards && data?.team?.boards?.length > 0)
+  //         setBoard(data.team.boards?.find((board: Board) => board.id === boardId) ?? null);
+  //     },
+  //   },
+  // );
+
+  const { loading, data, error, refetch } = useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(
+    BoardQueries.getBoard,
+    {
+      variables: { boardId },
+      onCompleted: (data) => {
+        setBoard(data?.board);
+      },
+    },
+  );
+
+  const iMember = board?.team?.members.find((member) => member.userId === me?.id);
 
   me?.id &&
     useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
@@ -63,7 +80,7 @@ export default function board({ teamId, boardId }: Props) {
     );
 
   useEffect(() => {
-    const value = data?.board?.columns?.reduce(
+    const value = board?.columns?.reduce(
       (prev, curr) =>
         prev +
         curr.opinions.reduce((prevOp, currOp) => prevOp + currOp.upVote.filter((id) => id === iMember?.id).length, 0),
@@ -87,8 +104,8 @@ export default function board({ teamId, boardId }: Props) {
   );
 
   const handleOnDragEnd = async (result: DropResult) => {
-    const prevList = _.cloneDeep(data?.board?.columns);
-    const tempList = _.cloneDeep(data?.board?.columns);
+    const prevList = _.cloneDeep(board?.columns);
+    const tempList = _.cloneDeep(board?.columns);
     if (result.combine) {
       let combineText = '';
       const currentColumn = tempList?.find((column) => column.id === result.combine?.droppableId);
@@ -157,7 +174,7 @@ export default function board({ teamId, boardId }: Props) {
           boardId,
         },
         data: {
-          board: { ...data?.board, columns: tempList },
+          board: { ...board, columns: tempList },
         },
       });
 
@@ -184,27 +201,24 @@ export default function board({ teamId, boardId }: Props) {
 
   return (
     <>
-      <TopNavBar team={data?.board?.team} boardId={boardId} title="Do Reflect" />
-      <Loading refetch={refetch} data={data?.board} loading={loading} error={error}>
+      <TopNavBar team={board?.team} boardId={boardId} title="Do Reflect" />
+      <Loading refetch={refetch} data={board} loading={loading} error={error}>
         <>
-          {data && data?.board ? (
+          {data && board ? (
             <>
-              <ConfigBoardModal board={data?.board} setVisible={setBoardModalVisible} visible={isBoardModalVisible} />
+              <ConfigBoardModal setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
+              <ConfigBoardModal board={board} setVisible={setIsUpdateModalVisible} visible={isUpdateModalVisible} />
               <ConfigTimeTrackingModal
-                boardData={data?.board}
+                boardData={board}
                 setVisible={setTimeTrackingModalVisible}
                 visible={isTimeTrackingModalVisible}
               />
               <div className="boardTools">
                 <div className="countDown">
-                  {data.board.timerInProgress && data.board.endTime ? (
-                    <CountDown endTime={data.board.endTime} />
-                  ) : (
-                    '--:--:--'
-                  )}
+                  {board.timerInProgress && board.endTime ? <CountDown endTime={board.endTime} /> : '--:--:--'}
                 </div>
-                {data?.board?.currentPhase === 'VOTES' && (
-                  <div className="currentLimitVotes">Votes {`${currentNumVotes}/${data?.board?.votesLimit}`}</div>
+                {board?.currentPhase === 'VOTES' && (
+                  <div className="currentLimitVotes">Votes {`${currentNumVotes}/${board?.votesLimit}`}</div>
                 )}
                 <div className={`board-action ${isBoardPanelActive && 'active'}`}>
                   <div className="boardPanel" onClick={() => setIsBoardPanelActive(!isBoardPanelActive)}>
@@ -219,13 +233,15 @@ export default function board({ teamId, boardId }: Props) {
                     <ul>
                       <li>
                         <PlusCircleOutlined className="boardPanelIcon " />
-                        <a className="addBoard" onClick={() => setBoardModalVisible(true)}>
+                        <a className="addBoard" onClick={() => setIsCreateModalVisible(true)}>
                           Create New Board
                         </a>
                       </li>
                       <li>
                         <EditOutlined className="boardPanelIcon " />
-                        <a className="editBoard">Edit Board</a>
+                        <a className="editBoard" onClick={() => setIsUpdateModalVisible(true)}>
+                          Edit Board
+                        </a>
                       </li>
                     </ul>
                   </div>
@@ -241,7 +257,7 @@ export default function board({ teamId, boardId }: Props) {
                       }}
                       maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
                     >
-                      {data?.board?.team?.members?.map((member) => (
+                      {board?.team?.members?.map((member) => (
                         <div onClick={() => history.push(`/manage-members/${teamId}`)} key={member?.user?.email}>
                           {member.isOwner ? (
                             <Badge offset={[-15, -3]} count={<CrownFilled style={{ color: '#F79C2D' }} />}>
@@ -273,7 +289,7 @@ export default function board({ teamId, boardId }: Props) {
                   <div className="phase-header" style={{ cursor: iMember?.isOwner ? 'pointer' : 'not-allowed' }}>
                     <div className="board-phase">
                       <div
-                        className={`phase-step ${data?.board?.currentPhase === 'REFLECT' && 'active'}`}
+                        className={`phase-step ${board?.currentPhase === 'REFLECT' && 'active'}`}
                         onClick={() => {
                           if (iMember?.isOwner)
                             updateBoard({
@@ -290,7 +306,7 @@ export default function board({ teamId, boardId }: Props) {
                         Reflect
                       </div>
                       <div
-                        className={`phase-step ${data?.board?.currentPhase === 'GROUP' && 'active'}`}
+                        className={`phase-step ${board?.currentPhase === 'GROUP' && 'active'}`}
                         onClick={() => {
                           if (iMember?.isOwner)
                             updateBoard({
@@ -307,7 +323,7 @@ export default function board({ teamId, boardId }: Props) {
                         Group
                       </div>
                       <div
-                        className={`phase-step ${data?.board?.currentPhase === 'VOTES' && 'active'}`}
+                        className={`phase-step ${board?.currentPhase === 'VOTES' && 'active'}`}
                         onClick={() => {
                           if (iMember?.isOwner)
                             updateBoard({
@@ -324,7 +340,7 @@ export default function board({ teamId, boardId }: Props) {
                         Votes
                       </div>
                       <div
-                        className={`phase-step ${data?.board?.currentPhase === 'DISCUSS' && 'active'}`}
+                        className={`phase-step ${board?.currentPhase === 'DISCUSS' && 'active'}`}
                         onClick={() => {
                           if (iMember?.isOwner)
                             updateBoard({
@@ -343,7 +359,7 @@ export default function board({ teamId, boardId }: Props) {
                     </div>
                     {iMember?.isOwner && (
                       <>
-                        {!data?.board?.timerInProgress ? (
+                        {!board?.timerInProgress ? (
                           <div className="phase-action-btn" onClick={() => setTimeTrackingModalVisible(true)}>
                             <>
                               <FieldTimeOutlined />
@@ -375,18 +391,20 @@ export default function board({ teamId, boardId }: Props) {
 
               <div className="board flex flex-dir-r">
                 <DragDropContext onDragEnd={handleOnDragEnd}>
-                  {data?.board?.columns?.map((column, index) => {
-                    return (
-                      <ColumnComponent
-                        iMember={iMember}
-                        currentNumVotes={currentNumVotes}
-                        setCurrentNumVotes={setCurrentNumVotes}
-                        board={data?.board}
-                        index={index}
-                        key={column.id}
-                        column={column}
-                      />
-                    );
+                  {board?.columns?.map((column, index) => {
+                    if (column.isActive) {
+                      return (
+                        <ColumnComponent
+                          iMember={iMember}
+                          currentNumVotes={currentNumVotes}
+                          setCurrentNumVotes={setCurrentNumVotes}
+                          board={board}
+                          index={index}
+                          key={column.id}
+                          column={column}
+                        />
+                      );
+                    }
                   })}
                 </DragDropContext>
               </div>

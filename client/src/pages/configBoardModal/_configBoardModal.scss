@@ -1,9 +1,21 @@
 .configBoard {
-  .configColumn {
-    margin-top: 10px;
+  .listColumn {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
+
+    .configColumn {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+  .buttonGenerate {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .fieldsConfig {
+    margin-top: 10px;
   }
 }

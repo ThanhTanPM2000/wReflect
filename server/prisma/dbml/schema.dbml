@@ -46,9 +46,10 @@ Table Board {
   disableUpVote Boolean [not null, default: false]
   isAnonymous Boolean [not null, default: false]
   votesLimit Int [not null, default: 25]
+  currentColumnId String
   title String [not null]
   timerInProgress Boolean [not null, default: false]
-  type BoardType [not null, default: 'DEFAULT']
+  type BoardType [not null, default: 'PHASE']
   currentPhase PhaseType [not null, default: 'REFLECT']
   endTime DateTime
   team Team [not null]
@@ -60,6 +61,7 @@ Table Column {
   color String [not null, default: 'white']
   title String [not null]
   isActive Boolean [not null, default: true]
+  position Int [not null]
   opinions Opinion [not null]
   boardId String [not null]
   board Board [not null]

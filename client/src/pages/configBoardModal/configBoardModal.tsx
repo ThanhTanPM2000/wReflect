@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Form, Input, Select, InputNumber, Switch } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Modal, Button, Form, Input, Select, InputNumber, Switch, FormInstance, notification } from 'antd';
 import Picker, { IEmojiData } from 'emoji-picker-react';
 
 import { Board } from '../../types';
@@ -7,6 +7,8 @@ import { SmileOutlined } from '@ant-design/icons';
 import boardTemplate from '../../const/boardTemplateOption';
 import ConfigColumn from './configColumn';
 import { template } from 'lodash';
+import { useMutation } from '@apollo/client';
+import { BoardMutations } from '../../grapql-client/mutations';
 
 type Props = {
   board?: Board;
@@ -16,26 +18,78 @@ type Props = {
 
 type boardTemplateType = {
   name: string;
-  columns: string[];
+  column1: string;
+  column2: string;
+  column3: string;
+  column4: string;
+  column5: string;
 };
 
 const { Option } = Select;
 
 export default function ConfigBoardModal({ board, visible, setVisible }: Props) {
   const [templateSelect, setTemplateSelect] = useState<string>('defaultBoard');
+  const [currentTemplate, setBoardTemplate] = useState<boardTemplateType>();
   const boardOption = new Map<string, boardTemplateType>();
   // boardTemplate.map((template, index) => boardOption.set(index, template));
+  const form = useRef<FormInstance>(null);
 
   const handleSelectTemplate = (value: string) => {
-    setTemplateSelect(value);
+    setTemplateSelect(`${value}`);
+    // form.current?.resetFields([
+    //   'Column1',
+    //   'Column2',
+    //   'Column3',
+    //   'Column4',
+    //   'Column5',
+    //   'isActiveColumn1',
+    //   'isActiveColumn2',
+    //   'isActiveColumn3',
+    //   'isActiveColumn4',
+    //   'isActiveColumn5',
+    // ]);
   };
 
-  // const renderColumn = () => {
-  //   let arr = [],
-  //   for (let idx = 1; idx <= 5; idx++) {
-  //     arr.push(())
-  //   }
-  // };
+  const [updateBoard, { loading }] = useMutation<BoardMutations.updateBoardResult, BoardMutations.updateBoardVars>(
+    BoardMutations.updateBoard,
+  );
+
+  useEffect(() => {
+    setBoardTemplate(boardTemplate.find((template) => template.name === templateSelect));
+  }, [templateSelect]);
+
+  const handleSubmitBoard = (values: any) => {
+    console.log(values);
+    if (board) {
+      updateBoard({
+        variables: {
+          boardId: board.id,
+          teamId: board.teamId,
+          isPublic: values['isPublic'],
+          isAnonymous: values['isAnonymous'],
+          disableDownVote: values['disableDownVote'],
+          disableUpVote: values['disableUpVote'],
+          votesLimit: values['votesLimit'],
+          type: values['type'],
+          title: values['title'],
+          column1: values['Column1'],
+          column2: values['Column2'],
+          column3: values['Column3'],
+          column4: values['Column4'],
+          column5: values['Column5'],
+          isActiveCol1: values['isActiveColumn1'],
+          isActiveCol2: values['isActiveColumn2'],
+          isActiveCol3: values['isActiveColumn3'],
+          isActiveCol4: values['isActiveColumn4'],
+          isActiveCol5: values['isActiveColumn5'],
+        },
+        onCompleted: () => {
+          setVisible(false);
+          setTemplateSelect('defaultBoard');
+        },
+      });
+    }
+  };
 
   return (
     <Modal
@@ -43,75 +97,91 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
       centered
       visible={visible}
       footer={null}
-      onCancel={() => setVisible(false)}
+      onCancel={() => {
+        setVisible(false);
+        setTemplateSelect('defaultBoard');
+        form.current?.resetFields();
+      }}
       width={1000}
     >
-      <Form>
+      <Form onFinish={handleSubmitBoard} ref={form}>
         <div className="config-board-modal">
           <div className="edit-board-modal">
-            <h2>Edit board</h2>
-            <Form.Item>
-              <h4>Board Type</h4>
-              <span>You can run a retrospective with phases</span>
+            <h2>{board ? 'Edit board' : 'Create board'}</h2>
+            <h4>Board Title</h4>
+            <span>You can run a retrospective with phases</span>
+            <Form.Item
+              rules={[{ required: true, message: 'Please input your board title' }]}
+              name="title"
+              initialValue={board?.title}
+            >
               <Input defaultValue={board?.title} placeholder="Board Title" />
             </Form.Item>
 
-            <Form.Item>
-              <h4>Board Type</h4>
-              <span>You can run a retrospective with phases</span>
-              <Select defaultValue={board?.type}>
+            <h4>Board Type</h4>
+            <span>You can run a retrospective with phases</span>
+            <Form.Item name="type" initialValue={board?.type ?? 'DEFAULT'}>
+              <Select defaultValue={board?.type ?? 'DEFAULT'}>
                 <Option value="DEFAULT">No Phase</Option>
                 <Option value="PHASE">Phase (Reflect, Group, Votes, Discuss)</Option>
               </Select>
             </Form.Item>
-            <Form.Item>
-              <h4>Max Votes</h4>
-              <span>The number of votes per participant</span>
-              <InputNumber style={{ width: '100%' }} value={board?.votesLimit ?? 25} />
+            <h4>Max Votes</h4>
+            <span>The number of votes per participant</span>
+            <Form.Item
+              rules={[{ required: true, message: 'Please input limit votes' }]}
+              name="votesLimit"
+              initialValue={board?.votesLimit ?? 25}
+            >
+              <InputNumber min={1} max={25} style={{ width: '100%' }} value={board?.votesLimit ?? 25} />
             </Form.Item>
           </div>
           <div className="setting-board-modal">
             <h2>Configurations</h2>
-            <Form.Item>
-              <div>
-                <h4>Public Board</h4>
-                <Switch />
-              </div>
+            <div>
+              <h4>Public Board</h4>
               <span>Anyone with the link to board can access it</span>
-            </Form.Item>
+              <Form.Item name="isPublic" initialValue={board?.isPublic ?? false}>
+                <Switch defaultChecked={board?.isPublic} />
+              </Form.Item>
+            </div>
 
-            <Form.Item>
-              <div>
-                <h4>Run Retrospective Anonymously</h4>
-                <Switch />
-              </div>
+            <div>
+              <h4>Run Retrospective Anonymously</h4>
               <span>All the participants will give feedback anonymously</span>
-            </Form.Item>
-            <Form.Item>
-              <div>
-                <h4>Disable Up Votes</h4>
-                <Switch />
-              </div>
+              <Form.Item name="isAnonymous" initialValue={board?.isAnonymous ?? false}>
+                <Switch defaultChecked={board?.isAnonymous} />
+              </Form.Item>
+            </div>
+            <div>
+              <h4>Disable Up Votes</h4>
               <span>The participants will not be able to up vote</span>
-            </Form.Item>
-            <Form.Item>
-              <div>
-                <h4>Disable Down Votes</h4>
-                <Switch />
-              </div>
+              <Form.Item name="disableUpVote" initialValue={board?.disableUpVote ?? false}>
+                <Switch defaultChecked={board?.disableUpVote} />
+              </Form.Item>
+            </div>
+            <div>
+              <h4>Disable Down Votes</h4>
               <span>The participants will not be able to down vote</span>
-            </Form.Item>
+              <Form.Item name="disableDownVote" initialValue={board?.disableDownVote ?? false}>
+                <Switch defaultChecked={board?.disableDownVote} />
+              </Form.Item>
+            </div>
           </div>
           <div className="config-column-board-modal">
             <h2>Columns</h2>
             <div style={{ marginTop: '10px', width: '100%' }}>
-              <Select onSelect={handleSelectTemplate} style={{ width: '100%' }} defaultValue="defaultBoard">
+              <Select
+                onSelect={handleSelectTemplate}
+                style={{ marginBottom: '10px', width: '100%' }}
+                defaultValue="defaultBoard"
+              >
                 <Option key="defaultBoard" value="defaultBoard">
                   -- Board Templates --
                 </Option>
                 {[
                   ...boardTemplate.map((template, index) => (
-                    <Option key={`${index}`} value={index}>
+                    <Option key={`${index}`} value={template.name}>
                       {template.name}
                     </Option>
                   )),
@@ -119,10 +189,78 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
               </Select>
 
               {templateSelect === 'defaultBoard' ? (
-                <ConfigColumn board={board} titleColumn="hello" />
+                <>
+                  {board?.columns && board?.columns.length > 0 ? (
+                    <div className="listColumn">
+                      <ConfigColumn
+                        form={form}
+                        placeholder="Column1"
+                        key={board?.columns[0]?.id}
+                        board={board}
+                        column={board?.columns[0]}
+                        titleColumn={board?.columns[0]?.title}
+                      />
+                      <ConfigColumn
+                        form={form}
+                        placeholder="Column2"
+                        key={board?.columns[1]?.id}
+                        board={board}
+                        column={board?.columns[1]}
+                        titleColumn={board?.columns[1]?.title}
+                      />
+                      <ConfigColumn
+                        form={form}
+                        placeholder="Column3"
+                        key={board?.columns[2]?.id}
+                        board={board}
+                        column={board?.columns[2]}
+                        titleColumn={board?.columns[2]?.title}
+                      />
+                      <ConfigColumn
+                        form={form}
+                        placeholder="Column4"
+                        key={board?.columns[3]?.id}
+                        board={board}
+                        column={board?.columns[3]}
+                        titleColumn={board?.columns[3]?.title}
+                      />
+                      <ConfigColumn
+                        form={form}
+                        placeholder="Column5"
+                        key={board?.columns[4]?.id}
+                        board={board}
+                        column={board?.columns[4]}
+                        titleColumn={board?.columns[4]?.title}
+                      />
+                    </div>
+                  ) : (
+                    <div className="listColumn">
+                      <ConfigColumn form={form} placeholder="Column1" />
+                      <ConfigColumn form={form} placeholder="Column2" />
+                      <ConfigColumn form={form} placeholder="Column3" />
+                      <ConfigColumn form={form} placeholder="Column4" />
+                      <ConfigColumn form={form} placeholder="Column5" />
+                    </div>
+                  )}
+                </>
               ) : (
-                <ConfigColumn titleColumn="what" />
+                <div className="listColumn">
+                  <ConfigColumn form={form} placeholder="Column1" titleColumn={currentTemplate?.column1} />
+                  <ConfigColumn form={form} placeholder="Column2" titleColumn={currentTemplate?.column2} />
+                  <ConfigColumn form={form} placeholder="Column3" titleColumn={currentTemplate?.column3} />
+                  <ConfigColumn form={form} placeholder="Column4" titleColumn={currentTemplate?.column4} />
+                  <ConfigColumn form={form} placeholder="Column5" titleColumn={currentTemplate?.column5} />
+                </div>
               )}
+
+              <div className="buttonGenerate">
+                {/* <Button htmlType="submit" size="large" loading={loading}>
+                  {board ? 'Update Board' : 'Create Board'}
+                </Button> */}
+                <Button htmlType="submit" size="large">
+                  {board ? 'Update Board' : 'Create Board'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
