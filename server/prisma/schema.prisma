@@ -27,42 +27,97 @@ model Session {
 }
 
 model Team {
-  id          String       @id @default(uuid())
-  name        String
-  ownerId     String
-  createdAt   DateTime     @default(now())
-  startDate   DateTime
-  endDate     DateTime
-  picture     String
-  isPublic    Boolean      @default(true)
-  description String?
-  status      TeamStatus   @default(DOING)
-  members     Member[]
-  InviteLink  InviteLink[]
-  boards      Board[]
-  Owner       User         @relation(fields: [ownerId], references: [id])
+  id            String        @id @default(uuid())
+  name          String
+  ownerId       String
+  createdAt     DateTime      @default(now())
+  startDate     DateTime
+  endDate       DateTime
+  picture       String
+  isPublic      Boolean       @default(true)
+  description   String?
+  selectedBoard String?
+  status        TeamStatus    @default(DOING)
+  members       Member[]
+  InviteLink    InviteLink[]
+  boards        Board[]
+  Owner         User          @relation(fields: [ownerId], references: [id])
+  HealthCheck   HealthCheck[]
 }
 
 model Board {
-  id              String    @id @default(uuid())
+  id              String       @id @default(uuid())
   teamId          String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
   createdBy       String
-  isPublic        Boolean   @default(true)
-  isLocked        Boolean   @default(false)
-  disableDownVote Boolean   @default(false)
-  disableUpVote   Boolean   @default(false)
-  isAnonymous     Boolean   @default(false)
-  votesLimit      Int       @default(25)
+  isPublic        Boolean      @default(true)
+  isLocked        Boolean      @default(false)
+  disableDownVote Boolean      @default(false)
+  disableUpVote   Boolean      @default(false)
+  isAnonymous     Boolean      @default(false)
+  votesLimit      Int          @default(25)
   currentColumnId String?
   title           String
-  timerInProgress Boolean   @default(false)
-  type            BoardType @default(PHASE)
-  currentPhase    PhaseType @default(REFLECT)
+  timerInProgress Boolean      @default(false)
+  type            BoardType    @default(PHASE)
+  currentPhase    PhaseType    @default(REFLECT)
   endTime         DateTime?
-  team            Team      @relation(fields: [teamId], references: [id])
+  team            Team         @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   columns         Column[]
+  HealthCheck     HealthCheck?
+}
+
+model HealthCheck {
+  id             String            @id @default(uuid())
+  teamId         String
+  boardId        String            @unique
+  templateId     String
+  createdAt      DateTime          @default(now())
+  createdBy      String
+  updatedAt      DateTime          @updatedAt
+  updatedBy      String?
+  isAnonymous    Boolean
+  isCustom       Boolean
+  status         StatusHealthCheck
+  board          Board             @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  team           Team              @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  memberAnswers  MemberAnswer[]
+  memberComments MemberComment[]
+}
+
+model MemberAnswer {
+  id            String       @id @default(uuid())
+  templateId    String
+  healthCheckId String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  userId        String
+  answers       Answer[]
+  healthCheck   HealthCheck? @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Answer {
+  id              String        @id @default(uuid())
+  questionId      String
+  value           String
+  memberAnswersId String?
+  memberAnswer    MemberAnswer? @relation(fields: [memberAnswersId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model MemberComment {
+  id            String       @id @default(uuid())
+  templateId    String
+  healthCheckId String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  userId        String
+  questionId    String
+  text          String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  healthCheck   HealthCheck? @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
 }
 
 enum BoardType {
@@ -85,7 +140,7 @@ model Column {
   position Int
   opinions Opinion[]
   boardId  String
-  board    Board     @relation(fields: [boardId], references: [id])
+  board    Board     @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Opinion {
@@ -108,7 +163,7 @@ model Opinion {
   status        OpinionStatus @default(NEW)
   author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   member        Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  column        Column?       @relation(fields: [columnId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  column        Column?       @relation(fields: [columnId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   remarks       Remark[]
 }
 
@@ -130,6 +185,11 @@ model Remark {
   opinion   Opinion  @relation(fields: [opinionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+enum StatusHealthCheck {
+  OPEN
+  CLOSED
 }
 
 enum OpinionStatus {
@@ -168,6 +228,7 @@ model Member {
   invitedBy           String?
   joinedAt            DateTime  @default(now())
   role                String?
+  boardActive         String?
   user                User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   team                Team      @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Opinion             Opinion[]
@@ -201,9 +262,11 @@ model User {
   members      Member[]
   Notification Notification[]
 
-  Team    Team[]
-  Opinion Opinion[]
-  Remark  Remark[]
+  Team           Team[]
+  Opinion        Opinion[]
+  Remark         Remark[]
+  MemberAnswers  MemberAnswer[]
+  MemberComments MemberComment[]
   @@index([email])
 }
 

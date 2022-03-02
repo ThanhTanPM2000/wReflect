@@ -14,6 +14,7 @@ import {
   UsergroupDeleteOutlined,
   BarChartOutlined,
   UserOutlined,
+  AimOutlined,
 } from '@ant-design/icons';
 
 import { auth } from '../../apis';
@@ -44,16 +45,6 @@ const SideBar = ({ isAdmin }: Props) => {
       },
     });
   };
-
-  // me?.id &&
-  //   useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
-  //     BoardSubscription.updateBoard,
-  //     {
-  //       variables: {
-  //         meId: me.id,
-  //       },
-  //     },
-  //   );
 
   return (
     <>
@@ -93,6 +84,9 @@ const SideBar = ({ isAdmin }: Props) => {
               <>
                 <Menu.Item style={{ marginTop: 20 }} icon={<GoldOutlined />} key="Teams">
                   <Link to="/teams">Teams</Link>
+                </Menu.Item>
+                <Menu.Item icon={<AimOutlined />} key="actionTracker">
+                  <Link to="/actions-tracker">Actions Tracker</Link>
                 </Menu.Item>
                 <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
                   <Menu.Item key="5" icon={<StockOutlined />}>

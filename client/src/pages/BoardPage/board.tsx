@@ -4,7 +4,7 @@ import { Avatar, Tooltip, Empty, Badge } from 'antd';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useHistory } from 'react-router-dom';
 
-import { useMutation, useQuery, useApolloClient, useSubscription } from '@apollo/client';
+import { useMutation, useQuery, useApolloClient } from '@apollo/client';
 import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
 import ColumnComponent from './column';
 import { BoardMutations, ColumnMutations, OpinionMutations } from '../../grapql-client/mutations';
@@ -25,7 +25,6 @@ import selfContext from '../../contexts/selfContext';
 import { ConfigBoardModal } from '../configBoardModal';
 import { Loading } from '../../components/Loading';
 import { TopNavBar } from '../../components/TopNavBar';
-import { BoardSubscription } from '../../grapql-client/subcriptions';
 import ConfigTimeTrackingModal from './configTimeTrackingModal';
 import { CountDown } from '../../components/CountDown';
 import { Board } from '../../types';
@@ -46,38 +45,23 @@ export default function board({ teamId, boardId }: Props) {
   const me = useContext(selfContext);
   const [currentNumVotes, setCurrentNumVotes] = useState(0);
 
-  // const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
-  //   BoardQueries.getBoard,
-  //   {
-  //     variables: { teamId },
-  //     onCompleted: (data) => {
-  //       if (data?.team?.boards && data?.team?.boards?.length > 0)
-  //         setBoard(data.team.boards?.find((board: Board) => board.id === boardId) ?? null);
-  //     },
-  //   },
-  // );
-
-  const { loading, data, error, refetch } = useQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>(
-    BoardQueries.getBoard,
+  const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
+    TeamQueries.getTeam,
     {
-      variables: { boardId },
+      variables: {
+        teamId,
+      },
       onCompleted: (data) => {
-        setBoard(data?.board);
+        setBoard(data?.team?.boards?.find((board) => board?.id === boardId) || null);
       },
     },
   );
 
   const iMember = board?.team?.members.find((member) => member.userId === me?.id);
 
-  me?.id &&
-    useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
-      BoardSubscription.updateBoard,
-      {
-        variables: {
-          meId: me.id,
-        },
-      },
-    );
+  useEffect(() => {
+    setBoard(data?.team?.boards?.find((board) => board?.id === boardId) || null);
+  }, [teamId, boardId]);
 
   useEffect(() => {
     const value = board?.columns?.reduce(
@@ -201,13 +185,24 @@ export default function board({ teamId, boardId }: Props) {
 
   return (
     <>
-      <TopNavBar team={board?.team} boardId={boardId} title="Do Reflect" />
+      <TopNavBar
+        team={board?.team}
+        boardId={boardId}
+        title="Do Reflect"
+        selectedBoard={board}
+        setSelectedBoard={setBoard}
+      />
       <Loading refetch={refetch} data={board} loading={loading} error={error}>
         <>
-          {data && board ? (
+          {data?.team && board ? (
             <>
-              <ConfigBoardModal setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
-              <ConfigBoardModal board={board} setVisible={setIsUpdateModalVisible} visible={isUpdateModalVisible} />
+              <ConfigBoardModal teamId={teamId} setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
+              <ConfigBoardModal
+                teamId={teamId}
+                board={board}
+                setVisible={setIsUpdateModalVisible}
+                visible={isUpdateModalVisible}
+              />
               <ConfigTimeTrackingModal
                 boardData={board}
                 setVisible={setTimeTrackingModalVisible}
@@ -226,7 +221,7 @@ export default function board({ teamId, boardId }: Props) {
                       <CloseOutlined className="boardPanelIcon" />
                     ) : (
                       <MenuOutlined className="boardPanelIcon" />
-                    )}{' '}
+                    )}
                     {'\t \t '} Action
                   </div>
                   <div className="boardActionPanel">
@@ -395,6 +390,7 @@ export default function board({ teamId, boardId }: Props) {
                     if (column.isActive) {
                       return (
                         <ColumnComponent
+                          setIsUpdateModalVisible={setIsUpdateModalVisible}
                           iMember={iMember}
                           currentNumVotes={currentNumVotes}
                           setCurrentNumVotes={setCurrentNumVotes}

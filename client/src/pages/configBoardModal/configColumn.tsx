@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, FormInstance, Input, message, notification, Switch } from 'antd';
+import { Form, FormInstance, Input, notification, Switch } from 'antd';
 
 import { SmileOutlined } from '@ant-design/icons';
 import { Board, Column } from '../../types';
@@ -13,7 +13,7 @@ type Props = {
   titleColumn?: string;
 };
 
-export default function ConfigColumn({ board, form, placeholder, column, titleColumn = '' }: Props) {
+export default function ConfigColumn({ form, placeholder, column, titleColumn = '' }: Props) {
   const [isActive, setIsActive] = useState<boolean>(column ? column?.isActive : false);
 
   useEffect(() => {

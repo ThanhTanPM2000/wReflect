@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Select, Avatar, Row, Col, Switch, Input, Tooltip, Empty } from 'antd';
+import { Button, Row, Col, Switch, Tooltip, Empty } from 'antd';
 import {
   PlusOutlined,
   LockTwoTone,
@@ -9,18 +9,21 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { TopNavBar } from '../../components/TopNavBar';
 import { Loading } from '../../components/Loading';
+import { BoardMutations } from '../../grapql-client/mutations';
+import { ConfigBoardModal } from '../configBoardModal';
 
 type Props = {
   teamId: string;
 };
 
-const { Option } = Select;
-
 const ManageBoardPage = ({ teamId }: Props) => {
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+
   const { loading, data, error, refetch } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(
     TeamQueries.getTeam,
     {
@@ -28,16 +31,22 @@ const ManageBoardPage = ({ teamId }: Props) => {
     },
   );
 
-  const boardOptions = () => {
-    return data?.team?.boards.map((board) => (
-      <Option key={board.id} value={board.id}>
-        {board.title}
-      </Option>
-    ));
+  const [deleteBoard] = useMutation<BoardMutations.updateBoardResult, BoardMutations.deleteBoardVars>(
+    BoardMutations.deleteBoard,
+  );
+
+  const handleDeleteBoard = (teamId: string, boardId: string) => {
+    deleteBoard({
+      variables: {
+        teamId,
+        boardId,
+      },
+    });
   };
 
   return (
     <>
+      <ConfigBoardModal teamId={teamId} setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
       <TopNavBar team={data?.team} title="Manage Board" />
       <Loading refetch={refetch} data={data?.team} loading={loading} error={error}>
         <>
@@ -45,8 +54,9 @@ const ManageBoardPage = ({ teamId }: Props) => {
             <div className="manage-board">
               <div className="board-selector">
                 <div className="button-right">
-                  {/* <Button>Merge Board</Button> */}
-                  <Button icon={<PlusOutlined />}>Create Board</Button>
+                  <Button onClick={() => setIsCreateModalVisible(true)} icon={<PlusOutlined />}>
+                    Create Board
+                  </Button>
                 </div>
               </div>
 
@@ -55,34 +65,48 @@ const ManageBoardPage = ({ teamId }: Props) => {
                   <div className="board-list">
                     {data?.team.boards?.map((board) => {
                       return (
-                        <div
-                          className="board-items site-layout-background"
-                          key={board.id}
-                          style={{
-                            padding: 24,
-                            height: '80px',
-                            width: '100%',
-                          }}
-                        >
-                          <h1>{board.title}</h1>
-                          <div className="board-icons">
-                            <span className="text-button" style={{ marginRight: 20 }}>
-                              <Switch
-                                style={{ marginRight: 10 }}
-                                checkedChildren={<LockTwoTone twoToneColor="white" />}
-                                unCheckedChildren={<UnlockTwoTone twoToneColor="white" />}
-                              />
-                              Lock Board
-                            </span>
-                            <Tooltip title="Clone Board">
-                              <CopyOutlined style={{ marginRight: 20 }} />
-                            </Tooltip>
-                            <Tooltip title="Edit">
-                              <EditOutlined style={{ marginRight: 20 }} />
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                              <DeleteOutlined style={{ marginRight: 20 }} />
-                            </Tooltip>
+                        <div key={board.id}>
+                          <ConfigBoardModal
+                            teamId={teamId}
+                            board={board}
+                            setVisible={setIsUpdateModalVisible}
+                            visible={isUpdateModalVisible}
+                          />
+                          <div
+                            className="board-items site-layout-background"
+                            key={board.id}
+                            style={{
+                              padding: 24,
+                              height: '80px',
+                              width: '100%',
+                            }}
+                          >
+                            <h1>{board.title}</h1>
+                            <div className="board-icons">
+                              <span className="text-button" style={{ marginRight: 20 }}>
+                                <Switch
+                                  style={{ marginRight: 10 }}
+                                  checkedChildren={<LockTwoTone twoToneColor="white" />}
+                                  unCheckedChildren={<UnlockTwoTone twoToneColor="white" />}
+                                />
+                                Lock Board
+                              </span>
+                              <Tooltip title="Clone Board">
+                                <CopyOutlined style={{ marginRight: 20 }} />
+                              </Tooltip>
+                              <Tooltip title="Edit">
+                                <EditOutlined
+                                  onClick={() => setIsUpdateModalVisible(true)}
+                                  style={{ marginRight: 20 }}
+                                />
+                              </Tooltip>
+                              <Tooltip title="Delete">
+                                <DeleteOutlined
+                                  onClick={() => handleDeleteBoard(board.teamId, board.id)}
+                                  style={{ marginRight: 20 }}
+                                />
+                              </Tooltip>
+                            </div>
                           </div>
                         </div>
                       );
@@ -96,7 +120,6 @@ const ManageBoardPage = ({ teamId }: Props) => {
           )}
         </>
       </Loading>
-      {/* </div> */}
     </>
   );
 };

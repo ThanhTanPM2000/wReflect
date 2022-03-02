@@ -6,6 +6,124 @@ import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
 import { Team, TeamStatus, Board, Column, Remark, Opinion, OpinionStatus } from '@prisma/client';
 import { errorName } from '../constant/errorsConstant';
 import { ForbiddenError, ApolloError } from 'apollo-server-errors';
+import { Forbidden } from '../errorsManagement';
+import { P } from 'pino';
+
+export const isMembersOfTeam = async (teamId: string, userId: string) => {
+  const team = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      members: {
+        some: {
+          userId,
+        },
+      },
+    },
+  });
+
+  !team && Forbidden();
+};
+
+export const isAllowUpdateBoard = async (boardId: string, userId: string) => {
+  const board = await prisma.board.findFirst({
+    where: {
+      isLocked: false,
+      id: boardId,
+      team: {
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+    },
+  });
+
+  !board && Forbidden();
+};
+
+export const isOwnedTeam = async (teamId: string, userId: string) => {
+  const team = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      members: {
+        some: {
+          userId,
+          isOwner: true,
+        },
+      },
+    },
+  });
+
+  !team && Forbidden();
+};
+
+export const isOwnedOpinion = async (opinionId: string, userId: string) => {
+  const opinion = await prisma.opinion.findFirst({
+    where: {
+      id: opinionId,
+      OR: [
+        {
+          responsible: {
+            equals: 'not-assigned',
+          },
+          column: {
+            board: {
+              team: {
+                members: {
+                  some: {
+                    userId,
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          responsible: userId,
+        },
+        {
+          column: {
+            board: {
+              team: {
+                members: {
+                  some: {
+                    userId,
+                    isOwner: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  !opinion && Forbidden();
+};
+
+// export const changeCurrentBoard = async (teamId: string, userId: string, boardId: string) => {
+//   const team = await prisma.team.update({
+//     where: {
+//       id: teamId,
+//     },
+//     data: {
+//       members: {
+//         update: {
+//           where: {
+//             id: userId,
+//           },
+//           data: {
+//             boardActive: boardId,
+//           },
+//         },
+//       },
+//     },
+//   });
+
+//   return team;
+// };
 
 export const getTeams = async (
   isGettingAll = false,
@@ -99,8 +217,6 @@ export const getTeam = async (teamId: string, userId?: string) => {
     },
   });
 
-  if (!team) throw new ApolloError(`Team not found`, `${StatusCodes.NOT_FOUND}`);
-
   return team;
 };
 
@@ -161,6 +277,9 @@ export const createTeam = async (req: RequestWithUserInfo, data: createTeamType)
         },
       },
     },
+    include: {
+      boards: true,
+    },
   });
 
   return team;
@@ -184,7 +303,6 @@ export const updateTeam = async (req: RequestWithUserInfo, data: updateTeamType)
     data: {
       name: data.name,
       description: data.description,
-      // isPublic: data.isPublic,
       isPublic: data.isPublic,
       picture: data.picture,
       startDate,
@@ -238,4 +356,26 @@ export const deleteTeam = async (req: RequestWithUserInfo, teamId: string) => {
 
 // export const createBoard = async (req: RequestWithUserInfo, teamId: string) => {
 //   const {id: }
+// }
+
+// export const updateAction = async (teamId: string,userId: string, boardId: string, ) => {
+//   const team = await prisma.team.update({
+//     where: {
+//       id: teamId
+//     },
+//     data: {
+//       boards: {
+//         update: {
+//           where: {
+//             id: boardId,
+//           },
+//           data: {
+//             update: {
+//               col
+//             }
+//           }
+//         }
+//       }
+//     }
+//   })
 // }

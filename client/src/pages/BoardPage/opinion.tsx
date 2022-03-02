@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useContext } from 'react';
 
-import { Dropdown, Menu, Modal, Input, Badge, Avatar, Select, Tooltip, notification } from 'antd';
+import { Dropdown, Menu, Modal, Input, Badge, Avatar, Tooltip, notification } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import {
   StarFilled,
@@ -17,14 +17,11 @@ import {
 } from '@ant-design/icons';
 
 import { Board, Column, Member, Opinion } from '../../types';
-import { useMutation, useApolloClient, useSubscription } from '@apollo/client';
+import { useMutation, useApolloClient } from '@apollo/client';
 import selfContext from '../../contexts/selfContext';
 import { OpinionMutations } from '../../grapql-client/mutations';
 import { BoardQueries } from '../../grapql-client/queries';
-import _, { update } from 'lodash';
-import remark from './remark';
 import Remark from './remark';
-import { OpinionSubscription } from '../../grapql-client/subcriptions';
 import ActionComponent from './action';
 
 type Props = {
@@ -32,7 +29,6 @@ type Props = {
   board: Board;
   column: Column;
   opinion: Opinion;
-  key: string;
   index: number;
   currentNumVotes: number | undefined;
   setCurrentNumVotes: (votes: number) => void;
@@ -41,7 +37,7 @@ type Props = {
 const { confirm } = Modal;
 const { TextArea } = Input;
 
-export default function OpinionComponenent({
+export default function OpinionComponent({
   iMember,
   opinion,
   board,
@@ -54,15 +50,6 @@ export default function OpinionComponenent({
   const client = useApolloClient();
   const me = useContext(selfContext);
   const [isOpenRemark, setIsOpenRemark] = useState(false);
-
-  useSubscription<OpinionSubscription.updateOpinionResult, OpinionSubscription.updateOpinionVars>(
-    OpinionSubscription.updateOpinion,
-    {
-      variables: {
-        opinionId: opinion.id,
-      },
-    },
-  );
 
   const [updateOpinion] = useMutation<OpinionMutations.updateOpinionResult, OpinionMutations.updateOpinionVars>(
     OpinionMutations.updateOpinion,
@@ -151,53 +138,11 @@ export default function OpinionComponenent({
       <Menu.Item>
         <div className="color-selector">
           <div
-            className="orange block-color"
-            onClick={() =>
-              updateOpinion({
-                variables: {
-                  teamId: board.teamId,
-                  boardId: board.id,
-                  columnId: column.id,
-                  opinionId: opinion.id,
-                  color: 'orange',
-                },
-                optimisticResponse: {
-                  updateOpinion: {
-                    ...opinion,
-                    color: 'orange',
-                  },
-                },
-              })
-            }
-          />
-          <div
-            className="pink block-color"
-            onClick={() =>
-              updateOpinion({
-                variables: {
-                  teamId: board.teamId,
-                  boardId: board.id,
-                  columnId: column.id,
-                  opinionId: opinion.id,
-                  color: 'pink',
-                },
-                optimisticResponse: {
-                  updateOpinion: {
-                    ...opinion,
-                    color: 'pink',
-                  },
-                },
-              })
-            }
-          />
-          <div
             className="blue block-color"
             onClick={() =>
               updateOpinion({
                 variables: {
                   teamId: board.teamId,
-                  boardId: board.id,
-                  columnId: column.id,
                   opinionId: opinion.id,
                   color: 'blue',
                 },
@@ -211,20 +156,18 @@ export default function OpinionComponenent({
             }
           />
           <div
-            className="light-blue block-color"
+            className="lblue block-color"
             onClick={() =>
               updateOpinion({
                 variables: {
                   teamId: board.teamId,
-                  boardId: board.id,
-                  columnId: column.id,
                   opinionId: opinion.id,
-                  color: 'light-blue',
+                  color: 'lblue',
                 },
                 optimisticResponse: {
                   updateOpinion: {
                     ...opinion,
-                    color: 'light-blue',
+                    color: 'lblue',
                   },
                 },
               })
@@ -236,8 +179,6 @@ export default function OpinionComponenent({
               updateOpinion({
                 variables: {
                   teamId: board.teamId,
-                  boardId: board.id,
-                  columnId: column.id,
                   opinionId: opinion.id,
                   color: 'green',
                 },
@@ -251,20 +192,72 @@ export default function OpinionComponenent({
             }
           />
           <div
-            className="gray block-color"
+            className="orange block-color"
             onClick={() =>
               updateOpinion({
                 variables: {
                   teamId: board.teamId,
-                  boardId: board.id,
-                  columnId: column.id,
                   opinionId: opinion.id,
-                  color: 'gray',
+                  color: 'orange',
                 },
                 optimisticResponse: {
                   updateOpinion: {
                     ...opinion,
-                    color: 'gray',
+                    color: 'orange',
+                  },
+                },
+              })
+            }
+          />
+          <div
+            className="lpink block-color"
+            onClick={() =>
+              updateOpinion({
+                variables: {
+                  teamId: board.teamId,
+                  opinionId: opinion.id,
+                  color: 'lpink',
+                },
+                optimisticResponse: {
+                  updateOpinion: {
+                    ...opinion,
+                    color: 'lpink',
+                  },
+                },
+              })
+            }
+          />
+          <div
+            className="pink block-color"
+            onClick={() =>
+              updateOpinion({
+                variables: {
+                  teamId: board.teamId,
+                  opinionId: opinion.id,
+                  color: 'pink',
+                },
+                optimisticResponse: {
+                  updateOpinion: {
+                    ...opinion,
+                    color: 'pink',
+                  },
+                },
+              })
+            }
+          />
+          <div
+            className="purple block-color"
+            onClick={() =>
+              updateOpinion({
+                variables: {
+                  teamId: board.teamId,
+                  opinionId: opinion.id,
+                  color: 'purple',
+                },
+                optimisticResponse: {
+                  updateOpinion: {
+                    ...opinion,
+                    color: 'purple',
                   },
                 },
               })
@@ -278,9 +271,9 @@ export default function OpinionComponenent({
   return (
     <Draggable
       isDragDisabled={board.isLocked || board.currentPhase === 'REFLECT'}
-      draggableId={`${opinion.id}`}
+      draggableId={opinion.id}
       index={index}
-      key={`${opinion.id}`}
+      key={opinion.id}
     >
       {(provided) => (
         <div
@@ -288,7 +281,6 @@ export default function OpinionComponenent({
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          key={opinion?.id}
         >
           <div className="opinionHeader">
             {opinion.isBookmarked ? (
@@ -298,8 +290,6 @@ export default function OpinionComponenent({
                   updateOpinion({
                     variables: {
                       teamId: board.teamId,
-                      boardId: board.id,
-                      columnId: column.id,
                       opinionId: opinion.id,
                       isBookmarked: false,
                     },
@@ -320,8 +310,6 @@ export default function OpinionComponenent({
                   updateOpinion({
                     variables: {
                       teamId: board.teamId,
-                      boardId: board.id,
-                      columnId: column.id,
                       opinionId: opinion.id,
                       isBookmarked: true,
                     },
@@ -385,8 +373,6 @@ export default function OpinionComponenent({
                       updateOpinion({
                         variables: {
                           teamId: board.teamId,
-                          boardId: board.id,
-                          columnId: column.id,
                           opinionId: opinion.id,
                           text: e.target.value,
                         },
@@ -413,9 +399,7 @@ export default function OpinionComponenent({
                   })}
                 </p>
               )}
-              {opinion.isAction === true && (
-                <ActionComponent iMember={iMember} board={board} column={column} opinion={opinion} />
-              )}
+              {opinion.isAction === true && <ActionComponent board={board} column={column} opinion={opinion} />}
             </div>
           </div>
 
@@ -432,8 +416,6 @@ export default function OpinionComponenent({
                             updateOpinion({
                               variables: {
                                 teamId: board?.teamId,
-                                boardId: board?.id,
-                                columnId: column?.id,
                                 opinionId: opinion?.id,
                                 downVote: opinion.downVote.filter((id) => {
                                   if (id === iMember.id && firstId == false) {
@@ -461,8 +443,6 @@ export default function OpinionComponenent({
                             updateOpinion({
                               variables: {
                                 teamId: board?.teamId,
-                                boardId: board?.id,
-                                columnId: column?.id,
                                 opinionId: opinion?.id,
                                 upVote: [...opinion?.upVote, iMember.id],
                               },
@@ -494,8 +474,6 @@ export default function OpinionComponenent({
                           updateOpinion({
                             variables: {
                               teamId: board?.teamId,
-                              boardId: board?.id,
-                              columnId: column?.id,
                               opinionId: opinion?.id,
                               upVote: opinion.upVote.filter((id) => {
                                 if (id === iMember?.id && firstId == false) {
@@ -523,8 +501,6 @@ export default function OpinionComponenent({
                           updateOpinion({
                             variables: {
                               teamId: board?.teamId,
-                              boardId: board?.id,
-                              columnId: column?.id,
                               opinionId: opinion?.id,
                               downVote: [...opinion?.downVote, iMember.id],
                             },
@@ -553,7 +529,7 @@ export default function OpinionComponenent({
               </>
             )}
 
-            <div className="remarks" style={{ marginLeft: 'auto' }}>
+            <div className="remarks">
               <Badge size="small" count={opinion.remarks.length} showZero={false}>
                 {opinion.remarks.length > 0 ? (
                   <MessageFilled

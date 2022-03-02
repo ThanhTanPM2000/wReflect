@@ -25,41 +25,64 @@ export const updateBoard = gql`
       votesLimit
       title
       timerInProgress
-      currentPhase
       endTime
+      type
+      currentPhase
+      team(meId: $meId) {
+        id
+        name
+        ownerUserIds
+        startDate
+        createdAt
+        endDate
+        picture
+        numOfMember
+        isPublic
+        status
+        description
+        boards {
+          id
+          teamId
+          createdAt
+          updatedAt
+          createdBy
+          isPublic
+          isLocked
+          disableDownVote
+          disableUpVote
+          isAnonymous
+          votesLimit
+          title
+          timerInProgress
+          endTime
+          type
+          currentPhase
+        }
+      }
       columns {
         id
         color
         title
+        position
         isActive
         boardId
         opinions {
           id
           columnId
+          memberId
           authorId
           createdAt
           updatedAt
           text
           upVote
           downVote
-          updatedBy
           isAction
+          updatedBy
           isBookmarked
           responsible
           mergedAuthors
-          color
           status
-          author {
-            id
-            email
-            createdAt
-            updatedAt
-            isAdmin
-            userStatus
-            name
-            nickname
-            picture
-          }
+          color
           position
           remarks {
             id
@@ -68,17 +91,78 @@ export const updateBoard = gql`
             text
             createdAt
             updatedAt
-            author {
-              id
-              email
-              createdAt
-              updatedAt
-              name
-              nickname
-              picture
-            }
           }
         }
+      }
+    }
+  }
+`;
+
+export type deleteBoardResult = {
+  deleteBoard: Board;
+};
+
+export type deleteBoardVars = {
+  meId: string;
+};
+
+export const deleteBoard = gql`
+  subscription Subscription($meId: ID!) {
+    deleteBoard(meId: $meId) {
+      id
+      teamId
+      createdAt
+      updatedAt
+      createdBy
+      isPublic
+      isLocked
+      disableDownVote
+      disableUpVote
+      isAnonymous
+      votesLimit
+      title
+      timerInProgress
+      endTime
+      type
+      currentPhase
+      team(meId: $meId) {
+        id
+        name
+        ownerUserIds
+        startDate
+        createdAt
+        endDate
+        picture
+        numOfMember
+        isPublic
+        status
+        description
+        boards {
+          id
+          teamId
+          createdAt
+          updatedAt
+          createdBy
+          isPublic
+          isLocked
+          disableDownVote
+          disableUpVote
+          isAnonymous
+          votesLimit
+          title
+          timerInProgress
+          endTime
+          type
+          currentPhase
+        }
+      }
+      columns {
+        id
+        color
+        title
+        position
+        isActive
+        boardId
       }
     }
   }

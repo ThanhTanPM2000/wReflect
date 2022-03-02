@@ -1,15 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router';
-import { Card, Col, Avatar, Row, Pagination, PageHeader, Empty } from 'antd';
+import { Card, Col, Avatar, Row, Pagination, Empty } from 'antd';
 
-import { NetworkStatus, useLazyQuery, useQuery, useSubscription } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
-import { SettingOutlined, UsergroupAddOutlined, EllipsisOutlined, AimOutlined } from '@ant-design/icons';
-import { Member, Team, Teams, TeamStatus } from '../../types';
+import { SettingOutlined, UsergroupAddOutlined, AimOutlined } from '@ant-design/icons';
+import { Member, Team, TeamStatus } from '../../types';
 import { Loading } from '../../components/Loading';
-import { TeamMutations } from '../../grapql-client/mutations';
-import { me } from '../../apis/user';
-import SelfContext from '../../contexts/selfContext';
 
 const { Meta } = Card;
 
@@ -23,12 +20,12 @@ type Props = {
   setPage: (value: number) => void;
 };
 
-const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoading }: Props) => {
+const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
   const history = useHistory();
-  const [isVisibleAddModal, setVisibleModal] = useState(false);
-  const me = useContext(SelfContext);
 
   const redirect = (team: Team) => {
+    // const boardId = team.members.find((member) => member.userId === me?.id)?.boardActive;
+    // boardId ? history.push(`/board/${team.id}/${team.boards[0].id}`) : history.push(`/board/${team.id}/${boardId}`);
     history.push(`/board/${team.id}/${team.boards[0].id}`);
   };
 
@@ -40,10 +37,6 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
     fetchPolicy: 'cache-first', // Used for first execution
     notifyOnNetworkStatusChange: true,
   });
-
-  const onAddMember = () => {
-    setVisibleModal(true);
-  };
 
   const onPaginationChanged = (page: number, pageSize: number | undefined) => {
     setPage(page);
@@ -129,7 +122,6 @@ const TeamsCard = ({ status, searchText, page, size, setPage, setSize, setIsLoad
                                           // srcSet={member?.user?.picture}
                                           key={member?.user?.email}
                                           src={member?.user?.picture}
-                                          crossOrigin="anonymous"
                                         />
                                       );
                                     })}

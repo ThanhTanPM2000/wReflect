@@ -17,7 +17,7 @@ type Props = {
 
 const { TextArea } = Input;
 
-export default function RemarkComponent({ iMember, isOpenRemark, setIsOpenRemark, board, column, opinion }: Props) {
+export default function RemarkComponent({ isOpenRemark, setIsOpenRemark, board, column, opinion }: Props) {
   const [textRemark, setTextRemark] = useState('');
   const remarkListRef = useRef<HTMLDivElement>(null);
   const client = useApolloClient();
@@ -45,7 +45,7 @@ export default function RemarkComponent({ iMember, isOpenRemark, setIsOpenRemark
           opinionId: opinion.id,
           text: e.currentTarget.value,
         },
-        update: (store, { data }) => {
+        update: () => {
           setTextRemark('');
         },
       });

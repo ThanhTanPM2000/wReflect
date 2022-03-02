@@ -123,3 +123,26 @@ export default [
   //   columns: ['Hopes', 'Fears'],
   // },
 ];
+
+export const columnActionTrackerDefault = [
+  {
+    name: 'Open',
+    index: '1',
+    key: 'NEW',
+  },
+  {
+    name: 'In Progress',
+    index: '2',
+    key: 'IN_PROGRESS',
+  },
+  {
+    name: 'Closed',
+    index: '3',
+    key: 'DONE',
+  },
+  {
+    name: 'Rejected',
+    index: '4',
+    key: 'REJECTED',
+  },
+];

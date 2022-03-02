@@ -137,4 +137,50 @@ const getTeams = gql`
   }
 `;
 
+export const getEssentialData = gql`
+  query Teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
+    teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
+      data {
+        id
+        name
+        isPublic
+        members {
+          id
+          userId
+          teamId
+          isOwner
+          user {
+            id
+            email
+            name
+            nickname
+            picture
+          }
+        }
+        boards {
+          id
+          title
+          columns {
+            id
+            color
+            title
+            opinions {
+              id
+              columnId
+              authorId
+              text
+              isAction
+              responsible
+              color
+              mergedAuthors
+              status
+            }
+          }
+        }
+      }
+      total
+    }
+  }
+`;
+
 export { getTeams, getTeam };

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { TweenOneGroup } from 'rc-tween-one';
 import { Form, notification, message, Button, FormInstance, Input, Tag, Switch, Tooltip } from 'antd';
 import { useMutation } from '@apollo/client';
@@ -7,7 +7,6 @@ import { TeamQueries } from '../../grapql-client/queries';
 import { UserAddOutlined, CheckOutlined, SendOutlined, CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Team } from '../../types';
-import { isTemplateMiddleOrTemplateTail, resolveProjectReferencePath } from 'typescript';
 
 const validEmail = new RegExp('^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$');
 
@@ -35,7 +34,6 @@ const showNotification = (data: listStatusAddMembers) => {
 };
 
 const AddMembersModal = ({ teamData }: Props) => {
-  const [inviteUrl, setInviteUrl] = useState('http://localhost:3000');
   const [listEmails, setListEmails] = useState<string[]>([]);
   const formRef = useRef<FormInstance>(null);
 
@@ -56,12 +54,6 @@ const AddMembersModal = ({ teamData }: Props) => {
     TeamMutations.changeTeamAccessVars
   >(TeamMutations.changeTeamAccess, {
     refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeam],
-    onError: () => ({}),
-    onCompleted: (data: TeamMutations.changeTeamAccessResult) => {
-      // if (data?.changeTeamAccess?.count > 0) {
-      //   setIsPublic(!isPublic);
-      // }
-    },
   });
 
   const onAddEmail = (value: any) => {
@@ -113,7 +105,7 @@ const AddMembersModal = ({ teamData }: Props) => {
 
   const copyToClipboard = async () => {
     navigator.clipboard
-      .writeText(inviteUrl)
+      .writeText('http://localhost:3000')
       .then(() => {
         message.info('Embedded Url is copied to clipboard!');
       })
@@ -145,7 +137,7 @@ const AddMembersModal = ({ teamData }: Props) => {
       <p>Anyone with the link can join your team.</p>
       <div>
         <Input.Group compact>
-          <Input disabled={true} style={{ width: 'calc(100% - 80px)' }} defaultValue={inviteUrl} />
+          <Input disabled={true} style={{ width: 'calc(100% - 80px)' }} defaultValue={'http://localhost:3000'} />
           <Tooltip title="copy git url">
             <Button
               style={{ borderRadius: '0px' }}

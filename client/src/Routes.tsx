@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage';
 import { SideBar } from './components/SideBar';
 import { User } from './types';
 import { Team } from './pages/TeamPage';
+import { ActionTracker } from './pages/ActionsTracker';
 import { ManageMembers } from './pages/ManageMembersPage';
 import { Board } from './pages/BoardPage';
 import { AccountSetting } from './pages/AccountSettingPage';
@@ -15,7 +16,9 @@ import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
 import { Footer } from 'antd/lib/layout/layout';
-import TeamDetail from './pages/TeamDetailPage/teamDetail';
+import { useSubscription } from '@apollo/client';
+import { BoardSubscription, OpinionSubscription } from './grapql-client/subcriptions';
+import HealthCheck from './pages/HealthCheck/HealthCheck';
 
 type Props = {
   me: null | User;
@@ -30,6 +33,36 @@ const Routes = ({ me }: Props) => {
   const isAdmin = me?.isAdmin || null;
   const picture = me?.picture || null;
 
+  const subcriptionFunc = () => {
+    if (me?.id) {
+      useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
+        BoardSubscription.updateBoard,
+        {
+          variables: {
+            meId: me.id,
+          },
+        },
+      );
+      useSubscription<BoardSubscription.deleteBoardResult, BoardSubscription.deleteBoardVars>(
+        BoardSubscription.deleteBoard,
+        {
+          variables: {
+            meId: me.id,
+          },
+        },
+      );
+
+      useSubscription<OpinionSubscription.updateOpinionResult, OpinionSubscription.updateOpinionVars>(
+        OpinionSubscription.updateOpinion,
+        {
+          variables: {
+            meId: me.id,
+          },
+        },
+      );
+    }
+  };
+
   return (
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
       <Router history={customHistory}>
@@ -39,7 +72,10 @@ const Routes = ({ me }: Props) => {
               <SideBar email={email} isAdmin={isAdmin} />
               <Layout className="site-layout">
                 {/* <TopNavBar email={email} picture={picture} /> */}
-                <Content className="flex flex-1" style={{ margin: '10px 16px', gap: '10px', overflow: 'auto' }}>
+                <Content
+                  className="flex flex-1"
+                  style={{ margin: '10px 16px', padding: '10px', gap: '10px', overflow: 'auto' }}
+                >
                   <Switch>
                     {/* <Route exact path="/" component={Team} /> */}
                     {isAdmin ? (
@@ -51,6 +87,7 @@ const Routes = ({ me }: Props) => {
                       <Switch>
                         <Route path="/teams" exact component={Team} />
                         <>
+                          {subcriptionFunc()}
                           <Switch>
                             <Route
                               path="/manage-members/:teamId"
@@ -58,13 +95,22 @@ const Routes = ({ me }: Props) => {
                             />
                             <Route
                               path="/board/:teamId/:boardId"
+                              exact
                               render={({ match }) => (
                                 <Board teamId={match.params.teamId} boardId={match.params.boardId} />
                               )}
                             />
                             <Route
-                              path="/team-details/:teamId"
-                              render={({ match }) => <TeamDetail teamId={match.params.teamId} />}
+                              path="/actions-tracker/:teamId"
+                              exact
+                              render={({ match }) => <ActionTracker teamId={match.params.teamId} />}
+                            />
+                            <Route
+                              path="/team-health/:teamId/:boardId"
+                              exact
+                              render={({ match }) => (
+                                <HealthCheck teamId={match.params.teamId} boardId={match.params.boardId} />
+                              )}
                             />
                             <Route path="/me" component={ProfileUser} />
                             <Route path="/account" component={AccountSetting} />

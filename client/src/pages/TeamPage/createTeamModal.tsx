@@ -10,8 +10,6 @@ import { RcFile, UploadChangeParam } from 'antd/lib/upload';
 import config from '../../config';
 import { UploadFile } from 'antd/lib/upload/interface';
 
-import { useApolloClient } from '@apollo/client';
-
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 

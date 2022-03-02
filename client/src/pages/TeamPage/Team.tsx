@@ -1,13 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Button, Tabs } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import TeamsCard from './TeamsCard';
 
 import CreateTeamModal from './createTeamModal';
 import SearchBar from '../../components/SearchBar/SearchBar';
-import selfContext from '../../contexts/selfContext';
-import { useSubscription } from '@apollo/client';
-import { BoardSubscription } from '../../grapql-client/subcriptions';
 
 const { TabPane } = Tabs;
 
@@ -18,7 +15,6 @@ const Team = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(8);
   const [loading, setIsLoading] = useState(false);
-  const me = useContext(selfContext);
 
   const onHandleSearch = (searchText: string) => {
     setSearchText(searchText);

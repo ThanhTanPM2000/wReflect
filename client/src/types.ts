@@ -17,6 +17,56 @@ export type Team = {
   boards: Board[];
 };
 
+export type HealthCheck = {
+  id: string;
+  teamId: string;
+  boardId: string;
+  templateId: string;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+  isAnonymous: boolean;
+  isCustom: boolean;
+  status: StatusHealthCheck;
+  board: Board;
+  team: Team;
+  memberAnswers: [MemberAnswer];
+  memberComments: [MemberComment];
+};
+
+export type MemberAnswer = {
+  id: string;
+  templateId: string;
+  healthCheckId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  answers: [Answer];
+  healthCheck: HealthCheck | null;
+  user: User;
+};
+
+export type MemberComment = {
+  id: string;
+  templateId: string;
+  healthCheckId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  questionId: string;
+  text: string;
+  user: User;
+  healthCheck: HealthCheck | null;
+};
+
+export type Answer = {
+  id: string;
+  questionId: string;
+  value: string;
+  memberAnswersId: string | null;
+};
+
 export type Board = {
   id: string;
   teamId: string;
@@ -95,6 +145,7 @@ export type Member = {
   invitedBy: string | null;
   joinedAt: Date;
   role: string | null;
+  boardActive: string;
   user: User;
   team: Team;
 };
@@ -132,6 +183,7 @@ export type Gender = 'UNSPECIFIED' | 'MALE' | 'FEMALE';
 export type OpinionStatus = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
 export type BoardType = 'DEFAULT' | 'PHASE';
 export type PhaseType = 'REFLECT' | 'GROUP' | 'VOTES' | 'DISCUSS';
+export type StatusHealthCheck = 'OPEN' | 'CLOSED';
 
 export type User = {
   id: string;

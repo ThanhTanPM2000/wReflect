@@ -22,7 +22,7 @@ const typeDefs = gql`
     author: User
     member: Member
     position: Int
-    column: Column
+    column(meId: ID): Column
     remarks: [Remark]
   }
 
@@ -45,8 +45,6 @@ export type createOpinionType = {
 
 export type updateOpinionType = {
   teamId: string;
-  boardId: string;
-  columnId: string;
   opinionId: string;
   text?: string;
   upVote?: string[];
@@ -56,6 +54,7 @@ export type updateOpinionType = {
   responsible?: string;
   color?: string;
   status?: OpinionStatus;
+  newColumnId?: string;
 };
 
 export type removeOpinionType = {

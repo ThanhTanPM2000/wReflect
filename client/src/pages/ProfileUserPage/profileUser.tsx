@@ -1,20 +1,19 @@
 import React, { useState, useContext } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { Row, Tabs, Avatar, Button, Input, Upload, message, Card, Col, Form } from 'antd';
+import { Row, Avatar, Button, Input, Upload, message, Card, Col, Form } from 'antd';
 
 import { UserQueries } from '../../grapql-client/queries';
 import { UserMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
 
-import { UploadOutlined, EditFilled } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 
-const { TextArea, Search } = Input;
-const { TabPane } = Tabs;
+const { TextArea } = Input;
 
 const ProfileUser = () => {
   const me = useContext(SelfContext);
 
-  const { loading, data } = useQuery(UserQueries.getUser, {
+  const { data } = useQuery(UserQueries.getUser, {
     variables: {
       email: me?.email,
     },

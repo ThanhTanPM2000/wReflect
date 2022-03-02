@@ -10,6 +10,7 @@ import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from '@apollo/client/link/error';
 import { notification } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
+import { Column, Opinion } from './types';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
@@ -32,15 +33,14 @@ const splitLink = split(
   httpLink,
 );
 
-const errorLink = onError(({ networkError }) => {
+const errorLink = onError(({ networkError, graphQLErrors }) => {
   try {
     if (networkError) {
       notification.error({
         placement: 'bottomRight',
-        message: `[Network error]: ${networkError}`,
+        message: `[Network error]`,
       });
     }
-    return;
   } catch (error) {
     notification.error({
       message: 'Something failed with server',
@@ -51,6 +51,7 @@ const errorLink = onError(({ networkError }) => {
 
 const client = new ApolloClient({
   connectToDevTools: true,
+
   cache: new InMemoryCache({
     addTypename: true,
     resultCaching: true,
@@ -75,11 +76,30 @@ const client = new ApolloClient({
           },
         },
       },
-      Board: {
-        queryType: true,
-        mutationType: true,
-        subscriptionType: true,
-      },
+      // Column: {
+      //   fields: {
+      //     opinion: {
+      //     }
+      //   }
+      // }
+      // Column: {
+      //   fields: {
+      //     opinions: {
+      //       merge(existing: Opinion[], incoming: Opinion[]) {
+      //         return [...incoming];
+      //       },
+      //     },
+      //   },
+      // },
+      // Board: {
+      //   fields: {
+      //     columns: {
+      //       merge(existing: Column[], incoming: Column[]) {
+      //         return [...incoming];
+      //       },
+      //     },
+      //   },
+      // },
     },
   }),
   link: from([errorLink, splitLink]),

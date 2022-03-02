@@ -51,7 +51,7 @@ export default function ListMember({ searchText, teamData }: Props) {
             removeMember({
               variables: { memberId: member.id },
             })
-              .then((res) => message.success(`${member?.user?.email} successfully removed`))
+              .then(() => message.success(`${member?.user?.email} successfully removed`))
               .catch((error) => message.error(error.message));
           };
           const menu = (

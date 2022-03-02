@@ -7,9 +7,9 @@ const typeDefs = gql`
     title: String
     position: Int
     isActive: Boolean
-    opinions: [Opinion]
     boardId: String
-    board: Board
+    opinions(meId: ID): [Opinion]
+    board(meId: ID): Board
   }
 `;
 

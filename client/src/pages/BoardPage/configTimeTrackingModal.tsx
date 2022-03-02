@@ -1,8 +1,8 @@
-import { Form, Input, Modal, InputNumber, notification } from 'antd';
+import { Modal, InputNumber, notification } from 'antd';
 import React, { useState } from 'react';
 import { Board } from '../../types';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { useMutation, useApolloClient } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { BoardMutations } from '../../grapql-client/mutations';
 import moment from 'moment';
 
@@ -14,7 +14,6 @@ type Props = {
 
 export default function ConfigTimeTrackingModal({ boardData, visible, setVisible }: Props) {
   const [minutes, setMinutes] = useState(60);
-  const client = useApolloClient();
 
   const [updateBoard] = useMutation<BoardMutations.updateBoardResult, BoardMutations.updateBoardVars>(
     BoardMutations.updateBoard,

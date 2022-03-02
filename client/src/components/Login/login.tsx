@@ -11,36 +11,39 @@ type Props = {
   redirectUri?: string;
 };
 
-const handleLogin = async (
-  code: string,
-  state: string,
-  setEmail: React.Dispatch<null | string>,
-  setNeedsEmailVerification: React.Dispatch<null | boolean>,
-) => {
-  const res = await auth.login(code, state);
-  if (!res) {
-    return;
-  }
-
-  if (res.requiresEmailVerification) {
-    setNeedsEmailVerification(res.requiresEmailVerification);
-  }
-
-  if (res.email) {
-    setEmail(res.email);
-  }
-
-  //Clear search params
-  const indexOfSearchParams = location.href.indexOf('&code');
-  const clearedUrl = indexOfSearchParams !== -1 ? location.href.substring(0, indexOfSearchParams) : location.href;
-  window.history.replaceState({}, '', clearedUrl);
-};
-
 const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
   const [email, setEmail] = useState<null | string>(null);
   const [needsEmailVerification, setNeedsEmailVerification] = useState<null | boolean>(null);
   const params = new URLSearchParams(location.search);
   const authConfig: AuthOptions = config.AUTH0_WEBAUTH_CONFIG;
+
+  let isMounted = true;
+  const handleLogin = async (
+    code: string,
+    state: string,
+    setEmail: React.Dispatch<null | string>,
+    setNeedsEmailVerification: React.Dispatch<null | boolean>,
+  ) => {
+    const res = await auth.login(code, state);
+    if (!res) {
+      return;
+    }
+    if (isMounted) {
+      if (res.requiresEmailVerification) {
+        setNeedsEmailVerification(res.requiresEmailVerification);
+      }
+
+      if (res.email) {
+        setEmail(res.email);
+      }
+
+      //Clear search params
+      const indexOfSearchParams = location.href.indexOf('&code');
+      const clearedUrl = indexOfSearchParams !== -1 ? location.href.substring(0, indexOfSearchParams) : location.href;
+      window.history.replaceState({}, '', clearedUrl);
+    }
+  };
+
   if (redirectUri) {
     authConfig.redirectUri = redirectUri;
     authConfig.universalLoginPage = false;
@@ -54,6 +57,9 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
         handleLogin(code, state, setEmail, setNeedsEmailVerification);
       }
     }
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {

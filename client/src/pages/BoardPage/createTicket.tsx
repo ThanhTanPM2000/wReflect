@@ -1,12 +1,9 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 
 import { Input, notification } from 'antd';
-import _ from 'lodash';
 import { useMutation } from '@apollo/client';
 import { OpinionMutations } from '../../grapql-client/mutations';
-import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
-import { Board, Column, Opinion } from '../../types';
-import board from './board';
+import { Board, Column } from '../../types';
 import Picker, { IEmojiData } from 'emoji-picker-react';
 import { SmileOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
@@ -19,7 +16,7 @@ type Props = {
   isCreateBottom: boolean;
 };
 
-export default function createTicket({ index, board, column, isCreateBottom }: Props) {
+export default function createTicket({ board, column, isCreateBottom }: Props) {
   const [text, setText] = useState('');
   const [isAction, setIsAction] = useState(false);
   const [isIconOpen, setIsIconOpen] = useState(false);

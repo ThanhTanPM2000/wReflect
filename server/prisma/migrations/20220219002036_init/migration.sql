@@ -43,6 +43,7 @@ CREATE TABLE "Team" (
     "picture" TEXT NOT NULL,
     "isPublic" BOOLEAN NOT NULL DEFAULT true,
     "description" TEXT,
+    "selectedBoard" TEXT,
     "status" "TeamStatus" NOT NULL DEFAULT E'DOING',
 
     PRIMARY KEY ("id")
@@ -197,6 +198,9 @@ CREATE UNIQUE INDEX "Session.userId_token_unique" ON "Session"("userId", "token"
 CREATE INDEX "Session.expiresAt_index" ON "Session"("expiresAt");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Board.teamId_unique" ON "Board"("teamId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Member.userId_teamId_unique" ON "Member"("userId", "teamId");
 
 -- CreateIndex
@@ -215,10 +219,10 @@ ALTER TABLE "Session" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELE
 ALTER TABLE "Team" ADD FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -227,7 +231,7 @@ ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DE
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Opinion" ADD FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Opinion" ADD FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Remark" ADD FOREIGN KEY ("opinionId") REFERENCES "Opinion"("id") ON DELETE CASCADE ON UPDATE CASCADE;

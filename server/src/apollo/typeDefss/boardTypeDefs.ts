@@ -31,21 +31,20 @@ const typeDefs = gql`
     endTime: String
     type: BoardType
     currentPhase: PhaseType
-    team: Team
-    columns: [Column]
+    team(meId: ID): Team
+    columns(meId: ID): [Column]
   }
 `;
 
 export type createBoardType = {
   teamId: string;
-  boardId: string;
   isPublic?: boolean;
   isLocked?: boolean;
   disableDownVote?: boolean;
   disableUpVote?: boolean;
   isAnonymous?: boolean;
   votesLimit?: number;
-  title?: string;
+  title: string;
   timerInProgress?: boolean;
   type?: BoardType;
   currentPhase?: PhaseType;
@@ -86,6 +85,11 @@ export type updateBoardType = {
   isActiveCol3?: boolean;
   isActiveCol4?: boolean;
   isActiveCol5?: boolean;
+};
+
+export type deleteBoardType = {
+  teamId: string;
+  boardId: string;
 };
 
 export default typeDefs;

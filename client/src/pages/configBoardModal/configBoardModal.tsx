@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Form, Input, Select, InputNumber, Switch, FormInstance, notification } from 'antd';
-import Picker, { IEmojiData } from 'emoji-picker-react';
+import { Modal, Button, Form, Input, Select, InputNumber, Switch, FormInstance } from 'antd';
 
 import { Board } from '../../types';
-import { SmileOutlined } from '@ant-design/icons';
 import boardTemplate from '../../const/boardTemplateOption';
 import ConfigColumn from './configColumn';
-import { template } from 'lodash';
 import { useMutation } from '@apollo/client';
 import { BoardMutations } from '../../grapql-client/mutations';
 
 type Props = {
+  teamId: string;
   board?: Board;
   visible: boolean;
   setVisible: (isVisible: boolean) => void;
@@ -27,30 +25,21 @@ type boardTemplateType = {
 
 const { Option } = Select;
 
-export default function ConfigBoardModal({ board, visible, setVisible }: Props) {
+export default function ConfigBoardModal({ teamId, board, visible, setVisible }: Props) {
   const [templateSelect, setTemplateSelect] = useState<string>('defaultBoard');
   const [currentTemplate, setBoardTemplate] = useState<boardTemplateType>();
-  const boardOption = new Map<string, boardTemplateType>();
   // boardTemplate.map((template, index) => boardOption.set(index, template));
   const form = useRef<FormInstance>(null);
 
   const handleSelectTemplate = (value: string) => {
     setTemplateSelect(`${value}`);
-    // form.current?.resetFields([
-    //   'Column1',
-    //   'Column2',
-    //   'Column3',
-    //   'Column4',
-    //   'Column5',
-    //   'isActiveColumn1',
-    //   'isActiveColumn2',
-    //   'isActiveColumn3',
-    //   'isActiveColumn4',
-    //   'isActiveColumn5',
-    // ]);
   };
 
-  const [updateBoard, { loading }] = useMutation<BoardMutations.updateBoardResult, BoardMutations.updateBoardVars>(
+  const [createBoard] = useMutation<BoardMutations.createBoardResult, BoardMutations.createBoardVars>(
+    BoardMutations.createBoard,
+  );
+
+  const [updateBoard] = useMutation<BoardMutations.updateBoardResult, BoardMutations.updateBoardVars>(
     BoardMutations.updateBoard,
   );
 
@@ -59,12 +48,38 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
   }, [templateSelect]);
 
   const handleSubmitBoard = (values: any) => {
-    console.log(values);
     if (board) {
       updateBoard({
         variables: {
+          teamId: teamId,
           boardId: board.id,
-          teamId: board.teamId,
+          isPublic: values['isPublic'],
+          isAnonymous: values['isAnonymous'],
+          disableDownVote: values['disableDownVote'],
+          disableUpVote: values['disableUpVote'],
+          votesLimit: values['votesLimit'],
+          type: values['type'],
+          title: values['title'],
+          column1: values['Column1'],
+          column2: values['Column2'],
+          column3: values['Column3'],
+          column4: values['Column4'],
+          column5: values['Column5'],
+          isActiveCol1: values['isActiveColumn1'],
+          isActiveCol2: values['isActiveColumn2'],
+          isActiveCol3: values['isActiveColumn3'],
+          isActiveCol4: values['isActiveColumn4'],
+          isActiveCol5: values['isActiveColumn5'],
+        },
+        onCompleted: () => {
+          setVisible(false);
+          setTemplateSelect('defaultBoard');
+        },
+      });
+    } else {
+      createBoard({
+        variables: {
+          teamId: teamId,
           isPublic: values['isPublic'],
           isAnonymous: values['isAnonymous'],
           disableDownVote: values['disableDownVote'],
@@ -109,7 +124,7 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
           <div className="edit-board-modal">
             <h2>{board ? 'Edit board' : 'Create board'}</h2>
             <h4>Board Title</h4>
-            <span>You can run a retrospective with phases</span>
+            <div>You can run a retrospective with phases</div>
             <Form.Item
               rules={[{ required: true, message: 'Please input your board title' }]}
               name="title"
@@ -119,7 +134,7 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
             </Form.Item>
 
             <h4>Board Type</h4>
-            <span>You can run a retrospective with phases</span>
+            <div>You can run a retrospective with phases</div>
             <Form.Item name="type" initialValue={board?.type ?? 'DEFAULT'}>
               <Select defaultValue={board?.type ?? 'DEFAULT'}>
                 <Option value="DEFAULT">No Phase</Option>
@@ -127,7 +142,7 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
               </Select>
             </Form.Item>
             <h4>Max Votes</h4>
-            <span>The number of votes per participant</span>
+            <div>The number of votes per participant</div>
             <Form.Item
               rules={[{ required: true, message: 'Please input limit votes' }]}
               name="votesLimit"
@@ -140,7 +155,7 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
             <h2>Configurations</h2>
             <div>
               <h4>Public Board</h4>
-              <span>Anyone with the link to board can access it</span>
+              <div>Anyone with the link to board can access it</div>
               <Form.Item name="isPublic" initialValue={board?.isPublic ?? false}>
                 <Switch defaultChecked={board?.isPublic} />
               </Form.Item>
@@ -148,21 +163,21 @@ export default function ConfigBoardModal({ board, visible, setVisible }: Props) 
 
             <div>
               <h4>Run Retrospective Anonymously</h4>
-              <span>All the participants will give feedback anonymously</span>
+              <div>All the participants will give feedback anonymously</div>
               <Form.Item name="isAnonymous" initialValue={board?.isAnonymous ?? false}>
                 <Switch defaultChecked={board?.isAnonymous} />
               </Form.Item>
             </div>
             <div>
               <h4>Disable Up Votes</h4>
-              <span>The participants will not be able to up vote</span>
+              <div>The participants will not be able to up vote</div>
               <Form.Item name="disableUpVote" initialValue={board?.disableUpVote ?? false}>
                 <Switch defaultChecked={board?.disableUpVote} />
               </Form.Item>
             </div>
             <div>
               <h4>Disable Down Votes</h4>
-              <span>The participants will not be able to down vote</span>
+              <div>The participants will not be able to down vote</div>
               <Form.Item name="disableDownVote" initialValue={board?.disableDownVote ?? false}>
                 <Switch defaultChecked={board?.disableDownVote} />
               </Form.Item>

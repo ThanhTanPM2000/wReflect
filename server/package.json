@@ -9,7 +9,7 @@
     "start": "node dist/app.js",
     "build": "yarn run prisma migrate deploy && yarn run prisma generate && tsc --build tsconfig.json",
     "generate-prisma-migration": "prisma migrate dev --name init",
-    "deploy-prisma-migrations": "prisma migrate resolve --applied '20211215062111_first_one' --preview-feature",
+    "deploy-prisma-migrations": "prisma migrate resolve --applied '20220302055836_init' --preview-feature",
     "generate-prisma-client": "prisma generate"
   },
   "dependencies": {

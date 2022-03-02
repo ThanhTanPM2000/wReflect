@@ -1,4 +1,5 @@
-import { Remark, Opinion } from '@prisma/client';
+import { orderOpinion } from './../../services/opinion';
+import { Remark, Opinion, Board, HealthCheck } from '@prisma/client';
 import { orderOpinionType } from './opinionTypeDefs';
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
@@ -10,6 +11,10 @@ const typeDefs = gql`
 
   type BatchPayload {
     count: Int!
+  }
+
+  type statusResponse {
+    success: Boolean!
   }
 
   input orderOpinion {
@@ -32,6 +37,16 @@ const typeDefs = gql`
     IN_PROGRESS
     DONE
     REJECTED
+  }
+
+  enum ActionConvertColumn {
+    ACTIONS
+    OPINIONS
+  }
+
+  enum StatusHealthCheck {
+    OPEN
+    CLOSED
   }
 
   type Mutation {
@@ -58,9 +73,20 @@ const typeDefs = gql`
     deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
 
-    createBoard(
+    startSurveyHealthCheck(
       teamId: String!
       boardId: String!
+      templateId: String!
+      isAnonymous: Boolean!
+      isCustom: Boolean!
+      status: StatusHealthCheck!
+    ): getHealthCheck
+
+    updateAction(teamId: String!, boardId: String!, columnId: String!, opinion: String!): Team
+    # usingCurrentBoard(teamId: String!, boardId: String!): Team
+
+    createBoard(
+      teamId: String!
       isPublic: Boolean
       isLocked: Boolean
       disableDownVote: Boolean
@@ -82,7 +108,7 @@ const typeDefs = gql`
       isActiveCol3: Boolean
       isActiveCol4: Boolean
       isActiveCol5: Boolean
-    ): Team
+    ): Board
 
     updateBoard(
       teamId: String!
@@ -110,6 +136,11 @@ const typeDefs = gql`
       isActiveCol5: Boolean
     ): Board
 
+    deleteBoard(teamId: String!, boardId: String!): Board
+
+    convertOpinionsInColumn(teamId: String!, boardId: String!, columnId: String!, action: ActionConvertColumn!): Column
+    emptyColumn(teamId: String!, boardId: String!, columnId: String): Column
+
     createOpinion(
       teamId: String!
       boardId: String!
@@ -120,8 +151,6 @@ const typeDefs = gql`
     ): Board
     updateOpinion(
       teamId: String!
-      boardId: String!
-      columnId: String!
       opinionId: String!
       text: String
       upVote: [String]
@@ -131,7 +160,9 @@ const typeDefs = gql`
       responsible: String
       color: String
       status: OpinionStatus
+      newColumnId: String
     ): Opinion
+
     removeOpinion(teamId: String!, boardId: String!, columnId: String!, opinionId: String!): Board
     orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): Board
     combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): Board

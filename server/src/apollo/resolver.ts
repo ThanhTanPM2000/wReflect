@@ -1,7 +1,9 @@
+import { startSurveyArgs } from './typeDefss/healthCheckTypeDefs';
+import { getHealthCheck } from './../services/healthcheck';
 import { updateOpinion } from './../services/opinion';
 import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
 import { RequestWithUserInfo } from './../types';
-import { member, team, user, board, column, opinion, remark } from '../services';
+import { member, team, user, board, column, opinion, remark, healthCheck } from '../services';
 import { withFilter } from 'graphql-subscriptions';
 
 import {
@@ -13,7 +15,8 @@ import {
 } from './typeDefss/opinionTypeDefs';
 import { pubsub } from '../pubSub';
 import logger from '../logger';
-import { updateBoardType, createBoardType } from './typeDefss/boardTypeDefs';
+import { updateBoardType, createBoardType, deleteBoardType } from './typeDefss/boardTypeDefs';
+import { prisma, Answer } from '@prisma/client';
 
 const resolvers = {
   Query: {
@@ -25,19 +28,28 @@ const resolvers = {
     },
     team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id, isAdmin } = req?.user;
-      return await team.getTeam(args.teamId, isAdmin ? undefined : id);
+      const myTeam = await team.getTeam(args.teamId, isAdmin ? undefined : id);
+      return myTeam;
     },
     user: async (_, args) => {
       return await user.getUser(args.userId);
     },
 
     boards: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      return await board.getListBoardOfTeam(req, args.teamId);
+      const { id: meId, isAdmin } = req?.user || {};
+      return await board.getListBoardOfTeam(args.teamId, isAdmin ? undefined : meId);
     },
 
     board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const myBoard = await board.getBoard(req, args.boardId);
+      const { id: meId } = req?.user || {};
+      const myBoard = await board.getBoard(args.boardId, meId);
       return myBoard;
+    },
+
+    getHealthCheck: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const result = await healthCheck.getHealthCheck(args?.teamId, args?.boardId);
+      return result;
     },
   },
   Mutation: {
@@ -55,21 +67,62 @@ const resolvers = {
     deleteTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       return await team.deleteTeam(req, args?.teamId);
     },
+
+    startSurveyHealthCheck: async (_, args: startSurveyArgs, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      const creatingHealthCheck = await healthCheck.createHealthCheck(meId, args);
+      // pubsub.publish('START_SURVEY', {
+      //   updateGetHealthCheck: creatingHealthCheck,
+      // });
+      return creatingHealthCheck;
+    },
+
     changeTeamAccess: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { teamId, isPublic } = args;
       return await team.changeTeamAccess(req, teamId, isPublic);
     },
-
-    // createBoard: async (_, args:createBoardType, {req}: {req: RequestWithUserInfo} ) => {
-    //   const myTeam = await team.
+    // usingCurrentBoard: async (_, args, {req}: {req: RequestWithUserInfo}) => {
+    //   return await team.changeCurrentBoard
     // },
-
+    createBoard: async (_, args: createBoardType, { req }: { req: RequestWithUserInfo }) => {
+      const myBoard = await board.createBoard(req, args);
+      pubsub.publish('CREATE_BOARD', {
+        updateBoard: myBoard,
+      });
+      return myBoard;
+    },
     updateBoard: async (_, args: updateBoardType, { req }: { req: RequestWithUserInfo }) => {
       const myBoard = await board.updateBoard(req, args);
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: myBoard,
       });
       return myBoard;
+    },
+    deleteBoard: async (_, args: deleteBoardType, { req }: { req: RequestWithUserInfo }) => {
+      const deletingBoard = await board.deleteBoard(req, args);
+      pubsub.publish('DELETE_BOARD', {
+        deleteBoard: deletingBoard,
+      });
+      return deletingBoard;
+    },
+    convertOpinionsInColumn: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const convertingColumn = await column.convert(
+        args.teamId,
+        args.boardId,
+        args.columnId,
+        meId,
+        args.action == 'ACTIONS' ? true : false,
+      );
+      pubsub.publish('CONVERT_COLUMN', {
+        convertColumn: convertingColumn,
+      });
+      return convertingColumn;
+    },
+    emptyColumn: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const emptingColumn = await column.emptyColumn(args.teamId, args.boardId, args.columnId, meId);
+      return emptingColumn;
     },
 
     addMembers: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -86,6 +139,9 @@ const resolvers = {
     },
     removeMember: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
+      pubsub.publish('REMOVE_MEMBER', {
+        addMembers: team,
+      });
       return await member.removeMember(meId, args.memberId);
     },
     changeRoleMember: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -101,7 +157,8 @@ const resolvers = {
       return data?.board;
     },
     updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const myOpinion = await opinion.updateOpinion(req, args);
+      const { id: meId } = req?.user;
+      const myOpinion = await opinion.updateOpinion(args.teamId, meId, args);
       pubsub.publish('UPDATE_OPINION', {
         updateOpinion: { ...myOpinion },
       });
@@ -129,6 +186,10 @@ const resolvers = {
       return board;
     },
 
+    // updateAction: async (_, args, {req}: {req: RequestWithUserInfo} ) => {
+    //   const newTeam = await team.updateAction();
+    // },
+
     createRemark: async (_, args: createRemarkType, { req }: { req: RequestWithUserInfo }) => {
       const opinion = await remark.createRemark(req, args);
       pubsub.publish('UPDATE_OPINION', {
@@ -145,14 +206,48 @@ const resolvers = {
     },
   },
   Subscription: {
+    // createBoard: {
+    //   subcribe: withFilter(
+    //     () => pubsub.asyncIterator(['CREATE_BOARD']),
+    //     (_, args) => {
+    //       return true;
+    //     },
+    //   ),
+    // },
     updateBoard: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(['UPDATE_BOARD', 'ORDER_OPINION']),
+        () => pubsub.asyncIterator(['CREATE_BOARD', 'UPDATE_BOARD', 'ORDER_OPINION']),
         (_, args) => {
           return true;
         },
       ),
     },
+    deleteBoard: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['DELETE_BOARD']),
+        (_, args) => {
+          return true;
+        },
+      ),
+    },
+    // updateMember: {
+    //   subscribe: withFilter(
+    //     () => pubsub.asyncIterator(['ADD_MEMBERS', 'REMOVE_MEMBER']),
+    //     (_, args) => {
+    //       return true;
+    //     },
+    //   ),
+    // },
+
+    convertColumn: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['CONVERT_COLUMN']),
+        (_, args) => {
+          return true;
+        },
+      ),
+    },
+
     updateOpinion: {
       subscribe: withFilter(
         () => pubsub.asyncIterator('UPDATE_OPINION'),
@@ -171,7 +266,8 @@ const resolvers = {
   },
   Team: {
     boards: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const boards = await board.getListBoardOfTeam(req, _.id);
+      const { id: meId, isAdmin } = req?.user || {};
+      const boards = await board.getListBoardOfTeam(_.id, req ? (isAdmin ? undefined : meId) : args.meId);
       return boards;
     },
     members: async (_) => {
@@ -181,8 +277,8 @@ const resolvers = {
   },
   Board: {
     team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId, isAdmin } = req.user;
-      const myTeam = await team.getTeam(_.teamId, isAdmin ? undefined : meId);
+      const { id: meId, isAdmin } = req?.user || {};
+      const myTeam = await team.getTeam(_.teamId, req ? (isAdmin ? undefined : meId) : args.meId);
       return myTeam;
     },
     columns: async (_) => {
@@ -192,7 +288,8 @@ const resolvers = {
   },
   Column: {
     board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const myBoard = await board.getBoard(req, _?.boarId);
+      const { id: meId, isAdmin } = req?.user || {};
+      const myBoard = await board.getBoard(_?.boardId, req ? (isAdmin ? undefined : meId) : args.meId);
       return myBoard;
     },
     opinions: async (_) => {

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Menu, Dropdown, Button } from 'antd';
+import { Button } from 'antd';
 
 import { Login } from '../Login';
-import { Logout } from '../Logout';
 
 type Props = {
   email: null | string;
@@ -10,22 +9,6 @@ type Props = {
 };
 
 const LoginSection = ({ email }: Props) => {
-  if (email) {
-    const menu = (
-      <Menu>
-        <Menu.Item key="sign-out">
-          <Logout>
-            <>Sign out</>
-          </Logout>
-        </Menu.Item>
-      </Menu>
-    );
-    return (
-      <Dropdown placement="bottomRight" overlay={menu}>
-        <Button type="text">{`Hi, ${email}`}</Button>
-      </Dropdown>
-    );
-  }
   return (
     <Login isLoggedIn={!!email}>
       <Button>Login / Sign up</Button>

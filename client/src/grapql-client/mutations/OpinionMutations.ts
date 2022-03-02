@@ -45,8 +45,6 @@ export type updateOpinionResult = {
 
 export type updateOpinionVars = {
   teamId: string;
-  boardId: string;
-  columnId: string;
   opinionId: string;
   text?: string;
   upVote?: string[];
@@ -56,14 +54,13 @@ export type updateOpinionVars = {
   responsible?: string;
   color?: string;
   status?: OpinionStatus;
+  newColumnId?: string;
 };
 
 export const updateOpinion = gql`
   ${OPINION_FIELDS}
   mutation updateOpinion(
     $teamId: String!
-    $boardId: String!
-    $columnId: String!
     $opinionId: String!
     $text: String
     $upVote: [String]
@@ -73,11 +70,10 @@ export const updateOpinion = gql`
     $responsible: String
     $color: String
     $status: OpinionStatus
+    $newColumnId: String
   ) {
     updateOpinion(
       teamId: $teamId
-      boardId: $boardId
-      columnId: $columnId
       opinionId: $opinionId
       text: $text
       upVote: $upVote
@@ -87,6 +83,7 @@ export const updateOpinion = gql`
       responsible: $responsible
       color: $color
       status: $status
+      newColumnId: $newColumnId
     ) {
       ...OpinionFields
     }

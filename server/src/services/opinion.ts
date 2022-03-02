@@ -1,3 +1,4 @@
+import { isOwnedTeam, isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './team';
 import { Opinion, Column } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
@@ -38,22 +39,8 @@ export const getOpinion = async (opinionId: string) => {
 export const createOpinion = async (req: RequestWithUserInfo, args: createOpinionType) => {
   const { id: meId, members, email } = req?.user;
 
-  const board = await prisma.board.findFirst({
-    where: {
-      isLocked: false,
-      id: args.boardId,
-      team: {
-        members: {
-          some: {
-            userId: meId,
-          },
-        },
-      },
-    },
-  });
-
-  if (!board)
-    throw new ApolloError('You dont have permission to do that or data not found', `${StatusCodes.FORBIDDEN}`);
+  await isMembersOfTeam(args.teamId, meId);
+  await isAllowUpdateBoard(args.boardId, meId);
 
   const max = await prisma.opinion.aggregate({
     where: {
@@ -137,30 +124,12 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
   return myBoard;
 };
 
-export const updateOpinion = async (req: RequestWithUserInfo, args: updateOpinionType) => {
-  const { id: meId } = req?.user;
-
-  const board = await prisma.board.findFirst({
-    where: {
-      id: args.boardId,
-      teamId: args.teamId,
-      columns: {
-        some: {
-          opinions: {
-            some: {
-              id: args?.opinionId,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!board) throw new ApolloError('Data not found or you dont have permission', `${StatusCodes.FORBIDDEN}`);
+export const updateOpinion = async (teamId: string, userId: string, args: updateOpinionType) => {
+  await isOwnedOpinion(args.opinionId, userId);
 
   const opinion = await prisma.opinion.update({
     where: {
-      id: args?.opinionId,
+      id: args.opinionId,
     },
     data: {
       text: args?.text,
@@ -171,6 +140,7 @@ export const updateOpinion = async (req: RequestWithUserInfo, args: updateOpinio
       responsible: args?.responsible,
       color: args?.color,
       status: args?.status,
+      columnId: args?.newColumnId,
     },
   });
 

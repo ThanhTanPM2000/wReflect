@@ -1,38 +1,44 @@
 import { RequestWithUserInfo } from './../types';
-import { updateBoardType } from './../apollo/typeDefss/boardTypeDefs';
+import { createBoardType, deleteBoardType, updateBoardType } from './../apollo/typeDefss/boardTypeDefs';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
 import _, { now } from 'lodash';
 import { NotFound } from '../errorsManagement';
+import { P } from 'pino';
+import { argsToArgsConfig } from 'graphql/type/definition';
 
-export const getListBoardOfTeam = async (req: RequestWithUserInfo, teamId: string) => {
-  const { id } = req?.user;
+export const getListBoardOfTeam = async (teamId: string, userId?: string) => {
+  const where = userId
+    ? {
+        team: {
+          OR: [
+            {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+            {
+              isPublic: true,
+            },
+          ],
+        },
+      }
+    : undefined;
+
   const boards = await prisma.board.findMany({
     where: {
       teamId,
-      team: {
-        OR: [
-          {
-            members: {
-              some: {
-                userId: id,
-              },
-            },
-          },
-          {
-            isPublic: true,
-          },
-        ],
-      },
+      ...where,
     },
   });
 
   return boards;
 };
 
-export const getBoard = async (req: RequestWithUserInfo, boardId: string) => {
-  const { id: meId } = req.user;
+export const getBoard = async (boardId: string, meId: string) => {
   const board = await prisma.board.findFirst({
     where: {
       id: boardId,
@@ -79,6 +85,72 @@ export const getBoard = async (req: RequestWithUserInfo, boardId: string) => {
   });
 
   !board && NotFound();
+
+  return board;
+};
+
+export const createBoard = async (req: RequestWithUserInfo, args: createBoardType) => {
+  const { id: meId, email } = req?.user;
+
+  const board = await prisma.board.create({
+    data: {
+      teamId: args.teamId,
+      isPublic: args.isPublic,
+      isLocked: args.isLocked,
+      disableDownVote: args.disableDownVote,
+      disableUpVote: args.disableUpVote,
+      isAnonymous: args.isAnonymous,
+      votesLimit: args.votesLimit,
+      title: args.title,
+      createdBy: email,
+      type: args.type,
+      currentPhase: args.currentPhase,
+      endTime: args.endTime,
+      columns: {
+        createMany: {
+          data: [
+            {
+              title: args.column1 || '',
+              isActive: args.isActiveCol1,
+              position: 1,
+            },
+            {
+              title: args.column2 || '',
+              isActive: args.isActiveCol2,
+              position: 2,
+            },
+            {
+              title: args.column3 || '',
+              isActive: args.isActiveCol3,
+              position: 3,
+            },
+            {
+              title: args.column4 || '',
+              isActive: args.isActiveCol4,
+              position: 4,
+            },
+            {
+              title: args.column5 || '',
+              isActive: args.isActiveCol5,
+              position: 5,
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  await prisma.member.update({
+    where: {
+      userId_teamId: {
+        userId: meId,
+        teamId: args.teamId,
+      },
+    },
+    data: {
+      boardActive: board.id,
+    },
+  });
 
   return board;
 };
@@ -192,4 +264,28 @@ export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardTyp
   });
 
   return board;
+};
+
+export const deleteBoard = async (req: RequestWithUserInfo, args: deleteBoardType) => {
+  const { id: meId } = req?.user;
+
+  const deletingBoard = await prisma.board.delete({
+    where: {
+      id: args.boardId,
+    },
+  });
+
+  await prisma.member.update({
+    where: {
+      userId_teamId: {
+        userId: meId,
+        teamId: args?.teamId,
+      },
+    },
+    data: {
+      boardActive: null,
+    },
+  });
+
+  return deletingBoard;
 };

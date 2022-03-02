@@ -220,7 +220,7 @@
 
 .board {
   align-items: flex-start;
-  justify-content: center;
+  // justify-content: center;
   gap: 30px;
   padding: 5px;
 
@@ -233,6 +233,18 @@
     min-height: 50px;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
       rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+
+    .colHead {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      .titleHead {
+        font-size: 15px;
+        font-weight: bold !important;
+      }
+    }
 
     .colContent {
       .panel.tab {
@@ -311,18 +323,19 @@
           text-align: end;
           display: flex;
           align-items: center;
+          justify-content: space-between;
 
           .owner-opinion {
-            margin-right: auto;
+            // margin-right: auto;
             text-align: center;
           }
           .myVotes {
             margin-right: auto;
             margin-left: auto;
           }
-          .upvote {
-            margin-right: 10px;
-          }
+          // .upvote {
+          //   margin-right: 10px;
+          // }
         }
       }
     }
