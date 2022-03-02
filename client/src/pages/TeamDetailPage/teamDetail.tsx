@@ -1,23 +1,20 @@
 import React, { useState, useContext, useRef } from 'react';
-import { Menu, Button, Tabs, Skeleton, Dropdown, List, Modal, Avatar } from 'antd';
-import { ExclamationCircleOutlined, EditFilled, DeleteOutlined } from '@ant-design/icons';
-import { useHistory } from 'react-router-dom';
+import { Input, Button, Tabs, Avatar, Upload, message, Row, Col } from 'antd';
+import { EditFilled, UploadOutlined } from '@ant-design/icons';
 
-import { useMutation, useQuery, useLazyQuery, NetworkStatus } from '@apollo/client';
+import { useMutation, useQuery} from '@apollo/client';
 
-import { PlusCircleOutlined, MoreOutlined } from '@ant-design/icons';
-import AddMembersModal from './addMemberModal';
 import { TeamQueries } from '../../grapql-client/queries';
+import { RcFile, UploadChangeParam } from 'antd/lib/upload';
+import { UploadFile } from 'antd/lib/upload/interface';
+import config from '../../config';
 import { TeamMutations } from '../../grapql-client/mutations';
-import EditTeamDetailModal from './editTeamDetailModal';
 
-import ListMember from './listMember';
-import SearchBar from '../../components/SearchBar/SearchBar';
-import { Member } from '../../types';
 import { Loading } from '../../components/Loading';
 import { TopNavBar } from '../../components/TopNavBar';
 
 const { TabPane } = Tabs;
+const { TextArea } = Input;
 
 type Props = {
   teamId: string;
@@ -31,6 +28,18 @@ const TeamDetail = ({ teamId }: Props) => {
     },
   );
 
+  const props = {
+    beforeUpload: async (file: RcFile) => {
+      if (file.type !== 'image/png') {
+        message.error(`${file.name} is not a png file`);
+      }
+      return file.type === 'image/png' ? true : Upload.LIST_IGNORE;
+    },
+    onChange: (info: UploadChangeParam<UploadFile<any>>) => {
+      console.log(info.fileList);
+    },
+  };
+
   return (
     <>
       <TopNavBar team={data?.team} title="Team Details" />
@@ -40,49 +49,57 @@ const TeamDetail = ({ teamId }: Props) => {
           style={{ height: '100%', padding: '5px' }}
         >
           <>
-            <div className="flex flex-2 flex-jc-sb" style={{ padding: 24, height: '100%' }}>
-              <div className="flex flex-ai-c flex-jc-sb">
-                <Avatar shape="square" size={250} src={data?.team?.picture}></Avatar>
-                <div
-                  className="flex flex-ai-c flex-jc-sb nameTeam"
-                  style={{ marginTop: '25px', height: 100, width: 500, overflow: 'hidden' }}
-                >
-                  Team: {data?.team?.name}
-                </div>
-                <div>Description: {data?.team?.description}</div>
-                <div style={{ marginTop: '20px' }}>
-                  {data?.team?.members.map((member: Member) => {
-                    return (
-                      <Avatar
-                        style={{ marginRight: '3px' }}
-                        size="small"
-                        key={member?.user?.email}
-                        src={member?.user?.picture}
-                      />
-                    );
-                  })}
-                </div>
+            <div className="flex flex-2 " style={{ padding: '48px 0 0', height: '100%' }}>
+              <div className="team-settings" style={{ padding: 0, margin: '0px 30px 20px' }}>
+                {' '}
+                <h2>Team Settings</h2>
               </div>
-              <div className="flex flex-ai-c flex-jc-c">
-                <Button
-                  type="primary"
-                  shape="round"
-                  icon={<EditFilled />}
-                  size="large"
-                  // onClick={() => setIsVisibleEditDetails(true)}
-                >
-                  Edit Details
-                </Button>
-              </div>
+              <Row style={{ paddingTop: 0, marginRight: 0 }}>
+                <Col span={8}>
+                  <div className="flex flex-ai-c flex-jc-sb">
+                    <Avatar shape="circle" size={250} src={data?.team?.picture}></Avatar>
+                    <Upload
+                      action={`${config.SERVER_BASE_URL}/api/upload`}
+                      name="photo"
+                      multiple={false}
+                      withCredentials={true}
+                      listType="picture"
+                      maxCount={1}
+                      {...props}
+                    >
+                      <Button style={{ marginTop: 20 }} size="large" shape="round" icon={<UploadOutlined />}>
+                        Upload
+                      </Button>
+                    </Upload>
+                  </div>
+                </Col>
+                <Col span={16}>
+                  <div className="flex">
+                    <div className="flex nameTeam" style={{ fontSize: 20, marginBottom: 10}}>
+                      <h5>Team Name</h5>
+                      <Input defaultValue={data?.team?.name} />
+                    </div>
+                    <div className="flex nameTeam" style={{ fontSize: 20, marginBottom: 10}}>
+                      <h5>Description</h5>
+                      <TextArea style={{ height: 108}} defaultValue={data?.team?.description || undefined} />
+                    </div>
+
+                    <div style={{marginTop: 20 }} className="flex">
+                      <hr style={{ marginBottom: 20}} />
+                      <Button
+                        shape="round"
+                        icon={<EditFilled />}
+                        size="large"
+                        style={{ width: 'fit-content', margin: '0 0 0 auto' }}
+                        // onClick={() => setIsVisibleEditDetails(true)}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
             </div>
-            <div
-              className="flex-5 site-layout-background card-workspace"
-              style={{
-                padding: 24,
-                height: '100%',
-                boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
-              }}
-            ></div>
           </>
         </div>
       </Loading>
