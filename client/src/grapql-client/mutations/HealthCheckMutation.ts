@@ -45,10 +45,87 @@ export const startSurvey = gql`
         userId
         createdAt
         healthCheckId
+        user {
+          email
+        }
         answers {
           questionId
           value
         }
+      }
+      memberComments {
+        id
+        templateId
+        healthCheckId
+        createdAt
+        updatedAt
+        userId
+        questionId
+        text
+        user {
+          email
+        }
+      }
+      healthCheck {
+        id
+        teamId
+        boardId
+        templateId
+        createdAt
+        createdBy
+        updatedAt
+        updatedBy
+        isAnonymous
+        isCustom
+      }
+    }
+  }
+`;
+
+export type setAnswerHealthCheckResult = {
+  answerHealthCheck: {
+    getHealthCheck: {
+      memberAnswers: [MemberAnswer];
+      memberComments: [MemberComment];
+      healthCheck: HealthCheck;
+    };
+  };
+};
+
+export type setAnswerHealthCheckVars = {
+  teamId: string;
+  boardId: string;
+  templateId: string;
+  answers: { questionId: string; value: string }[];
+  comments: { questionId: string; text: string }[];
+};
+
+export const setAnswerHealthCheck = gql`
+  mutation Mutation(
+    $teamId: String!
+    $boardId: String!
+    $templateId: String!
+    $answers: [answerInput!]!
+    $comments: [commentInput!]!
+  ) {
+    answerHealthCheck(
+      teamId: $teamId
+      boardId: $boardId
+      templateId: $templateId
+      answers: $answers
+      comments: $comments
+    ) {
+      memberAnswers {
+        answers {
+          questionId
+          value
+        }
+        id
+        templateId
+        healthCheckId
+        createdAt
+        updatedAt
+        userId
       }
       memberComments {
         id

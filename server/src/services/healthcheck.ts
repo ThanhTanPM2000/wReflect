@@ -1,5 +1,5 @@
 import { HealthCheck, MemberAnswer } from '@prisma/client';
-import { startSurveyArgs } from './../apollo/typeDefss/healthCheckTypeDefs';
+import { startSurveyArgs, answerHealthCheckArgs } from './../apollo/typeDefss/healthCheckTypeDefs';
 import prisma from '../prisma';
 
 export const getHealthCheck = async (teamId: string, boardId: string) => {
@@ -9,8 +9,17 @@ export const getHealthCheck = async (teamId: string, boardId: string) => {
       boardId,
     },
     include: {
-      memberAnswers: true,
-      memberComments: true,
+      memberAnswers: {
+        include: {
+          answers: true,
+          user: true,
+        },
+      },
+      memberComments: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 
@@ -33,8 +42,17 @@ export const createHealthCheck = async (userId: string, args: startSurveyArgs) =
       status: args.status,
     },
     include: {
-      memberAnswers: true,
-      memberComments: true,
+      memberAnswers: {
+        include: {
+          answers: true,
+          user: true,
+        },
+      },
+      memberComments: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 
@@ -42,6 +60,59 @@ export const createHealthCheck = async (userId: string, args: startSurveyArgs) =
     healthCheck: healthCheck || null,
     memberAnswers: healthCheck?.memberAnswers || [],
     memberComments: healthCheck?.memberComments || [],
-    __typeName: 'getHealthCheck',
+  };
+};
+
+export const setAnswerHealthCheck = async (userId: string, args: answerHealthCheckArgs) => {
+  const createManyMemberComments = args.comments.map((comment) => {
+    return {
+      userId,
+      templateId: args.templateId,
+      questionId: comment.questionId,
+      text: comment.text,
+    };
+  });
+
+  const healthCheck = await prisma.healthCheck.update({
+    where: {
+      boardId: args.boardId,
+    },
+    data: {
+      memberAnswers: {
+        create: {
+          userId,
+          templateId: args.templateId,
+          answers: {
+            createMany: {
+              data: args.answers,
+            },
+          },
+        },
+      },
+      memberComments: {
+        createMany: {
+          data: createManyMemberComments,
+        },
+      },
+    },
+    include: {
+      memberAnswers: {
+        include: {
+          answers: true,
+          user: true,
+        },
+      },
+      memberComments: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
+  return {
+    healthCheck: healthCheck || null,
+    memberAnswers: healthCheck?.memberAnswers || [],
+    memberComments: healthCheck?.memberComments || [],
   };
 };

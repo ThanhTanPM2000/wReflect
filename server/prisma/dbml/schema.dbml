@@ -80,13 +80,17 @@ Table HealthCheck {
 Table MemberAnswer {
   id String [pk]
   templateId String [not null]
-  healthCheckId String
+  healthCheckId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   userId String [not null]
   answers Answer [not null]
-  healthCheck HealthCheck
+  healthCheck HealthCheck [not null]
   user User [not null]
+
+  indexes {
+    (healthCheckId, userId) [unique]
+  }
 }
 
 Table Answer {
@@ -100,14 +104,18 @@ Table Answer {
 Table MemberComment {
   id String [pk]
   templateId String [not null]
-  healthCheckId String
+  healthCheckId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   userId String [not null]
   questionId String [not null]
   text String [not null]
   user User [not null]
-  healthCheck HealthCheck
+  healthCheck HealthCheck [not null]
+
+  indexes {
+    (healthCheckId, userId) [unique]
+  }
 }
 
 Table Column {

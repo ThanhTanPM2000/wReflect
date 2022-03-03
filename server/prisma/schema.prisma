@@ -87,15 +87,17 @@ model HealthCheck {
 }
 
 model MemberAnswer {
-  id            String       @id @default(uuid())
+  id            String      @id @default(uuid())
   templateId    String
-  healthCheckId String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  healthCheckId String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   userId        String
   answers       Answer[]
-  healthCheck   HealthCheck? @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  healthCheck   HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([healthCheckId, userId])
 }
 
 model Answer {
@@ -107,17 +109,18 @@ model Answer {
 }
 
 model MemberComment {
-  id            String       @id @default(uuid())
+  id            String      @id @default(uuid())
   templateId    String
-  healthCheckId String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  healthCheckId String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   userId        String
   questionId    String
   text          String
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  healthCheck   HealthCheck? @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  healthCheck   HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
+  @@unique([healthCheckId, userId])
 }
 
 enum BoardType {

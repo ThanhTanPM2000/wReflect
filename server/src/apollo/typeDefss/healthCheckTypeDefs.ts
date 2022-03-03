@@ -29,4 +29,12 @@ export type startSurveyArgs = {
   status: StatusHealthCheck;
 };
 
+export type answerHealthCheckArgs = {
+  teamId: string;
+  boardId: string;
+  templateId: string;
+  answers: { questionId: string; value: string }[];
+  comments: { questionId: string; text: string }[];
+};
+
 export default typeDefs;

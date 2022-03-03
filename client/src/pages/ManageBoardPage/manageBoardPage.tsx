@@ -79,6 +79,7 @@ const ManageBoardPage = ({ teamId }: Props) => {
                               padding: 24,
                               height: '80px',
                               width: '100%',
+
                             }}
                           >
                             <h1>{board.title}</h1>

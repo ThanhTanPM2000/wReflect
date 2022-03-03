@@ -1,4 +1,4 @@
-import { startSurveyArgs } from './typeDefss/healthCheckTypeDefs';
+import { answerHealthCheckArgs, startSurveyArgs } from './typeDefss/healthCheckTypeDefs';
 import { getHealthCheck } from './../services/healthcheck';
 import { updateOpinion } from './../services/opinion';
 import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
@@ -17,6 +17,7 @@ import { pubsub } from '../pubSub';
 import logger from '../logger';
 import { updateBoardType, createBoardType, deleteBoardType } from './typeDefss/boardTypeDefs';
 import { prisma, Answer } from '@prisma/client';
+import { string } from 'zod';
 
 const resolvers = {
   Query: {
@@ -75,6 +76,12 @@ const resolvers = {
       //   updateGetHealthCheck: creatingHealthCheck,
       // });
       return creatingHealthCheck;
+    },
+
+    answerHealthCheck: async (_, args: answerHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      const setAnswerToHealthCheck = await healthCheck.setAnswerHealthCheck(meId, args);
+      return setAnswerToHealthCheck;
     },
 
     changeTeamAccess: async (_, args, { req }: { req: RequestWithUserInfo }) => {

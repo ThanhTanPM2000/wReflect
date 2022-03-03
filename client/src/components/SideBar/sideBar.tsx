@@ -72,33 +72,32 @@ const SideBar = ({ isAdmin }: Props) => {
                 <Menu.Item key="2" icon={<BarChartOutlined />}>
                   <Link to="/dashboard">Dashboard</Link>
                 </Menu.Item>
-
-                <Menu.Item key="3" icon={<UsergroupDeleteOutlined />}>
+                {/* <Menu.Item key="3" icon={<UsergroupDeleteOutlined />}>
                   <Link to="/user-managements">User Managements</Link>
                 </Menu.Item>
                 <Menu.Item key="4" icon={<SettingOutlined />}>
                   Settings
-                </Menu.Item>
+                </Menu.Item> */}
               </>
             ) : (
               <>
                 <Menu.Item style={{ marginTop: 20 }} icon={<GoldOutlined />} key="Teams">
                   <Link to="/teams">Teams</Link>
                 </Menu.Item>
-                <Menu.Item icon={<AimOutlined />} key="actionTracker">
+                {/* <Menu.Item icon={<AimOutlined />} key="actionTracker">
                   <Link to="/actions-tracker">Actions Tracker</Link>
-                </Menu.Item>
-                <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
+                </Menu.Item> */}
+                {/* <SubMenu className="flex-1" key="sub1" icon={<TeamOutlined />} title="Team">
                   <Menu.Item key="5" icon={<StockOutlined />}>
                     Health Check
                   </Menu.Item>
                   <Menu.Item key="6" icon={<CarryOutOutlined />}>
                     Task
                   </Menu.Item>
-                </SubMenu>
-                <Menu.Item icon={<UserOutlined />} key="account">
+                </SubMenu> */}
+                {/* <Menu.Item icon={<UserOutlined />} key="account">
                   <Link to="/me">Account</Link>
-                </Menu.Item>
+                </Menu.Item> */}
               </>
             )}
 

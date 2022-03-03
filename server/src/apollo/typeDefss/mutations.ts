@@ -13,6 +13,16 @@ const typeDefs = gql`
     count: Int!
   }
 
+  input answerInput {
+    questionId: String!
+    value: String!
+  }
+
+  input commentInput {
+    questionId: String!
+    text: String!
+  }
+
   type statusResponse {
     success: Boolean!
   }
@@ -80,6 +90,14 @@ const typeDefs = gql`
       isAnonymous: Boolean!
       isCustom: Boolean!
       status: StatusHealthCheck!
+    ): getHealthCheck
+
+    answerHealthCheck(
+      teamId: String!
+      boardId: String!
+      templateId: String!
+      answers: [answerInput!]!
+      comments: [commentInput!]!
     ): getHealthCheck
 
     updateAction(teamId: String!, boardId: String!, columnId: String!, opinion: String!): Team

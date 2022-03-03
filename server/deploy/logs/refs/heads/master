@@ -9,3 +9,5 @@ afab498773a4cbd752655c409bd5ccb7b252fffe 66c37ba0ecfa170965383b8cbf0b9d1e5d8cfe7
 ee05b521ad48d8004dadbfb275a7f7d9b9f302e1 5dae9fdc14ed1d1a6da18005029f789d54c398a6 Tân Nguyễn Thành <tannguyenthanh@Tans-MacBook-Pro.local> 1642828729 +0700	commit: khoc
 5dae9fdc14ed1d1a6da18005029f789d54c398a6 d6136965e60491317a9ec93cf2918d14cd4fc883 Tân Nguyễn Thành <tannguyenthanh@Tans-MacBook-Pro.local> 1642830743 +0700	commit: hudsjfk
 d6136965e60491317a9ec93cf2918d14cd4fc883 a5727982941fc70b3db2c7fdf4a09697dacf499f Tân Nguyễn Thành <tannguyenthanh@Tans-MacBook-Pro.local> 1646208170 +0700	commit: server health check
+a5727982941fc70b3db2c7fdf4a09697dacf499f 300dac25f11f564075852f02388c993426468760 Tân Nguyễn Thành <tannguyenthanh@Tans-MacBook-Pro.local> 1646267079 +0700	commit: api for health check
+300dac25f11f564075852f02388c993426468760 c62ab2bcd807ecfad9a654e983b5ceb00bafb47f Tân Nguyễn Thành <tannguyenthanh@Tans-MacBook-Pro.local> 1646267973 +0700	commit: change environment

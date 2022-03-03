@@ -1,45 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Radar } from '@ant-design/plots';
 import { templateHealthCheckType } from '../../const/healthCheckTemplate';
+import { HealthCheck, MemberAnswer, MemberComment } from '../../types';
 
 type Props = {
+  teamId: string;
+  boardId: string;
   selectedTemplate: templateHealthCheckType;
+  healthCheckData: {
+    getHealthCheck: {
+      memberAnswers: [MemberAnswer];
+      memberComments: [MemberComment];
+      healthCheck: HealthCheck;
+    };
+  };
 };
 
-export default function ResultHealthCheck({}: Props) {
-  const data = [
-    { item: 'Design', user: 'a', score: 70 },
-    { item: 'Design', user: 'b', score: 30 },
-    { item: 'Development', user: 'a', score: 60 },
-    { item: 'Development', user: 'b', score: 70 },
-    { item: 'Marketing', user: 'a', score: 50 },
-    { item: 'Marketing', user: 'b', score: 60 },
-    { item: 'Users', user: 'a', score: 40 },
-    { item: 'Users', user: 'b', score: 50 },
-    { item: 'Test', user: 'a', score: 60 },
-    { item: 'Test', user: 'b', score: 70 },
-    { item: 'Language', user: 'a', score: 70 },
-    { item: 'Language', user: 'b', score: 50 },
-    { item: 'Technology', user: 'a', score: 50 },
-    { item: 'Technology', user: 'b', score: 40 },
-    { item: 'Support', user: 'a', score: 30 },
-    { item: 'Support', user: 'b', score: 40 },
-    { item: 'Sales', user: 'a', score: 60 },
-    { item: 'Sales', user: 'b', score: 40 },
-    { item: 'UX', user: 'a', score: 50 },
-    { item: 'UX', user: 'b', score: 60 },
-  ];
+type data = {
+  item: string;
+  user?: string;
+  value?: string;
+};
+
+export default function ResultHealthCheck({ teamId, boardId, selectedTemplate, healthCheckData }: Props) {
+  const [data, setData] = useState<data[]>([]);
+
+  useEffect(() => {
+    if (healthCheckData?.getHealthCheck?.memberAnswers?.length > 0) {
+      const test = [];
+      const memberAnswers = healthCheckData?.getHealthCheck?.memberAnswers;
+
+      memberAnswers?.forEach((memberAnswer) => {
+        selectedTemplate?.statements?.forEach((statement) => {
+          const data = memberAnswer?.answers?.find((answer) => answer?.questionId === statement?.id);
+          if (data) {
+            test.push({
+              item: statement?.title,
+              user: memberAnswer?.user?.email,
+              value: parseInt(data?.value),
+            });
+          }
+        });
+      });
+
+      setData(test);
+    } else {
+      setData(
+        selectedTemplate.statements.map((statement) => {
+          return {
+            item: statement.title,
+          };
+        }),
+      );
+    }
+  }, [teamId, boardId, healthCheckData, selectedTemplate]);
 
   const config = {
     data,
     xField: 'item',
-    yField: 'score',
+    yField: 'value',
     seriesField: 'user',
     meta: {
-      score: {
+      value: {
         alias: '分数',
         min: 0,
-        max: 80,
+        max: 5,
       },
     },
     xAxis: {
@@ -65,13 +90,11 @@ export default function ResultHealthCheck({}: Props) {
         },
       },
     },
-    // 开启面积
     area: {},
-    // 开启辅助点
     point: {
       size: 2,
     },
   };
 
-  return <Radar {...config} />;
+  return <Radar width={600} height={600} {...config} />;
 }

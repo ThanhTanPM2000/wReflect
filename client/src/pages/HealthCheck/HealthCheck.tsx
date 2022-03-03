@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { Button, notification, Select, Switch } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { TopNavBar } from '../../components/TopNavBar';
 import { HealthCheckQueries, TeamQueries } from '../../grapql-client/queries';
 import { HealthCheckMutations } from '../../grapql-client/mutations';
@@ -11,6 +11,8 @@ import { useEffect } from 'react';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import ResultHealthCheck from './resultHealthCheck';
 import { useHistory } from 'react-router-dom';
+import Statement from './Statement';
+import selfContext from '../../contexts/selfContext';
 
 type Props = {
   teamId: string;
@@ -24,8 +26,14 @@ export default function HealthCheck({ teamId, boardId }: Props) {
   const [isViewResult, setIsViewResult] = useState(false);
   const [selectedBoard, setSelectedBoard] = useState<Board | null>();
   const [selecteTemplate, setSelectedTemplate] = useState<templateHealthCheckType>();
+  const me = useContext(selfContext);
 
-  const { data } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(TeamQueries.getTeam, {
+  const [answers, setAnswers] = useState<{ questionId: string; value: string }[]>([]);
+  const [comments, setComments] = useState<{ questionId: string; text: string }[]>([]);
+
+  const [] = useState();
+
+  const { data, client } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(TeamQueries.getTeam, {
     variables: {
       teamId,
     },
@@ -47,21 +55,75 @@ export default function HealthCheck({ teamId, boardId }: Props) {
       onError: () => {
         notification.error({ message: 'Something failed with server', placement: 'bottomRight' });
       },
+      updateQueries: {
+        getHealthCheck: (previousData, { mutationResult }) => {
+          return { getHealthCheck: mutationResult?.data?.startSurveyHealthCheck };
+        },
+      },
     },
   );
 
+  const [setAnswerHealthCheck] = useMutation<
+    HealthCheckMutations.setAnswerHealthCheckResult,
+    HealthCheckMutations.setAnswerHealthCheckVars
+  >(HealthCheckMutations.setAnswerHealthCheck, {
+    onError: (error) => {
+      notification.error({ message: error?.message, placement: 'bottomRight' });
+    },
+    updateQueries: {
+      getHealthCheck: (previousData, { mutationResult }) => {
+        return { getHealthCheck: mutationResult?.data?.answerHealthCheck };
+      },
+    },
+  });
+
+  const handleOnRateChange = (questionId: string, value: string) => {
+    const existantAnswer = answers.find((answer) => answer.questionId === questionId);
+    if (existantAnswer) {
+      setAnswers(
+        answers.map((answers) => {
+          if (answers.questionId === questionId) {
+            return { ...answers, value };
+          } else return answers;
+        }),
+      );
+    } else {
+      setAnswers([...answers, { questionId, value }]);
+    }
+  };
+
+  const handleOnCommentChange = (questionId: string, text: string) => {
+    const existantComments = comments.find((comment) => comment.questionId === questionId);
+    if (existantComments) {
+      setComments(
+        comments.map((comment) => {
+          if (comment.questionId === questionId) {
+            return { ...comment, text };
+          } else return comment;
+        }),
+      );
+    } else {
+      setComments([...comments, { questionId, text }]);
+    }
+  };
+
   useEffect(() => {
     setSelectedBoard(data?.team?.boards.find((board) => board.id === boardId));
+    setAnswers([]);
+    setComments([]);
     setIsViewResult(false);
   }, [teamId, boardId, data]);
 
   useEffect(() => {
+    console.log('what');
     setSelectedTemplate(
       templatesHealthCheck.find(
         (template) => template.id === healthCheckData?.getHealthCheck?.healthCheck?.templateId,
       ) || null,
     );
   }, [healthCheckData?.getHealthCheck?.healthCheck]);
+
+  console.log('template', selecteTemplate);
 
   const renderListOptionBoard = data?.team?.boards?.map((board) => (
     <Option value={board?.id} key={board?.id}>
@@ -74,9 +136,30 @@ export default function HealthCheck({ teamId, boardId }: Props) {
     history.push(`/team-health/${teamId}/${value}`);
   };
 
+  const handleSubmitHealthCheck = () => {
+    if (selecteTemplate.statements.length !== answers.length) {
+      notification.error({ message: 'Please answer all question.', placement: 'bottomRight' });
+      return;
+    } else {
+      setAnswerHealthCheck({
+        variables: {
+          teamId,
+          boardId,
+          templateId: selecteTemplate.id,
+          answers,
+          comments,
+        },
+      });
+    }
+  };
+
+  const answerOfCurrentUser = healthCheckData?.getHealthCheck?.memberAnswers?.find(
+    (answer) => answer?.userId === me?.id,
+  );
+
   return (
     <div className="healthCheckPage">
-      <TopNavBar team={data?.team} title="Health Check" />
+      <TopNavBar team={data?.team} boardId={boardId} title="Health Check" />
       <div className="team-health">
         {healthCheckData?.getHealthCheck?.healthCheck ? (
           <>
@@ -88,40 +171,93 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                 <Button onClick={() => history.push(`/board/${teamId}/${boardId}`)} type="ghost">
                   Go To Board
                 </Button>
-                <Button onClick={() => setIsViewResult(!isViewResult)} style={{ marginLeft: '20px' }}>
-                  {isViewResult ? 'Go To Survey' : 'Show Results'}
-                </Button>
+
+                {!answerOfCurrentUser && (
+                  <>
+                    {isViewResult ? (
+                      <Button onClick={() => setIsViewResult(false)} style={{ marginLeft: '20px' }}>
+                        Go To Survey
+                      </Button>
+                    ) : (
+                      <Button onClick={() => setIsViewResult(true)} style={{ marginLeft: '20px' }}>
+                        Show Results
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
-            <div className="templates-overview poll-center-items">
-              <div className="templates-overview-card poll-center-items" style={{ height: 'auto', minHeight: '0px' }}>
-                <h3>{selecteTemplate?.title}</h3>
-              </div>
-            </div>
-            <div className="templates-overview poll-center-items">
-              {isViewResult ? (
-                <div>
-                  <ResultHealthCheck selectedTemplate={selecteTemplate} />
+            <div className="health-check-answer">
+              <div className="templates-overview poll-center-items">
+                <div className="templates-overview-card poll-center-items" style={{ height: 'auto', minHeight: '0px' }}>
+                  <h3>{selecteTemplate?.title}</h3>
                 </div>
+              </div>
+              {isViewResult || answerOfCurrentUser ? (
+                <>
+                  <div className="chartjs-size-monitor-expand">
+                    <ResultHealthCheck
+                      teamId={teamId}
+                      boardId={boardId}
+                      healthCheckData={healthCheckData}
+                      selectedTemplate={selecteTemplate}
+                    />
+                  </div>
+                  <div className="templates-overview poll-center-items">
+                    <div
+                      className="templates-overview-card poll-center-items"
+                      style={{ height: 'auto', minHeight: '0px' }}
+                    >
+                      <h3>
+                        Response Rate{' '}
+                        {`${healthCheckData.getHealthCheck.memberAnswers.length}/${data?.team?.members.length} (${
+                          (healthCheckData.getHealthCheck.memberAnswers.length * 100) / data?.team?.members.length
+                        }%)`}
+                      </h3>
+                    </div>
+                  </div>
+                  {answerOfCurrentUser && (
+                    <div className="templates-overview poll-center-items">
+                      {selecteTemplate?.statements.map((statement) => (
+                        <>
+                          <div
+                            style={{ cursor: 'default' }}
+                            className="templates-overview-card poll-center-items"
+                            key={statement.id}
+                          >
+                            <Statement
+                              answerOfCurrentUser={answerOfCurrentUser}
+                              commentOfAllMembers={healthCheckData?.getHealthCheck?.memberComments?.filter(
+                                (comment) => comment?.questionId === statement.id,
+                              )}
+                              handleOnRateChange={handleOnRateChange}
+                              handleOnCommentChange={handleOnCommentChange}
+                              statement={statement}
+                            />
+                          </div>
+                        </>
+                      ))}
+                    </div>
+                  )}
+                </>
               ) : (
                 <>
-                  {selecteTemplate?.statements.map((statement) => (
-                    <div
-                      key={statement?.title}
-                      className="templates-overview-card poll-center-items"
-                      style={{ height: 'auto', minHeight: '180px', cursor: 'auto' }}
-                    >
-                      <h3>{statement?.title}</h3>
-                      <p style={{ textAlign: 'center' }}>{statement?.description}</p>
-                      <div className="num-wrapper poll-center-items">
-                        <span className="num orange">1</span>
-                        <span className="num blue">2</span>
-                        <span className="num purple">3</span>
-                        <span className="num lpink">4</span>
-                        <span className="num green">5</span>
+                  <div className="templates-overview poll-center-items">
+                    {selecteTemplate?.statements.map((statement) => (
+                      <div className="templates-overview-card poll-center-items" key={statement.id}>
+                        <Statement
+                          handleOnRateChange={handleOnRateChange}
+                          handleOnCommentChange={handleOnCommentChange}
+                          statement={statement}
+                        />
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <div className="flex flex-jc-c flex-ai-c">
+                    <Button onClick={handleSubmitHealthCheck} size="large">
+                      Submit
+                    </Button>
+                  </div>
                 </>
               )}
             </div>
@@ -182,7 +318,9 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                   </Button>
                 </div>
                 <div className="templates-overview poll-center-items">
-                  <span className="anonymous-label"></span>
+                  <span style={{ marginRight: '10px' }} className="anonymous-label">
+                    Collect Feedback Anonymously{' '}
+                  </span>
                   <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} defaultChecked />
                 </div>
                 <div className="templates-overview poll-center-items">

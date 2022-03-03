@@ -15,7 +15,7 @@ export type getBoardVars = {
 };
 
 export const getHealthCheck = gql`
-  query GetHealthCheck($teamId: String, $boardId: String) {
+  query getHealthCheck($teamId: String, $boardId: String) {
     getHealthCheck(teamId: $teamId, boardId: $boardId) {
       memberAnswers {
         id
@@ -24,6 +24,9 @@ export const getHealthCheck = gql`
         createdAt
         updatedAt
         userId
+        user {
+          email
+        }
         answers {
           questionId
           value
@@ -38,6 +41,9 @@ export const getHealthCheck = gql`
         userId
         questionId
         text
+        user {
+          email
+        }
       }
       healthCheck {
         id

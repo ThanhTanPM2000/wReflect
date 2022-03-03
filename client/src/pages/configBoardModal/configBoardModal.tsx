@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Form, Input, Select, InputNumber, Switch, FormInstance } from 'antd';
+import { Modal, Button, Form, Input, Select, InputNumber, Switch, FormInstance, notification } from 'antd';
 
 import { Board } from '../../types';
 import boardTemplate from '../../const/boardTemplateOption';
@@ -48,6 +48,9 @@ export default function ConfigBoardModal({ teamId, board, visible, setVisible }:
   }, [templateSelect]);
 
   const handleSubmitBoard = (values: any) => {
+    if (!values['Column1'] && !values['Column2'] && !values['Column3'] && !values['Column4'] && !values['Column5']) {
+      notification.error({ message: 'Please choose at least 1 column.', placement: 'bottomRight' });
+    }
     if (board) {
       updateBoard({
         variables: {

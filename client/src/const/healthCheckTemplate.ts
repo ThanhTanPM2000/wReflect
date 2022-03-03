@@ -2,6 +2,7 @@ export type templateHealthCheckType = {
   id: string;
   title: string;
   statements: {
+    id: string;
     title: string;
     color: string;
     description: string;
@@ -82,7 +83,7 @@ export default [
   },
   {
     id: '2',
-    title: 'Team Health Check',
+    title: 'Squad Health Check',
     statements: [
       {
         id: '1',

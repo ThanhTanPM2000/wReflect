@@ -63,6 +63,9 @@ async function startApolloServer(typeDefs, resolvers) {
     context: ({ req, res }) => ({ req, res }),
     formatError: (err) => {
       const errorsList = ['403', '404'];
+      // if(err.extensions?.code === "INTERNAL_SERVER_ERROR") {
+      //   return new ApolloError(``)
+      // }
       if (err.extensions?.code === `BAD_USER_INPUT`) {
         return new ApolloError(`Invalid argument value`, `${StatusCodes.BAD_REQUEST}`, {
           messageDetail: err.message,

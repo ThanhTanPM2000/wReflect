@@ -645,7 +645,8 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       color: white; }
   .manage-board .board-items {
     margin-bottom: 10px;
-    display: flex; }
+    display: flex;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
     .manage-board .board-items .board-icons {
       margin: 0 10px 5px auto; }
       .manage-board .board-items .board-icons span {
@@ -777,7 +778,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         justify-content: space-between;
         width: 40%;
         height: auto;
-        min-height: 220px;
+        min-height: 200px;
         background-color: #f6f6f7;
         margin: 10px;
         padding: 10px;
@@ -799,14 +800,29 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         .healthCheckPage .team-health .templates-overview .templates-overview-card .num-wrapper {
           margin: auto 0 30px 0; }
           .healthCheckPage .team-health .templates-overview .templates-overview-card .num-wrapper .num {
-            text-align: center;
             font-size: 10px;
-            height: 25px;
-            width: 25px;
+            height: 35px;
+            width: 35px;
             line-height: 25px;
             color: #6d7982;
             border-radius: 50%;
-            margin-top: 10px; }
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center; }
+    .healthCheckPage .team-health .health-check-answer .templates-overview-card {
+      width: 40%;
+      min-height: 180px;
+      height: 240px;
+      cursor: default; }
+      .healthCheckPage .team-health .health-check-answer .templates-overview-card .num-wrapper {
+        margin: auto 0 10px 0; }
+    .healthCheckPage .team-health .health-check-answer .num {
+      cursor: pointer;
+      margin: 10px;
+      border: 3px solid #f6f6f7; }
+    .healthCheckPage .team-health .health-check-answer .num.is-selected {
+      border: 3px solid #6d7982; }
   .healthCheckPage .poll-center-items {
     display: flex;
     justify-content: center;
