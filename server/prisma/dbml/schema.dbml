@@ -114,7 +114,7 @@ Table MemberComment {
   healthCheck HealthCheck [not null]
 
   indexes {
-    (healthCheckId, userId) [unique]
+    (healthCheckId, questionId, userId) [unique]
   }
 }
 

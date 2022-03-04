@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@apollo/client';
-import { Button, notification, Select, Switch } from 'antd';
+import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { Button, Modal, notification, Select, Switch } from 'antd';
 import React, { useState, useContext } from 'react';
 import { TopNavBar } from '../../components/TopNavBar';
 import { HealthCheckQueries, TeamQueries } from '../../grapql-client/queries';
@@ -13,6 +13,7 @@ import ResultHealthCheck from './resultHealthCheck';
 import { useHistory } from 'react-router-dom';
 import Statement from './Statement';
 import selfContext from '../../contexts/selfContext';
+import { HealthCheckSubscription } from '../../grapql-client/subcriptions';
 
 type Props = {
   teamId: string;
@@ -39,15 +40,16 @@ export default function HealthCheck({ teamId, boardId }: Props) {
     },
   });
 
-  const { data: healthCheckData } = useQuery<HealthCheckQueries.getBoardResult, HealthCheckQueries.getBoardVars>(
-    HealthCheckQueries.getHealthCheck,
-    {
-      variables: {
-        teamId,
-        boardId,
-      },
+  const { data: healthCheckData, refetch } = useQuery<
+    HealthCheckQueries.getBoardResult,
+    HealthCheckQueries.getBoardVars
+  >(HealthCheckQueries.getHealthCheck, {
+    variables: {
+      teamId,
+      boardId,
     },
-  );
+    fetchPolicy: 'cache-and-network',
+  });
 
   const [startSurvey] = useMutation<HealthCheckMutations.startSurveyResult, HealthCheckMutations.startSurveyVars>(
     HealthCheckMutations.startSurvey,
@@ -76,6 +78,48 @@ export default function HealthCheck({ teamId, boardId }: Props) {
       },
     },
   });
+
+  const [reopenHealthCheck] = useMutation<
+    HealthCheckMutations.reopenHealthCheckResult,
+    HealthCheckMutations.reopenHealthCheckVars
+  >(HealthCheckMutations.reopenHealthCheck, {
+    onError: (error) => {
+      notification.error({ message: error?.message, placement: 'bottomRight' });
+    },
+    updateQueries: {
+      getHealthCheck: (previousData, { mutationResult }) => {
+        return { getHealthCheck: mutationResult?.data?.reopenHealthCheck };
+      },
+    },
+    variables: {
+      teamId,
+      boardId,
+    },
+  });
+
+  useSubscription<HealthCheckSubscription.reopenHealthCheckResult, HealthCheckSubscription.reopenHealthCheckVars>(
+    HealthCheckSubscription.updateGetHealthCheckData,
+    {
+      variables: {
+        boardId,
+        meId: me.id,
+      },
+      onSubscriptionData: ({ subscriptionData, client }) => {
+        client.cache.updateQuery(
+          {
+            query: HealthCheckQueries.getHealthCheck,
+            variables: {
+              teamId,
+              boardId,
+            },
+          },
+          (data) => ({
+            getHealthCheck: subscriptionData.data.updateGetHealthCheckData,
+          }),
+        );
+      },
+    },
+  );
 
   const handleOnRateChange = (questionId: string, value: string) => {
     const existantAnswer = answers.find((answer) => answer.questionId === questionId);
@@ -112,18 +156,20 @@ export default function HealthCheck({ teamId, boardId }: Props) {
     setAnswers([]);
     setComments([]);
     setIsViewResult(false);
-  }, [teamId, boardId, data]);
-
-  useEffect(() => {
-    console.log('what');
     setSelectedTemplate(
       templatesHealthCheck.find(
         (template) => template.id === healthCheckData?.getHealthCheck?.healthCheck?.templateId,
       ) || null,
     );
-  }, [healthCheckData?.getHealthCheck?.healthCheck]);
+  }, [teamId, boardId, data, healthCheckData]);
 
-  console.log('template', selecteTemplate);
+  // useEffect(() => {
+  // setSelectedTemplate(
+  //   templatesHealthCheck.find(
+  //     (template) => template.id === healthCheckData?.getHealthCheck?.healthCheck?.templateId,
+  //   ) || null,
+  // );
+  // }, [healthCheckData]);
 
   const renderListOptionBoard = data?.team?.boards?.map((board) => (
     <Option value={board?.id} key={board?.id}>
@@ -138,6 +184,8 @@ export default function HealthCheck({ teamId, boardId }: Props) {
 
   const handleSubmitHealthCheck = () => {
     if (selecteTemplate.statements.length !== answers.length) {
+      console.log('answers are', answers);
+      console.log('comments are', comments);
       notification.error({ message: 'Please answer all question.', placement: 'bottomRight' });
       return;
     } else {
@@ -172,7 +220,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                   Go To Board
                 </Button>
 
-                {!answerOfCurrentUser && (
+                {!answerOfCurrentUser ? (
                   <>
                     {isViewResult ? (
                       <Button onClick={() => setIsViewResult(false)} style={{ marginLeft: '20px' }}>
@@ -181,6 +229,29 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                     ) : (
                       <Button onClick={() => setIsViewResult(true)} style={{ marginLeft: '20px' }}>
                         Show Results
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {data?.team?.members?.find((member) => member.userId === me.id && member.isOwner) && (
+                      <Button
+                        style={{ marginLeft: '10px' }}
+                        onClick={() => {
+                          Modal.confirm({
+                            title: 'Are you sure want to Reopen this health check',
+                            centered: true,
+                            okText: 'Reopen',
+                            cancelText: 'Cancel',
+                            onOk: async () => {
+                              console.log('hello world');
+                              reopenHealthCheck();
+                            },
+                          });
+                        }}
+                        type="ghost"
+                      >
+                        Reopen
                       </Button>
                     )}
                   </>
@@ -275,7 +346,21 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                 <div className="templates-overview">
                   {templatesHealthCheck.map((card) => (
                     <div
-                      onClick={() => setSelectedTemplate(card)}
+                      onClick={() => {
+                        if (
+                          data?.team?.members.find((member) => {
+                            return member.userId === me.id && member.isOwner;
+                          })
+                        ) {
+                          setSelectedTemplate(card);
+                        } else {
+                          notification.warning({
+                            message: 'Permission denied',
+                            description: 'Please contact to admin for more info',
+                            placement: 'bottomRight',
+                          });
+                        }
+                      }}
                       key={card?.id}
                       className="templates-overview-card poll-center-items"
                     >

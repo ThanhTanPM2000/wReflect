@@ -6,6 +6,8 @@ const typeDefs = gql`
     deleteBoard(meId: ID!): Board
     convertColumn(meId: ID!): Column
     updateOpinion(meId: ID!): Opinion
+
+    updateGetHealthCheckData(boardId: String!, meId: ID!): getHealthCheck
   }
 `;
 

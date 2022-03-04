@@ -18,7 +18,7 @@ type Props = {
 export default function Comment({ statement, isOpenComment, setIsOpenComment, commentOfAllMembers }: Props) {
   const remarkListRef = useRef<HTMLDivElement>(null);
 
-  console.log('list commant', commentOfAllMembers);
+  if (isOpenComment) console.log('comment are', commentOfAllMembers);
 
   return (
     <Modal
@@ -38,18 +38,16 @@ export default function Comment({ statement, isOpenComment, setIsOpenComment, co
       onCancel={() => setIsOpenComment(false)}
     >
       <div className="remarkline" ref={remarkListRef}>
-        {commentOfAllMembers?.map((comment) => {
+        {commentOfAllMembers?.map((comment) => (
           <>
-            {console.log('comment', comment)}
             <div key={comment?.id} className="remark">
               <div className="remarkHeader">
                 <p>{comment?.user.email}</p>
               </div>
               <div className="remarkContent">{comment.text}</div>
             </div>
-            ;
-          </>;
-        })}
+          </>
+        ))}
       </div>
     </Modal>
   );

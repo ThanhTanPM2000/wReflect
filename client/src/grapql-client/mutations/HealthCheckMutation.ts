@@ -152,3 +152,59 @@ export const setAnswerHealthCheck = gql`
     }
   }
 `;
+
+export type reopenHealthCheckResult = {
+  reopenHealthCheck: {
+    getHealthCheck: {
+      memberAnswers: [MemberAnswer];
+      memberComments: [MemberComment];
+      healthCheck: HealthCheck;
+    };
+  };
+};
+
+export type reopenHealthCheckVars = {
+  teamId: string;
+  boardId: string;
+};
+
+export const reopenHealthCheck = gql`
+  mutation Mutation($teamId: String!, $boardId: String!) {
+    reopenHealthCheck(teamId: $teamId, boardId: $boardId) {
+      memberAnswers {
+        answers {
+          questionId
+          value
+        }
+        id
+        templateId
+        healthCheckId
+        createdAt
+        updatedAt
+        userId
+      }
+      memberComments {
+        id
+        templateId
+        healthCheckId
+        createdAt
+        updatedAt
+        userId
+        questionId
+        text
+      }
+      healthCheck {
+        id
+        teamId
+        boardId
+        templateId
+        createdAt
+        createdBy
+        updatedAt
+        updatedBy
+        isAnonymous
+        isCustom
+      }
+    }
+  }
+`;

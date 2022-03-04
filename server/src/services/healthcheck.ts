@@ -1,6 +1,11 @@
 import { HealthCheck, MemberAnswer } from '@prisma/client';
-import { startSurveyArgs, answerHealthCheckArgs } from './../apollo/typeDefss/healthCheckTypeDefs';
+import {
+  startSurveyArgs,
+  answerHealthCheckArgs,
+  reopenHealthCheckArgs,
+} from './../apollo/typeDefss/healthCheckTypeDefs';
 import prisma from '../prisma';
+import { isOwnedTeam } from './team';
 
 export const getHealthCheck = async (teamId: string, boardId: string) => {
   const healthCheck = await prisma.healthCheck.findFirst({
@@ -114,5 +119,36 @@ export const setAnswerHealthCheck = async (userId: string, args: answerHealthChe
     healthCheck: healthCheck || null,
     memberAnswers: healthCheck?.memberAnswers || [],
     memberComments: healthCheck?.memberComments || [],
+  };
+};
+
+export const reopenHealthCheck = async (userId: string, args: reopenHealthCheckArgs) => {
+  isOwnedTeam(userId, args.teamId);
+
+  const healthCheck = await prisma.healthCheck.delete({
+    where: {
+      boardId: args.boardId,
+    },
+    include: {
+      memberAnswers: {
+        include: {
+          answers: true,
+          user: true,
+        },
+      },
+      memberComments: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
+  if (!healthCheck) console.log('cant delete healthcheck');
+
+  return {
+    healthCheck: null,
+    memberAnswers: [],
+    memberComments: [],
   };
 };

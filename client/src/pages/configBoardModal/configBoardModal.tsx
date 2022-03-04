@@ -48,8 +48,15 @@ export default function ConfigBoardModal({ teamId, board, visible, setVisible }:
   }, [templateSelect]);
 
   const handleSubmitBoard = (values: any) => {
-    if (!values['Column1'] && !values['Column2'] && !values['Column3'] && !values['Column4'] && !values['Column5']) {
-      notification.error({ message: 'Please choose at least 1 column.', placement: 'bottomRight' });
+    if (
+      (!values['Column1'] || !values['isActiveColumn1']) &&
+      (!values['Column2'] || !values['isActiveColumn2']) &&
+      (!values['Column3'] || !values['isActiveColumn3']) &&
+      (!values['Column4'] || !values['isActiveColumn4']) &&
+      (!values['Column5'] || !values['isActiveColumn5'])
+    ) {
+      notification.error({ message: 'Please choose at least 1 column to active.', placement: 'bottomRight' });
+      return;
     }
     if (board) {
       updateBoard({
@@ -115,6 +122,7 @@ export default function ConfigBoardModal({ teamId, board, visible, setVisible }:
       centered
       visible={visible}
       footer={null}
+      destroyOnClose
       onCancel={() => {
         setVisible(false);
         setTemplateSelect('defaultBoard');

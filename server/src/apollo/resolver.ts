@@ -1,4 +1,4 @@
-import { answerHealthCheckArgs, startSurveyArgs } from './typeDefss/healthCheckTypeDefs';
+import { answerHealthCheckArgs, startSurveyArgs, reopenHealthCheckArgs } from './typeDefss/healthCheckTypeDefs';
 import { getHealthCheck } from './../services/healthcheck';
 import { updateOpinion } from './../services/opinion';
 import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
@@ -72,16 +72,26 @@ const resolvers = {
     startSurveyHealthCheck: async (_, args: startSurveyArgs, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
       const creatingHealthCheck = await healthCheck.createHealthCheck(meId, args);
-      // pubsub.publish('START_SURVEY', {
-      //   updateGetHealthCheck: creatingHealthCheck,
-      // });
+      pubsub.publish('START_SURVEY', {
+        updateGetHealthCheckData: creatingHealthCheck,
+      });
       return creatingHealthCheck;
     },
-
     answerHealthCheck: async (_, args: answerHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
       const setAnswerToHealthCheck = await healthCheck.setAnswerHealthCheck(meId, args);
+      pubsub.publish('ANSWER_HEALTH', {
+        updateGetHealthCheckData: setAnswerToHealthCheck,
+      });
       return setAnswerToHealthCheck;
+    },
+    reopenHealthCheck: async (_, args: reopenHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      const deletingHealthCheck = await healthCheck.reopenHealthCheck(meId, args);
+      pubsub.publish('REOPEN_HEALTH', {
+        updateGetHealthCheckData: deletingHealthCheck,
+      });
+      return deletingHealthCheck;
     },
 
     changeTeamAccess: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -232,6 +242,15 @@ const resolvers = {
     deleteBoard: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(['DELETE_BOARD']),
+        (_, args) => {
+          return true;
+        },
+      ),
+    },
+
+    updateGetHealthCheckData: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['START_SURVEY', 'ANSWER_HEALTH', 'REOPEN_HEALTH']),
         (_, args) => {
           return true;
         },

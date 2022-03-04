@@ -1,3 +1,4 @@
+import { getHealthCheck } from './../../services/healthcheck';
 import { orderOpinion } from './../../services/opinion';
 import { Remark, Opinion, Board, HealthCheck } from '@prisma/client';
 import { orderOpinionType } from './opinionTypeDefs';
@@ -99,6 +100,8 @@ const typeDefs = gql`
       answers: [answerInput!]!
       comments: [commentInput!]!
     ): getHealthCheck
+
+    reopenHealthCheck(teamId: String!, boardId: String!): getHealthCheck
 
     updateAction(teamId: String!, boardId: String!, columnId: String!, opinion: String!): Team
     # usingCurrentBoard(teamId: String!, boardId: String!): Team

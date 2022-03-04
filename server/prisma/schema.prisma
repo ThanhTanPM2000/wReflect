@@ -120,7 +120,7 @@ model MemberComment {
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   healthCheck   HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([healthCheckId, userId])
+  @@unique([healthCheckId, questionId, userId])
 }
 
 enum BoardType {

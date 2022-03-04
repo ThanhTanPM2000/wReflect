@@ -37,4 +37,9 @@ export type answerHealthCheckArgs = {
   comments: { questionId: string; text: string }[];
 };
 
+export type reopenHealthCheckArgs = {
+  teamId: string;
+  boardId: string;
+};
+
 export default typeDefs;
