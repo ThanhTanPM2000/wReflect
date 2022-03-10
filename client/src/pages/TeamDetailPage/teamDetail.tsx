@@ -34,15 +34,6 @@ const TeamDetail = ({ teamId }: Props) => {
   );
 
   const [disabled, setDisabled] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
   const key = 'updatable';
   const handleSave = () => {
@@ -88,13 +79,18 @@ const TeamDetail = ({ teamId }: Props) => {
                         danger
                         size="large"
                         style={{ width: '80px', marginRight: 10 }}
-                        onClick={() => setIsModalVisible(true)}
+                        onClick={() => {
+                          Modal.confirm({
+                            title: 'Are you sure want to detele team',
+                            centered: true,
+                            okText: 'Delete',
+                            cancelText: 'Cancel',
+                          });
+                        }}
                       >
                         Delete
                       </Button>
-                      <Modal title="Delete Team" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-                        <p>Are you sure delete team ?</p>
-                      </Modal>
+                   
                       <Button
                         shape="round"
                         size="large"
