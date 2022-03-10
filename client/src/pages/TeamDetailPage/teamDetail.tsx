@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Input, Button, Tabs, Avatar, Upload, message, Row, Col, Select, DatePicker, Modal } from 'antd';
-import { EditFilled, UploadOutlined } from '@ant-design/icons';
+import { EditFilled, UploadOutlined, DeleteFilled, SaveFilled } from '@ant-design/icons';
 
 import { useMutation, useQuery } from '@apollo/client';
 
@@ -76,9 +76,10 @@ const TeamDetail = ({ teamId }: Props) => {
                     <div style={{ float: 'right', margin: '0px 20px 20px 0px' }}>
                       <Button
                         shape="round"
+                        icon={<DeleteFilled />}
                         danger
                         size="large"
-                        style={{ width: '80px', marginRight: 10 }}
+                        style={{ width: '100px', marginRight: 10 }}
                         onClick={() => {
                           Modal.confirm({
                             title: 'Are you sure want to detele team',
@@ -90,11 +91,12 @@ const TeamDetail = ({ teamId }: Props) => {
                       >
                         Delete
                       </Button>
-                   
+
                       <Button
                         shape="round"
                         size="large"
-                        style={{ width: '80px', marginRight: 10 }}
+                        icon={<EditFilled />}
+                        style={{ width: '100px', marginRight: 10 }}
                         onClick={() => setDisabled(false)}
                       >
                         Edit
@@ -103,7 +105,8 @@ const TeamDetail = ({ teamId }: Props) => {
                         shape="round"
                         type="primary"
                         size="large"
-                        style={{ width: '80px' }}
+                        icon={<SaveFilled />}
+                        style={{ width: '100px' }}
                         onClick={() => handleSave()}
                       >
                         Save
