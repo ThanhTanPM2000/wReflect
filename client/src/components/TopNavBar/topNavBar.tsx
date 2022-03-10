@@ -76,9 +76,9 @@ const TopNavBar = ({ title, team, boardId }: Props) => {
           <Link key="5" style={{ textDecoration: 'none' }} to={`/manage-board/${team?.id}`}>
             <Button type={title == 'Manage Board' ? 'primary' : undefined}>Board</Button>
           </Link>,
-          // <Link key="6" style={{ textDecoration: 'none' }} to={`/team-details/${team?.id}`}>
-          //   <Button type={title == 'Setting' ? 'primary' : undefined}>Details</Button>
-          // </Link>,
+          <Link key="6" style={{ textDecoration: 'none' }} to={`/team-details/${team?.id}`}>
+            <Button type={title == 'Setting' ? 'primary' : undefined}>Settings</Button>
+          </Link>,
         ]}
       />
     </>

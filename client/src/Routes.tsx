@@ -19,6 +19,7 @@ import { Footer } from 'antd/lib/layout/layout';
 import { useSubscription } from '@apollo/client';
 import { BoardSubscription, OpinionSubscription } from './grapql-client/subcriptions';
 import HealthCheck from './pages/HealthCheck/HealthCheck';
+import TeamDetail from './pages/TeamDetailPage/teamDetail';
 
 type Props = {
   me: null | User;
@@ -117,6 +118,10 @@ const Routes = ({ me }: Props) => {
                             <Route
                               path="/manage-board/:teamId"
                               render={({ match }) => <ManageBoardPage teamId={match.params.teamId} />}
+                            />
+                            <Route
+                              path="/team-details/:teamId"
+                              render={({ match }) => <TeamDetail teamId={match.params.teamId} />}
                             />
                             <Redirect from="/" exact to="/teams" />
                             <Route path="/not-found" component={NotFound} />
