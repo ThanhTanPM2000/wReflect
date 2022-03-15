@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Select, Button, Form, notification } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Select, Button, notification } from 'antd';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import { OpinionStatus } from '../../types';
 import { useMutation, useQuery } from '@apollo/client';

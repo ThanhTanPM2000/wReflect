@@ -4,6 +4,7 @@ import auth0, { AuthOptions } from 'auth0-js';
 import config from '../../config';
 import { auth } from '../../apis';
 import EmailVerificationNotice from './EmailVerificationNotice';
+import { createSemanticDiagnosticsBuilderProgram } from 'typescript';
 
 type Props = {
   isLoggedIn: boolean;
@@ -14,6 +15,7 @@ type Props = {
 const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
   const [email, setEmail] = useState<null | string>(null);
   const [needsEmailVerification, setNeedsEmailVerification] = useState<null | boolean>(null);
+  const [sub, setSub] = useState<null | string>(null);
   const params = new URLSearchParams(location.search);
   const authConfig: AuthOptions = config.AUTH0_WEBAUTH_CONFIG;
 
@@ -29,6 +31,10 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
       return;
     }
     if (isMounted) {
+      if (res.sub) {
+        setSub(res.sub);
+      }
+
       if (res.requiresEmailVerification) {
         setNeedsEmailVerification(res.requiresEmailVerification);
       }
@@ -73,7 +79,12 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
 
   return (
     <div className="App login-scene">
-      <EmailVerificationNotice email={email} webAuth={webAuth} needsEmailVerification={needsEmailVerification} />
+      <EmailVerificationNotice
+        email={email}
+        sub={sub}
+        webAuth={webAuth}
+        needsEmailVerification={needsEmailVerification}
+      />
       <div onClick={() => webAuth.authorize({ prompt: 'login' })}>{children}</div>
     </div>
   );

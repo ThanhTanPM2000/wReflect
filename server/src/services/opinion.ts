@@ -1,5 +1,4 @@
-import { isOwnedTeam, isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './team';
-import { Opinion, Column } from '@prisma/client';
+import { isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './essential';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';

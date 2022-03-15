@@ -18,9 +18,10 @@ export const login = async (req: Request, res: Response): Promise<void | Respons
       name,
       nickname,
       picture,
+      sub,
     } = await services.auth0.exchangeCodeForToken(body.code);
     if (!isEmailVerified) {
-      return res.send({ email, requiresEmailVerification: !isEmailVerified, picture });
+      return res.send({ email, requiresEmailVerification: !isEmailVerified, picture, sub });
     }
     const user = await services.user.findOrCreateUserByEmail(email, picture, name, nickname);
     const session = await services.session.createSession(user.id, config.SESSION_DURATION_MINUTES);
@@ -43,6 +44,20 @@ export const logout = async (req: RequestWithUserInfo, res: Response): Promise<v
   try {
     const { cookies } = validators.logout(req);
     await services.session.endSession(req.user.id, cookies.token);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(StatusCodes.BAD_REQUEST).send(error.errors);
+    }
+    logger.info(error);
+    return res.status(StatusCodes.BAD_REQUEST).send();
+  }
+};
+
+export const sendVerificationEmail = async (req: RequestWithUserInfo, res: Response): Promise<void | Response> => {
+  try {
+    const { body } = validators.verificationEmail(req);
+    const data = await services.auth0.verificationEmails(body.sub);
+    return res.send(data);
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(StatusCodes.BAD_REQUEST).send(error.errors);

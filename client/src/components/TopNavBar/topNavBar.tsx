@@ -64,16 +64,19 @@ const TopNavBar = ({ title, team, boardId }: Props) => {
           <Link key="1" to={`/board/${team?.id}/${boardId || team?.boards[0]?.id}`}>
             <Button type={title == 'Do Reflect' ? 'primary' : undefined}>Reflect</Button>
           </Link>,
-          <Link key="2" to={`/actions-tracker/${team?.id}`}>
+          <Link key="2" to={`/personal-reflect/manage/${team?.id}`}>
+            <Button type={title == 'Personal Reflection' ? 'primary' : undefined}>Personal</Button>
+          </Link>,
+          <Link key="3" to={`/actions-tracker/${team?.id}`}>
             <Button type={title == 'Actions Tracker' ? 'primary' : undefined}>Actions Tracker</Button>
           </Link>,
-          <Link key="3" to={`/team-health/${team?.id}/${boardId || team?.boards[0]?.id}`}>
+          <Link key="4" to={`/team-health/${team?.id}/${boardId || team?.boards[0]?.id}`}>
             <Button type={title == 'Health Check' ? 'primary' : undefined}>Health Check</Button>
           </Link>,
-          <Link key="4" style={{ textDecoration: 'none' }} to={`/manage-members/${team?.id}`}>
+          <Link key="5" style={{ textDecoration: 'none' }} to={`/manage-members/${team?.id}`}>
             <Button type={title == 'Manage Members' ? 'primary' : undefined}>Members</Button>
           </Link>,
-          <Link key="5" style={{ textDecoration: 'none' }} to={`/manage-board/${team?.id}`}>
+          <Link key="6" style={{ textDecoration: 'none' }} to={`/manage-board/${team?.id}`}>
             <Button type={title == 'Manage Board' ? 'primary' : undefined}>Board</Button>
           </Link>,
           <Link key="6" style={{ textDecoration: 'none' }} to={`/team-details/${team?.id}`}>

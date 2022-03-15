@@ -11,9 +11,10 @@ import { Droppable } from 'react-beautiful-dnd';
 import { Board, Column, Member } from '../../types';
 import CreateTicket from './createTicket';
 import OpinionComponent from './opinion';
-import { Dropdown, Menu, Modal } from 'antd';
+import { Dropdown, Menu, Modal, notification } from 'antd';
 import { useMutation } from '@apollo/client';
 import { ColumnMutations } from '../../grapql-client/mutations';
+import { onError } from '@apollo/client/link/error';
 
 type Props = {
   index: number;
@@ -42,6 +43,14 @@ export default function ColumnComponent({
 
   const [emptyColumn] = useMutation<ColumnMutations.emptyColumnResult, ColumnMutations.emptyColumnVars>(
     ColumnMutations.emptyColumn,
+    {
+      onError: (error) => {
+        notification.error({
+          message: error.message,
+          placement: 'bottomRight',
+        });
+      },
+    },
   );
 
   const menu = (

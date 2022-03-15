@@ -34,10 +34,10 @@ export const getMember = async (memberId?: string) => {
   return member;
 };
 
-export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) => {
+export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) => {
   const team = await prisma.team.findFirst({
     where: {
-      id: data.teamId,
+      id: args.teamId,
       members: {
         some: {
           isOwner: {
@@ -54,7 +54,7 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
   const currentUsers: User[] = await prisma.user.findMany({
     where: {
       email: {
-        in: data.emailUsers,
+        in: args.emailUsers,
       },
     },
   });
@@ -63,12 +63,12 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
   const success = [] as string[];
   const warnings = [] as string[];
   const errors = [] as string[];
-  const newEmail = _.filter(data.emailUsers, (email) => !currentMailsUser.includes(email));
+  const newEmail = _.filter(args.emailUsers, (email) => !currentMailsUser.includes(email));
   if (newEmail.length > 0) {
     for (let idx = 0; idx < newEmail.length; idx++) {
       const email = newEmail[idx];
       try {
-        sendMail(email, `Invite to team ${data.teamId}`, `Someone invite you to team ${team.name} - ${team.id}`);
+        sendMail(email, `Invite to team ${args.teamId}`, `Someone invite you to team ${team.name} - ${args.teamId}`);
         warnings.push(`We have sent email invite to ${email}`);
 
         await prisma.user.create({
@@ -76,7 +76,7 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
             email: email,
             members: {
               create: {
-                teamId: team.id,
+                teamId: args.teamId,
                 invitedBy: meId,
                 isPendingInvitation: true,
               },
@@ -101,7 +101,7 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
         const member = await prisma.member.findUnique({
           where: {
             userId_teamId: {
-              teamId: data.teamId,
+              teamId: args.teamId,
               userId: currentUsers[idx].id,
             },
           },
@@ -113,7 +113,7 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
             data: {
               invitedBy: meId,
               userId: currentUsers[idx].id,
-              teamId: data?.teamId,
+              teamId: args?.teamId,
             },
           });
           success.push(`${currentUsers[idx]?.email} added in this team`);
@@ -125,7 +125,7 @@ export const addMembersToTeam = async (meId: string, data: addMemberToTeamType) 
   }
   const updatedTeam = await prisma.team.findUnique({
     where: {
-      id: data.teamId,
+      id: args.teamId,
     },
     include: {
       members: true,

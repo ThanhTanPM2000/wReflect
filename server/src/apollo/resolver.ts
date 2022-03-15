@@ -1,9 +1,7 @@
 import { answerHealthCheckArgs, startSurveyArgs, reopenHealthCheckArgs } from './typeDefss/healthCheckTypeDefs';
-import { getHealthCheck } from './../services/healthcheck';
-import { updateOpinion } from './../services/opinion';
 import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
 import { RequestWithUserInfo } from './../types';
-import { member, team, user, board, column, opinion, remark, healthCheck } from '../services';
+import { member, team, user, board, column, opinion, remark, healthCheck, criteria } from '../services';
 import { withFilter } from 'graphql-subscriptions';
 
 import {
@@ -51,6 +49,11 @@ const resolvers = {
       const { id: meId } = req?.user || {};
       const result = await healthCheck.getHealthCheck(args?.teamId, args?.boardId);
       return result;
+    },
+
+    criteriaList: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const criteriaList = await criteria.getListCriteria();
+      return criteriaList;
     },
   },
   Mutation: {
@@ -168,6 +171,12 @@ const resolvers = {
 
     createOpinion: async (_, args: createOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const data = await opinion.createOpinion(req, args);
+
+      const array = ['test', 'test2'];
+      const anotherArr = ['test3', 'test4'];
+      anotherArr.push(...array);
+      console.log(anotherArr);
+
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: data?.board,
       });

@@ -26,6 +26,44 @@ model Session {
   @@index([expiresAt])
 }
 
+model Assessment {
+  id                       String                 @id @default(uuid())
+  name                     String
+  startDate                DateTime
+  endDate                  DateTime
+  teamId                   String
+  team                     Team                   @relation(fields: [teamId], references: [id])
+  ownerId                  String
+  ownerMember              Member                 @relation(fields: [ownerId], references: [id])
+  status                   AssessmentStatus
+  assessmentOnCriteriaList AssessmentOnCriteria[]
+}
+
+model AssessmentOnCriteria {
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  criteriaId   String
+  criteria     Criteria   @relation(fields: [criteriaId], references: [id])
+  createdAt    DateTime   @default(now())
+  createdBy    String
+
+  @@id([assessmentId, criteriaId])
+}
+
+model Criteria {
+  id                       String                 @id @default(uuid())
+  name                     String                 @unique
+  description              String
+  assessmentOnCriteriaList AssessmentOnCriteria[]
+}
+
+enum AssessmentStatus {
+  PLANNED
+  DOING
+  COMPLETE
+  REOPENED
+}
+
 model Team {
   id            String        @id @default(uuid())
   name          String
@@ -43,6 +81,7 @@ model Team {
   boards        Board[]
   Owner         User          @relation(fields: [ownerId], references: [id])
   HealthCheck   HealthCheck[]
+  assessment    Assessment[]
 }
 
 model Board {
@@ -170,13 +209,6 @@ model Opinion {
   remarks       Remark[]
 }
 
-// enum ColorPicker {
-//   PINK
-//   GRAY
-//   GREEN
-
-// }
-
 model Remark {
   id        String   @id @default(uuid())
   memberId  String
@@ -237,6 +269,7 @@ model Member {
   Opinion             Opinion[]
   Remark              Remark[]
 
+  Assessment Assessment[]
   @@unique([userId, teamId])
 }
 

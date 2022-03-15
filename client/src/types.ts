@@ -175,6 +175,35 @@ export type Session = {
   updatedAt: Date;
 };
 
+export type Assessment = {
+  id: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  teamId: string;
+  ownerId: string;
+  status: AssessmentStatus;
+  team: Team;
+  ownerMember: Member;
+  assessmentOnCriteriaList: AssessmentOnCriteria[];
+};
+
+export type AssessmentOnCriteria = {
+  assessmentId: string;
+  criteriaId: string;
+  createdAt: Date;
+  createdBy: string;
+  assessment: Assessment;
+  criteria: Criteria;
+};
+
+export type Criteria = {
+  id: string;
+  name: string;
+  description: string;
+  assessmentOnCriteriaList: AssessmentOnCriteria[];
+};
+
 export type MemberStatus = 'PENDING_INVITATION' | 'JOINED';
 export type UserOnlineStatus = 'ONLINE' | 'OFFLINE';
 export type TeamStatus = 'DOING' | 'DONE';
@@ -184,6 +213,7 @@ export type OpinionStatus = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
 export type BoardType = 'DEFAULT' | 'PHASE';
 export type PhaseType = 'REFLECT' | 'GROUP' | 'VOTES' | 'DISCUSS';
 export type StatusHealthCheck = 'OPEN' | 'CLOSED';
+export type AssessmentStatus = 'PLANNED' | 'DOING' | 'COMPLETE' | 'REOPENED';
 
 export type User = {
   id: string;

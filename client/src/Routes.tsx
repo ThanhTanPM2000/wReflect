@@ -20,6 +20,7 @@ import { useSubscription } from '@apollo/client';
 import { BoardSubscription, OpinionSubscription } from './grapql-client/subcriptions';
 import HealthCheck from './pages/HealthCheck/HealthCheck';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
+import { PersonalReflection } from './pages/PersonalReflection';
 
 type Props = {
   me: null | User;
@@ -90,10 +91,12 @@ const Routes = ({ me }: Props) => {
                         <>
                           {subcriptionFunc()}
                           <Switch>
+                            {/* <Route path={`/team-details//:teamId`} children={[]} render={({ match }) => <TeamDetailsPage />} /> */}
                             <Route
                               path="/manage-members/:teamId"
                               render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
                             />
+                            <Route path="/personal-reflect" render={({ match }) => <PersonalReflection />} />
                             <Route
                               path="/board/:teamId/:boardId"
                               exact

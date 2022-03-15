@@ -3,6 +3,11 @@ import { axios } from './axios';
 type LoginResponse = {
   email: string;
   requiresEmailVerification?: boolean;
+  sub?: string;
+};
+
+type SendVerificationResponse = {
+  status: string;
 };
 
 const login = async (code: string, state: string) => {
@@ -23,4 +28,13 @@ const logout = async () => {
   }
 };
 
-export { login, logout };
+const resendVerificationEmail = async (sub: string) => {
+  try {
+    const res = await axios.post('/resend_verification_email', { sub });
+    return <SendVerificationResponse>res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { login, logout, resendVerificationEmail };

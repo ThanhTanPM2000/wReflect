@@ -1,6 +1,6 @@
 import { Forbidden } from './../errorsManagement';
 import prisma from '../prisma';
-import { isOwnedTeam } from './team';
+import { isOwnedTeam } from './essential';
 
 export const getListColumns = (boardId: string) => {
   const columns = prisma.column.findMany({

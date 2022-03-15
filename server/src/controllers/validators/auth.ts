@@ -18,3 +18,12 @@ export const logout = (req: Request) => {
   });
   return schema.parse(req);
 };
+
+export const verificationEmail = (req: Request) => {
+  const schema = z.object({
+    body: z.object({
+      sub: z.string(),
+    }),
+  });
+  return schema.parse(req);
+};

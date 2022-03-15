@@ -334,7 +334,9 @@ export default function OpinionComponent({
                 maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
               >
                 {board?.team?.members
-                  ?.filter((member) => opinion.mergedAuthors.includes(member?.id) || opinion?.memberId == member?.id)
+                  ?.filter(
+                    (member) => opinion.mergedAuthors.includes(member?.userId) || opinion?.authorId == member?.userId,
+                  )
                   .map((member) => (
                     <div key={member?.user?.email}>
                       <Tooltip title={member?.user?.name} key={member?.user?.email} placement="bottom">

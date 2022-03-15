@@ -57,12 +57,12 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   };
 
   const props = {
-    beforeUpload: async (file: RcFile) => {
-      if (file.type !== 'image/png') {
-        message.error(`${file.name} is not a png file`);
-      }
-      return file.type === 'image/png' ? true : Upload.LIST_IGNORE;
-    },
+    // beforeUpload: async (file: RcFile) => {
+    //   if (file.type !== 'image/png') {
+    //     message.error(`${file.name} is not a png file`);
+    //   }
+    //   return file.type === 'image/png' ? true : Upload.LIST_IGNORE;
+    // },
     onChange: (info: UploadChangeParam<UploadFile<any>>) => {
       console.log(info.fileList);
     },

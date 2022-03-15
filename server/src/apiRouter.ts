@@ -11,6 +11,8 @@ const apiRouter = (): Router => {
   router.post('/logout', auth.logout);
   router.post('/upload', upload, uploadFile);
 
+  router.post('/resend_verification_email', auth.sendVerificationEmail);
+
   router.get('/me', user.me);
 
   return router;

@@ -28,6 +28,7 @@ const typeDefs = gql`
     members(teamId: String!): [Member]
     boards(teamId: String!): [Board]
     board(boardId: String): Board
+    criteriaList: [Criteria]
 
     getHealthCheck(teamId: String, boardId: String): getHealthCheck
   }
