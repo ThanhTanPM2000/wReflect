@@ -272,6 +272,13 @@ Enum AssessmentStatus {
   REOPENED
 }
 
+Enum AssessmentStatus {
+  PLANNED
+  DOING
+  COMPLETE
+  REOPENED
+}
+
 Enum BoardType {
   DEFAULT
   PHASE
