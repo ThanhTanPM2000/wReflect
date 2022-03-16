@@ -95,9 +95,9 @@ const SideBar = ({ isAdmin }: Props) => {
                     Task
                   </Menu.Item>
                 </SubMenu> */}
-                {/* <Menu.Item icon={<UserOutlined />} key="account">
+                <Menu.Item icon={<UserOutlined />} key="account">
                   <Link to="/me">Account</Link>
-                </Menu.Item> */}
+                </Menu.Item>
               </>
             )}
 

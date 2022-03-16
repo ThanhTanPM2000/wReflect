@@ -44,12 +44,12 @@ export default function ColumnComponent({
   const [emptyColumn] = useMutation<ColumnMutations.emptyColumnResult, ColumnMutations.emptyColumnVars>(
     ColumnMutations.emptyColumn,
     {
-      onError: (error) => {
-        notification.error({
-          message: error.message,
-          placement: 'bottomRight',
-        });
-      },
+      // onError: (error) => {
+      //   notification.error({
+      //     message: error.message,
+      //     placement: 'bottomRight',
+      //   });
+      // },
     },
   );
 

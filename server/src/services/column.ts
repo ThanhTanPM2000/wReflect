@@ -1,4 +1,4 @@
-import { Forbidden } from './../errorsManagement';
+import error from './../errorsManagement';
 import prisma from '../prisma';
 import { isOwnedTeam } from './essential';
 

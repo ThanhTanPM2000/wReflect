@@ -11,6 +11,8 @@ import { onError } from '@apollo/client/link/error';
 import { notification } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { Column, Opinion } from './types';
+import { user } from './apis';
+import { updateLoginState } from './apis/axios';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
@@ -33,13 +35,21 @@ const splitLink = split(
   httpLink,
 );
 
-const errorLink = onError(({ networkError, graphQLErrors }) => {
+const errorLink = onError(({ networkError, response }) => {
   try {
     if (networkError) {
-      notification.error({
-        placement: 'bottomRight',
-        message: `[Network error]`,
-      });
+      if ('statusCode' in networkError && networkError.statusCode === 401) {
+        updateLoginState(null);
+        notification.error({
+          placement: 'bottomRight',
+          message: `Session timeout`,
+        });
+      } else {
+        notification.error({
+          placement: 'bottomRight',
+          message: `[Network error]`,
+        });
+      }
     }
   } catch (error) {
     notification.error({

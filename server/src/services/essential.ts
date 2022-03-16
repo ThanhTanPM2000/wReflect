@@ -1,5 +1,5 @@
 import prisma from './../prisma';
-import { Forbidden } from '../errorsManagement';
+import error from '../errorsManagement';
 
 export const isMembersOfTeam = async (teamId: string, userId: string) => {
   const team = await prisma.team.findFirst({
@@ -13,7 +13,7 @@ export const isMembersOfTeam = async (teamId: string, userId: string) => {
     },
   });
 
-  !team && Forbidden();
+  !team && error.Forbidden();
 };
 
 export const isAllowUpdateBoard = async (boardId: string, userId: string) => {
@@ -31,7 +31,7 @@ export const isAllowUpdateBoard = async (boardId: string, userId: string) => {
     },
   });
 
-  !board && Forbidden();
+  !board && error.Forbidden();
 };
 
 export const isOwnedTeam = async (teamId: string, userId: string) => {
@@ -47,7 +47,7 @@ export const isOwnedTeam = async (teamId: string, userId: string) => {
     },
   });
 
-  !team && Forbidden();
+  !team && error.Forbidden();
 };
 
 export const isOwnedOpinion = async (opinionId: string, userId: string) => {
@@ -92,5 +92,5 @@ export const isOwnedOpinion = async (opinionId: string, userId: string) => {
     },
   });
 
-  !opinion && Forbidden();
+  !opinion && error.Forbidden();
 };

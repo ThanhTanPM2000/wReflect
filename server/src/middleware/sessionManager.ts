@@ -12,7 +12,7 @@ const sessionManager = async (
   next: NextFunction,
 ): Promise<void | Response> => {
   try {
-    const PUBLIC_PATHS = ['/api/login', '/api/me', '/api/resend_verification_email'];
+    const PUBLIC_PATHS = ['/api/login', '/api/logout', '/api/me', '/api/resend_verification_email'];
     if (PUBLIC_PATHS.includes(req.path)) {
       next();
       return;
@@ -25,8 +25,9 @@ const sessionManager = async (
     if (!sanitizedUser) {
       setCookie('email', '', 0, res);
       setCookie('token', '', 0, res);
-      // return res.status(StatusCodes.UNAUTHORIZED).send();
-      throw new Error('Unauthen');
+      // return error.UnAuthorized();
+      return res.status(StatusCodes.UNAUTHORIZED).send('Unauthen');
+      // throw new ApolloError('Unauthorized user', `${StatusCodes.UNAUTHORIZED}`);
     }
     const oneDayInMilliseconds = config.SESSION_DURATION_MINUTES * 60 * 1000;
     // TODO: Refactor cookie adding and remove to one place

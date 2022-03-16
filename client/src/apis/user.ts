@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { axios } from './axios';
 
 export const me = async () => {
@@ -7,7 +6,7 @@ export const me = async () => {
     return response.data;
   } catch (error) {
     if (error instanceof Error) {
-      message.error(error.message);
+      console.log(error.message);
     }
   }
 };

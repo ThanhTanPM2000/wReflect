@@ -11,12 +11,7 @@ export type SanitizedUser = {
 };
 
 export interface RequestWithUserInfo extends Request {
-  user: User & {
-    profile: UserProfile | null;
-    members: (Member & {
-      team: Team;
-    })[];
-  };
+  user: User;
 }
 
 export type UserStatus = 'NotInitiated' | 'Initiated' | 'Completed';

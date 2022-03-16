@@ -18,28 +18,12 @@ export const createSession = async (userId: string, sessionDurationMinutes: numb
   return session;
 };
 
-export const checkAndExtendSession = async (
-  email: string,
-  token: string,
-): Promise<
-  | (User & {
-      profile: UserProfile | null;
-      members: (Member & {
-        team: Team;
-      })[];
-    })
-  | null
-> => {
+export const checkAndExtendSession = async (email: string, token: string): Promise<User | null> => {
   try {
     const user = await prisma.user.findFirst({
       where: { email },
       include: {
         profile: true,
-        members: {
-          include: {
-            team: true,
-          },
-        },
       },
     });
     if (!user) return null;

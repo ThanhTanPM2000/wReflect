@@ -12,7 +12,6 @@ import { ManageMembers } from './pages/ManageMembersPage';
 import { Board } from './pages/BoardPage';
 import { AccountSetting } from './pages/AccountSettingPage';
 import { UserManagements } from './components/UserManagements';
-import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
 import { Footer } from 'antd/lib/layout/layout';
@@ -116,8 +115,7 @@ const Routes = ({ me }: Props) => {
                                 <HealthCheck teamId={match.params.teamId} boardId={match.params.boardId} />
                               )}
                             />
-                            <Route path="/me" component={ProfileUser} />
-                            <Route path="/account" component={AccountSetting} />
+                            <Route path="/me" component={AccountSetting} />
                             <Route
                               path="/manage-board/:teamId"
                               render={({ match }) => <ManageBoardPage teamId={match.params.teamId} />}

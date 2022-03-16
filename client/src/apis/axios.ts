@@ -6,6 +6,7 @@ import { User } from '../types';
 // Function is dynamically added on initialization to prevent circular dependencies
 // For updating react state
 type UpdateLoginState = null | ((newEmail: null | User) => void);
+
 let updateLoginState: UpdateLoginState = null;
 const setUpdateLoginState = async (updateLoginStateFunction: UpdateLoginState) => {
   updateLoginState = await updateLoginStateFunction;
@@ -52,4 +53,4 @@ instance.interceptors.response.use(
   },
 );
 
-export { instance as axios, setUpdateLoginState };
+export { instance as axios, setUpdateLoginState, updateLoginState };
