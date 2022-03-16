@@ -8,7 +8,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from, split } fr
 import config from './config';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from '@apollo/client/link/error';
-import { notification } from 'antd';
+import { message, notification } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { updateLoginState } from './apis/axios';
 
@@ -51,7 +51,6 @@ const errorLink = onError(({ networkError, graphQLErrors }) => {
       }
     } else if (graphQLErrors) {
       for (const err of graphQLErrors) {
-        console.log(err.message);
         notification.error({
           placement: 'bottomRight',
           message: err.message,
