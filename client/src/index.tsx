@@ -8,7 +8,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from, split } fr
 import config from './config';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from '@apollo/client/link/error';
-import { notification } from 'antd';
+import { message, notification } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { Column, Opinion } from './types';
 import { user } from './apis';
@@ -35,7 +35,7 @@ const splitLink = split(
   httpLink,
 );
 
-const errorLink = onError(({ networkError, response }) => {
+const errorLink = onError(({ networkError, graphQLErrors }) => {
   try {
     if (networkError) {
       if ('statusCode' in networkError && networkError.statusCode === 401) {
@@ -48,6 +48,13 @@ const errorLink = onError(({ networkError, response }) => {
         notification.error({
           placement: 'bottomRight',
           message: `[Network error]`,
+        });
+      }
+    } else if (graphQLErrors) {
+      for (const err of graphQLErrors) {
+        notification.error({
+          placement: 'bottomRight',
+          message: err.message,
         });
       }
     }

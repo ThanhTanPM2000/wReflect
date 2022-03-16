@@ -40,7 +40,7 @@ export default function createTicket({ board, column, isCreateBottom }: Props) {
         onError: (error) => {
           notification.error({
             placement: 'bottomRight',
-            message: error.message,
+            message: 'Cant create a ticket',
           });
         },
       });

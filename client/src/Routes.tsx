@@ -16,7 +16,7 @@ import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
 import { Footer } from 'antd/lib/layout/layout';
 import { useSubscription } from '@apollo/client';
-import { BoardSubscription, OpinionSubscription } from './grapql-client/subcriptions';
+import { BoardSubscription, OpinionSubscription, TeamSubscription } from './grapql-client/subcriptions';
 import HealthCheck from './pages/HealthCheck/HealthCheck';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { PersonalReflection } from './pages/PersonalReflection';
@@ -61,6 +61,8 @@ const Routes = ({ me }: Props) => {
           },
         },
       );
+
+      
     }
   };
 

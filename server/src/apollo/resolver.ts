@@ -59,9 +59,6 @@ const resolvers = {
   Mutation: {
     createTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const myTeam = await team.createTeam(req, args);
-      pubsub.publish('CREATE_TEAM', {
-        createdTeam: myTeam,
-      });
 
       return myTeam;
     },
@@ -151,6 +148,12 @@ const resolvers = {
       pubsub.publish('ADD_MEMBERS', {
         addMembers: team,
       });
+
+      pubsub.publish('UPDATE_LIST_TEAMS', {
+        updateListTeams: {
+          success: true,
+        },
+      });
       return {
         success,
         errors,
@@ -161,6 +164,11 @@ const resolvers = {
       const { id: meId } = req?.user;
       pubsub.publish('REMOVE_MEMBER', {
         addMembers: team,
+      });
+      pubsub.publish('UPDATE_LIST_TEAMS', {
+        updateListTeams: {
+          success: true,
+        },
       });
       return await member.removeMember(meId, args.memberId);
     },
@@ -232,14 +240,14 @@ const resolvers = {
     },
   },
   Subscription: {
-    // createBoard: {
-    //   subcribe: withFilter(
-    //     () => pubsub.asyncIterator(['CREATE_BOARD']),
-    //     (_, args) => {
-    //       return true;
-    //     },
-    //   ),
-    // },
+    updateListTeams: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['UPDATE_LIST_TEAMS']),
+        (_, args) => {
+          return true;
+        },
+      ),
+    },
     updateBoard: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(['CREATE_BOARD', 'UPDATE_BOARD', 'ORDER_OPINION']),

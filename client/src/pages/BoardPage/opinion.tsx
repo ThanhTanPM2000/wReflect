@@ -56,8 +56,8 @@ export default function OpinionComponent({
     {
       onError: (error) => {
         notification.error({
+          message: 'Failed',
           placement: 'bottomRight',
-          message: error?.message,
         });
       },
     },
