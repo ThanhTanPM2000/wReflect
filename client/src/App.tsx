@@ -12,6 +12,8 @@ import './styles/less/ant.less';
 
 const App = (): JSX.Element => {
   const [me, setMe] = useState<null | User>(null);
+  const [teamId, setTeamId] = useState<string>('');
+  const [boardId, setBoardId] = useState<string>('');
   // const [constructor, setConstructor] = useState(true);
 
   setUpdateLoginState((newMe: null | User) => {
@@ -26,7 +28,15 @@ const App = (): JSX.Element => {
   }, []);
 
   return (
-    <SelfContext.Provider value={me}>
+    <SelfContext.Provider
+      value={{
+        ...me,
+        teamId,
+        setTeamId,
+        boardId,
+        setBoardId,
+      }}
+    >
       <Routes me={me} />
     </SelfContext.Provider>
   );

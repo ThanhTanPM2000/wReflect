@@ -18,8 +18,10 @@ const AccountSetting = () => {
   return (
     <div className="profileUser">
       <div className="headerSection">
-        
-      </div>
+        </div>
+        <div>
+          
+        </div>
     </div>
   );
 };

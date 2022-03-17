@@ -2,6 +2,8 @@ import React from 'react';
 import { Button, Select, PageHeader } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
 import { Board, Team } from '../../types';
+import { useQuery } from '@apollo/client';
+import { TeamQueries } from '../../grapql-client/queries';
 
 const { Option } = Select;
 
