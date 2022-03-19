@@ -50,6 +50,8 @@ export default function OpinionComponent({
   const client = useApolloClient();
   const me = useContext(selfContext);
   const [isOpenRemark, setIsOpenRemark] = useState(false);
+  const [loadingIcon, setLoadingIcon] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const [updateOpinion] = useMutation<OpinionMutations.updateOpinionResult, OpinionMutations.updateOpinionVars>(
     OpinionMutations.updateOpinion,
@@ -367,19 +369,19 @@ export default function OpinionComponent({
                   style={{ textAlign: 'center', minHeight: '180px' }}
                   autoFocus
                   bordered
-                  onBlur={(e) => {
-                    if (e.target.value && e.target.value.length > 0) {
+                  onPressEnter={(e) => {
+                    if (!e.shiftKey && e.currentTarget.value && e.currentTarget.value.length > 0) {
                       setIsEdit(false);
                       updateOpinion({
                         variables: {
                           teamId: board.teamId,
                           opinionId: opinion.id,
-                          text: e.target.value,
+                          text: e.currentTarget.value.trim(),
                         },
                         optimisticResponse: {
                           updateOpinion: {
                             ...opinion,
-                            text: e.target.value,
+                            text: e.currentTarget.value,
                           },
                         },
                       });

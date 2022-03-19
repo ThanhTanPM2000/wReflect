@@ -6,7 +6,7 @@ import { NetworkStatus, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, AimOutlined } from '@ant-design/icons';
 import { Member, Team, TeamStatus } from '../../types';
-import { Loading } from '../../components/Loading';
+import { LoadingSkeleton } from '../../components/Loading';
 
 const { Meta } = Card;
 
@@ -45,7 +45,7 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
 
   return (
     <div className="flex flex-1 flex-dir-c" style={{ padding: '10px' }}>
-      <Loading
+      <LoadingSkeleton
         refetch={refetch}
         data={data?.teams}
         loading={loading || networkStatus === NetworkStatus.refetch}
@@ -90,11 +90,13 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
                           <AimOutlined
                             key="reflect"
                             onClick={() => history.push(`/board/${team.id}/${team.boards[0].id}`)}
+                            title='Do Reflect'
                           />,
-                          <SettingOutlined key="setting" onClick={() => history.push(`/manage-board/${team.id}`)} />,
+                          <SettingOutlined title='Manage Board' key="setting" onClick={() => history.push(`/manage-board/${team.id}`)} />,
                           <UsergroupAddOutlined
                             key="edit"
                             onClick={() => history.push(`/manage-members/${team.id}`)}
+                            title='Add member'
                           />,
                         ]}
                       >
@@ -154,7 +156,7 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
         ) : (
           <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
         )}
-      </Loading>
+      </LoadingSkeleton>
     </div>
   );
 };
