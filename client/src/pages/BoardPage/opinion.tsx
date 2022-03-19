@@ -54,6 +54,8 @@ export default function OpinionComponent({
   const me = useContext(selfContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenRemark, setIsOpenRemark] = useState(false);
+  const [loadingIcon, setLoadingIcon] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
