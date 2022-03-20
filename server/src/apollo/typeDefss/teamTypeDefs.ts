@@ -14,7 +14,7 @@ const typeDefs = gql`
     status: TeamStatus
     description: String
     members: [Member]
-    boards: [Board]
+    boards(meId: ID): [Board]
   }
 
   enum TeamStatus {

@@ -1,7 +1,10 @@
-import { Column, Opinion } from './../../types';
+import { Board, Column, Opinion, OpinionStatus } from './../../types';
 import { gql } from '@apollo/client';
+import { BOARD_FIELDS } from '../fragments/boardFragment';
+import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createOpinionVars = {
+  teamId: string;
   boardId: string;
   columnId: string;
   text: string;
@@ -14,117 +17,95 @@ export type createOpinionResult = {
 };
 
 export const createOpinion = gql`
-  mutation Mutation($boardId: String!, $columnId: String, $text: String, $isAction: Boolean, $isCreateBottom: Boolean) {
+  ${BOARD_FIELDS}
+  mutation Mutation(
+    $teamId: String!
+    $boardId: String!
+    $columnId: String!
+    $text: String
+    $isAction: Boolean
+    $isCreateBottom: Boolean
+  ) {
     createOpinion(
+      teamId: $teamId
       boardId: $boardId
       columnId: $columnId
       text: $text
       isAction: $isAction
       isCreateBottom: $isCreateBottom
     ) {
-      id
-      color
-      title
-      isActive
-      boardId
-      opinions {
-        id
-        columnId
-        authorId
-        createdAt
-        updatedAt
-        text
-        upVote
-        downVote
-        updatedBy
-        isAction
-        isBookmarked
-        responsible
-        mergedAuthors
-        color
-        status
-        position
-        remarks {
-          id
-          authorId
-          opinionId
-          text
-          createdAt
-          updatedAt
-        }
-        author {
-          id
-          email
-          createdAt
-          updatedAt
-          isAdmin
-          userStatus
-          profile {
-            id
-            userId
-            name
-            nickname
-            picture
-          }
-        }
-      }
+      ...BoardFields
     }
   }
 `;
 
 export type updateOpinionResult = {
-  updateOpinion: string;
+  updateOpinion: Opinion;
 };
 
 export type updateOpinionVars = {
+  teamId: string;
   opinionId: string;
   text?: string;
   upVote?: string[];
+  downVote?: string[];
   isAction?: boolean;
   isBookmarked?: boolean;
   responsible?: string;
   color?: string;
-  status?: string;
+  status?: OpinionStatus;
+  newColumnId?: string;
 };
 
 export const updateOpinion = gql`
-  mutation Mutation(
+  ${OPINION_FIELDS}
+  mutation updateOpinion(
+    $teamId: String!
     $opinionId: String!
     $text: String
     $upVote: [String]
+    $downVote: [String]
     $isAction: Boolean
     $isBookmarked: Boolean
-    $responsible: Boolean
+    $responsible: String
     $color: String
-    $status: String
+    $status: OpinionStatus
+    $newColumnId: String
   ) {
     updateOpinion(
+      teamId: $teamId
       opinionId: $opinionId
       text: $text
       upVote: $upVote
+      downVote: $downVote
       isAction: $isAction
       isBookmarked: $isBookmarked
       responsible: $responsible
       color: $color
       status: $status
-    )
+      newColumnId: $newColumnId
+    ) {
+      ...OpinionFields
+    }
   }
 `;
 
 export type removeOpinionResult = {
-  removeOpinion: {
-    count: number;
-  };
+  removeOpinion: Board;
 };
 
 export type removeOpinionVars = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
   opinionId: string;
 };
 
 export const removeOpinion = gql`
-  mutation RemoveOpinion($opinionId: String) {
-    removeOpinion(opinionId: $opinionId) {
-      count
+  ${BOARD_FIELDS}
+  mutation RemoveOpinion($teamId: String!, $boardId: String!, $columnId: String!, $opinionId: String!) {
+    removeOpinion(teamId: $teamId, boardId: $boardId, columnId: $columnId, opinionId: $opinionId) {
+      ...BoardFields
     }
   }
 `;
@@ -147,7 +128,10 @@ export type combineOpinionVars = {
 };
 
 export const combineOpinion = gql`
+  ${BOARD_FIELDS}
   mutation Mutation($combine: combineOpinion, $source: orderOpinion, $draggableId: String, $text: String) {
-    combineOpinion(combine: $combine, source: $source, draggableId: $draggableId, text: $text)
+    combineOpinion(combine: $combine, source: $source, draggableId: $draggableId, text: $text) {
+      ...BoardFields
+    }
   }
 `;

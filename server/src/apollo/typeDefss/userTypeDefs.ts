@@ -10,6 +10,9 @@ const typeDefs = gql`
     userStatus: String
     members: [Member]
     profile: Profile
+    name: String!
+    nickname: String!
+    picture: String!
   }
 `;
 

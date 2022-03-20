@@ -1,10 +1,129 @@
+import { addMembersToTeam } from './member';
 import { StatusCodes } from 'http-status-codes';
 import config from '../config';
 import prisma from './../prisma';
-import { createTeamType, updateTeamType } from '../types';
+import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
 import { Team, TeamStatus, Board, Column, Remark, Opinion, OpinionStatus } from '@prisma/client';
 import { errorName } from '../constant/errorsConstant';
 import { ForbiddenError, ApolloError } from 'apollo-server-errors';
+import { Forbidden } from '../errorsManagement';
+import { P } from 'pino';
+
+export const isMembersOfTeam = async (teamId: string, userId: string) => {
+  const team = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      members: {
+        some: {
+          userId,
+        },
+      },
+    },
+  });
+
+  !team && Forbidden();
+};
+
+export const isAllowUpdateBoard = async (boardId: string, userId: string) => {
+  const board = await prisma.board.findFirst({
+    where: {
+      isLocked: false,
+      id: boardId,
+      team: {
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+    },
+  });
+
+  !board && Forbidden();
+};
+
+export const isOwnedTeam = async (teamId: string, userId: string) => {
+  const team = await prisma.team.findFirst({
+    where: {
+      id: teamId,
+      members: {
+        some: {
+          userId,
+          isOwner: true,
+        },
+      },
+    },
+  });
+
+  !team && Forbidden();
+};
+
+export const isOwnedOpinion = async (opinionId: string, userId: string) => {
+  const opinion = await prisma.opinion.findFirst({
+    where: {
+      id: opinionId,
+      OR: [
+        {
+          responsible: {
+            equals: 'not-assigned',
+          },
+          column: {
+            board: {
+              team: {
+                members: {
+                  some: {
+                    userId,
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          responsible: userId,
+        },
+        {
+          column: {
+            board: {
+              team: {
+                members: {
+                  some: {
+                    userId,
+                    isOwner: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  !opinion && Forbidden();
+};
+
+// export const changeCurrentBoard = async (teamId: string, userId: string, boardId: string) => {
+//   const team = await prisma.team.update({
+//     where: {
+//       id: teamId,
+//     },
+//     data: {
+//       members: {
+//         update: {
+//           where: {
+//             id: userId,
+//           },
+//           data: {
+//             boardActive: boardId,
+//           },
+//         },
+//       },
+//     },
+//   });
+
+//   return team;
+// };
 
 export const getTeams = async (
   isGettingAll = false,
@@ -98,12 +217,12 @@ export const getTeam = async (teamId: string, userId?: string) => {
     },
   });
 
-  if (!team) throw new ApolloError(`Team not found`, `${StatusCodes.NOT_FOUND}`);
-
   return team;
 };
 
-export const createTeam = async (meId: string, data: createTeamType) => {
+export const createTeam = async (req: RequestWithUserInfo, data: createTeamType) => {
+  const { id: meId } = req.user;
+
   const startDate = data.startDate ? new Date(data.startDate) : new Date();
   const endDate = data.endDate ? new Date(data.endDate) : new Date();
 
@@ -113,6 +232,7 @@ export const createTeam = async (meId: string, data: createTeamType) => {
       ...data,
       startDate,
       endDate,
+      ownerId: meId,
       boards: {
         create: {
           createdBy: meId,
@@ -122,12 +242,28 @@ export const createTeam = async (meId: string, data: createTeamType) => {
               data: [
                 {
                   title: 'Went Well',
+                  isActive: true,
+                  position: 1,
                 },
                 {
                   title: 'To Improve',
+                  isActive: true,
+                  position: 2,
                 },
                 {
                   title: 'Action Items',
+                  isActive: true,
+                  position: 3,
+                },
+                {
+                  title: '',
+                  isActive: false,
+                  position: 4,
+                },
+                {
+                  title: '',
+                  isActive: false,
+                  position: 5,
                 },
               ],
             },
@@ -141,12 +277,16 @@ export const createTeam = async (meId: string, data: createTeamType) => {
         },
       },
     },
+    include: {
+      boards: true,
+    },
   });
 
   return team;
 };
 
-export const updateTeam = async (meId: string, data: updateTeamType): Promise<Team> => {
+export const updateTeam = async (req: RequestWithUserInfo, data: updateTeamType): Promise<Team> => {
+  const { id: meId } = req?.user;
   const startDate = data.startDate ? new Date(data.startDate) : undefined;
   const endDate = data.endDate ? new Date(data.endDate) : undefined;
 
@@ -163,7 +303,6 @@ export const updateTeam = async (meId: string, data: updateTeamType): Promise<Te
     data: {
       name: data.name,
       description: data.description,
-      // isPublic: data.isPublic,
       isPublic: data.isPublic,
       picture: data.picture,
       startDate,
@@ -176,7 +315,8 @@ export const updateTeam = async (meId: string, data: updateTeamType): Promise<Te
   return team[0];
 };
 
-export const changeTeamAccess = async (meId: string, teamId: string, isPublic: boolean) => {
+export const changeTeamAccess = async (req: RequestWithUserInfo, teamId: string, isPublic: boolean) => {
+  const { id: meId } = req?.user;
   const team = await prisma.team.updateMany({
     where: {
       id: teamId,
@@ -196,7 +336,8 @@ export const changeTeamAccess = async (meId: string, teamId: string, isPublic: b
   return team;
 };
 
-export const deleteTeam = async (meId: string, teamId: string) => {
+export const deleteTeam = async (req: RequestWithUserInfo, teamId: string) => {
+  const { id: meId } = req?.user;
   const batchPayload = await prisma.team.deleteMany({
     where: {
       id: teamId,
@@ -212,3 +353,29 @@ export const deleteTeam = async (meId: string, teamId: string) => {
   if (!batchPayload) throw new ForbiddenError(`You are not the owner of Team ${teamId}`);
   return batchPayload;
 };
+
+// export const createBoard = async (req: RequestWithUserInfo, teamId: string) => {
+//   const {id: }
+// }
+
+// export const updateAction = async (teamId: string,userId: string, boardId: string, ) => {
+//   const team = await prisma.team.update({
+//     where: {
+//       id: teamId
+//     },
+//     data: {
+//       boards: {
+//         update: {
+//           where: {
+//             id: boardId,
+//           },
+//           data: {
+//             update: {
+//               col
+//             }
+//           }
+//         }
+//       }
+//     }
+//   })
+// }

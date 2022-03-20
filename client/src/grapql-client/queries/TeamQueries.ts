@@ -1,6 +1,7 @@
-import { StringNullableChain } from 'lodash';
 import { gql } from '@apollo/client';
-import { Board, Team } from '../../types';
+import { Team } from '../../types';
+
+import { BOARD_FIELDS } from '../fragments/boardFragment';
 
 export type getTeamVars = {
   teamId: string;
@@ -11,6 +12,7 @@ export type getTeamResult = {
 };
 
 const getTeam = gql`
+  ${BOARD_FIELDS}
   query Query($teamId: String!) {
     team(teamId: $teamId) {
       id
@@ -41,65 +43,13 @@ const getTeam = gql`
           updatedAt
           isAdmin
           userStatus
-          profile {
-            id
-            userId
-            name
-            nickname
-            picture
-          }
+          name
+          nickname
+          picture
         }
       }
       boards {
-        timerInProgress
-        id
-        teamId
-        createdAt
-        updatedAt
-        createdBy
-        isPublic
-        isLocked
-        disableDownVote
-        disableUpVote
-        isAnonymous
-        votesLimit
-        title
-        endTime
-        columns {
-          id
-          color
-          title
-          isActive
-          boardId
-          opinions {
-            id
-            columnId
-            authorId
-            createdAt
-            updatedAt
-            text
-            upVote
-            downVote
-            updatedBy
-            isAction
-            isBookmarked
-            responsible
-            mergedAuthors
-            color
-            author {
-              id
-              email
-            }
-            remarks {
-              id
-              authorId
-              opinionId
-              text
-              createdAt
-              updatedAt
-            }
-          }
-        }
+        ...BoardFields
       }
     }
   }
@@ -114,19 +64,23 @@ export type getTeamsResult = {
   };
 };
 
+enum statusOfTeam {
+  DOING,
+  DONE,
+}
+
 export type getTeamsVars = {
-  input: {
-    status?: string;
-    isGettingAll?: boolean;
-    search?: string;
-    page?: number;
-    size?: number;
-  };
+  status?: statusOfTeam;
+  isGettingAll?: boolean;
+  search?: string;
+  page?: number;
+  size?: number;
 };
 
 const getTeams = gql`
-  query Teams($input: TeamsInput) {
-    teams(input: $input) {
+  ${BOARD_FIELDS}
+  query Teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
+    teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
       data {
         id
         name
@@ -156,12 +110,12 @@ const getTeams = gql`
             updatedAt
             isAdmin
             userStatus
+            name
+            nickname
+            picture
             profile {
               id
               userId
-              name
-              nickname
-              picture
               workplace
               address
               school
@@ -175,89 +129,58 @@ const getTeams = gql`
           }
         }
         boards {
+          ...BoardFields
+        }
+      }
+      total
+    }
+  }
+`;
+
+export const getEssentialData = gql`
+  query Teams($status: String, $isGettingAll: Boolean, $search: String, $page: Int, $size: Int) {
+    teams(status: $status, isGettingAll: $isGettingAll, search: $search, page: $page, size: $size) {
+      data {
+        id
+        name
+        isPublic
+        members {
           id
+          userId
           teamId
-          createdAt
-          updatedAt
-          createdBy
-          isPublic
-          isLocked
-          disableDownVote
-          disableUpVote
-          isAnonymous
-          votesLimit
+          isOwner
+          user {
+            id
+            email
+            name
+            nickname
+            picture
+          }
+        }
+        boards {
+          id
           title
-          timerInProgress
-          endTime
           columns {
             id
             color
             title
-            isActive
             opinions {
               id
               columnId
               authorId
-              createdAt
-              updatedAt
               text
-              upVote
-              downVote
-              updatedBy
               isAction
-              isBookmarked
               responsible
-              mergedAuthors
               color
-              remarks {
-                id
-                authorId
-                opinionId
-                text
-                createdAt
-                updatedAt
-              }
+              mergedAuthors
+              status
             }
           }
         }
       }
+      total
     }
   }
 `;
 
-export type getTeamIdsResult = {
-  getTeamIds: {
-    id: string;
-    name: string;
-    picture: string;
-    boards: Board[];
-  }[];
-};
-
-const getTeamIds = gql`
-  query GetTeamIds {
-    getTeamIds {
-      id
-      name
-      picture
-      boards {
-        id
-        teamId
-        createdAt
-        updatedAt
-        createdBy
-        isPublic
-        isLocked
-        disableDownVote
-        disableUpVote
-        isAnonymous
-        votesLimit
-        title
-        timerInProgress
-        endTime
-      }
-    }
-  }
-`;
-
-export { getTeams, getTeam, getTeamIds };
+export { getTeams, getTeam };

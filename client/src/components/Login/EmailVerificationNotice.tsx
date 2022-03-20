@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import auth0 from 'auth0-js';
 import { notification } from 'antd';
 

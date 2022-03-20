@@ -4,30 +4,54 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './styles/css/style.css';
 
-import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from, useQuery, useLazyQuery } from '@apollo/client';
+import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, from, split } from '@apollo/client';
 import config from './config';
+import { WebSocketLink } from '@apollo/client/link/ws';
 import { onError } from '@apollo/client/link/error';
-import { message, Spin } from 'antd';
-import { Team } from './types';
+import { notification } from 'antd';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { Column, Opinion } from './types';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,
   credentials: 'include',
 });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message: messageData, extensions }) => {
-      console.log(message);
-      if (extensions.code === '404') return;
-      message.error(`${messageData}`);
-    });
+const wsLink = new WebSocketLink({
+  uri: `${config.SERVER_BASE_URL.replace('http', 'ws')}/graphql`,
+  options: {
+    reconnect: true,
+  },
+});
 
-  if (networkError) console.log(`[Network error]: ${networkError}`);
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+  },
+  wsLink,
+  httpLink,
+);
+
+const errorLink = onError(({ networkError, graphQLErrors }) => {
+  try {
+    if (networkError) {
+      notification.error({
+        placement: 'bottomRight',
+        message: `[Network error]`,
+      });
+    }
+  } catch (error) {
+    notification.error({
+      message: 'Something failed with server',
+      placement: 'bottomRight',
+    });
+  }
 });
 
 const client = new ApolloClient({
   connectToDevTools: true,
+
   cache: new InMemoryCache({
     addTypename: true,
     resultCaching: true,
@@ -42,11 +66,43 @@ const client = new ApolloClient({
               });
             },
           },
+          board: {
+            read(_, { args, toReference }) {
+              return toReference({
+                __typename: 'Board',
+                id: args?.boardId,
+              });
+            },
+          },
         },
       },
+      // Column: {
+      //   fields: {
+      //     opinion: {
+      //     }
+      //   }
+      // }
+      // Column: {
+      //   fields: {
+      //     opinions: {
+      //       merge(existing: Opinion[], incoming: Opinion[]) {
+      //         return [...incoming];
+      //       },
+      //     },
+      //   },
+      // },
+      // Board: {
+      //   fields: {
+      //     columns: {
+      //       merge(existing: Column[], incoming: Column[]) {
+      //         return [...incoming];
+      //       },
+      //     },
+      //   },
+      // },
     },
   }),
-  link: from([errorLink, httpLink]),
+  link: from([errorLink, splitLink]),
 });
 
 ReactDOM.render(

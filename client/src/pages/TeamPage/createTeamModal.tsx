@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import moment from 'moment';
 import { Modal, Form, Input, DatePicker, Upload, Button, Select, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
@@ -10,8 +10,6 @@ import { RcFile, UploadChangeParam } from 'antd/lib/upload';
 import config from '../../config';
 import { UploadFile } from 'antd/lib/upload/interface';
 
-import { useApolloClient } from '@apollo/client';
-
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
@@ -22,14 +20,11 @@ type Props = {
 
 const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   const [form] = Form.useForm();
-  const client = useApolloClient();
 
-  const [addNewTeam] = useMutation<TeamMutations.createTeamResult, TeamMutations.createTeamVars>(
-    TeamMutations.createTeam,
-    {
-      refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeamIds],
-    },
-  );
+  const [addNewTeam] = useMutation(TeamMutations.createTeam, {
+    // refetchQueries: [TeamQueries.getTeams, TeamQueries.getTeamIds],
+    refetchQueries: [TeamQueries.getTeams],
+  });
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -56,7 +51,6 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           isPublic: isPublic,
         },
       });
-      console.log('cache is', client.cache);
       form.resetFields();
       setIsVisible(false);
     });
@@ -98,16 +92,7 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
         >
           <Input bordered placeholder="Input team name" type="text" name="name" />
         </Form.Item>
-        <Form.Item
-          name="teamDescription"
-          hasFeedback
-          label="Description"
-          rules={[
-            { required: true, message: 'Please input your team description' },
-            { min: 15, message: 'Team desciption must be minimum 15 characters.' },
-            { max: 100, message: 'Team name must be maximum 100 characters.' },
-          ]}
-        >
+        <Form.Item name="teamDescription" hasFeedback label="Description">
           <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
         <Form.Item

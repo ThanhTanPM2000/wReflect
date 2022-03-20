@@ -21,12 +21,12 @@ const me = gql`
       updatedAt
       isAdmin
       userStatus
+      name
+      nickname
+      picture
       profile {
         id
         userId
-        name
-        nickname
-        picture
         workplace
         address
         school
@@ -118,5 +118,6 @@ const getUsers = gql`
     }
   }
 `;
+
 
 export { login, me, getUsers, getUser };

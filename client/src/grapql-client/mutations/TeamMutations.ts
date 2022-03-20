@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-import { StringNullableChain } from 'lodash';
 import { Team } from '../../types';
 
 export type createTeamVars = {

@@ -22,8 +22,8 @@ function Logout({ children }: Props): JSX.Element {
   };
 
   return (
-    <div className="App logout">
-      <div onClick={onClickLogout}>{children}</div>
+    <div onClick={() => onClickLogout()} className="App logout">
+      {children}
     </div>
   );
 }

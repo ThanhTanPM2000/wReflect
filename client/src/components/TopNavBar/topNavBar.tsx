@@ -1,36 +1,86 @@
 import React from 'react';
-import { Avatar, Layout } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
-import DropDown from './components/DropDown';
-import { useQuery } from '@apollo/client';
-import { TeamQueries } from '../../grapql-client/queries';
-import { useApolloClient } from '@apollo/client';
+import { Button, Select, PageHeader } from 'antd';
+import { Link, useHistory } from 'react-router-dom';
+import { Board, Team } from '../../types';
+
+const { Option } = Select;
+
 type Props = {
-  email: string | null;
-  picture: string | null;
+  title: string;
+  team?: Team;
+  boardId?: string;
+  selectedBoard?: Board | null;
+  setSelectedBoard?: (selectedBoard: Board) => void;
 };
 
-const { Header } = Layout;
+const TopNavBar = ({ title, team, boardId }: Props) => {
+  const history = useHistory();
 
-const TopNavBar = ({ email, picture }: Props) => {
-  
+  const handleSelectBoard = async (value: string) => {
+    history.push(`/board/${team?.id}/${value}`);
+  };
+
+  const boardOptions = () => {
+    return team?.boards?.map((board) => (
+      <Option key={board.id} value={board.id}>
+        {board.title}
+      </Option>
+    ));
+  };
+
+  const handleRenderExtra = () => {
+    switch (title) {
+      case 'Manage Members':
+        return [];
+      case 'Do Reflect':
+        return [
+          <Select
+            onSelect={handleSelectBoard}
+            placeholder="Select board"
+            key="selectBoard"
+            // defaultActiveFirstOption={selectedBoard?.id || undefined}
+            style={{ width: 200 }}
+            bordered
+            optionFilterProp="children"
+            defaultValue={boardId || ''}
+          >
+            {boardOptions()}
+          </Select>,
+        ];
+
+      default:
+        return [];
+    }
+  };
 
   return (
     <>
-      <Header style={{ paddingRight: '20px' }} className="topNavBar">
-        <div className="flex-1">
-          {/* <div style={{ flexGrow: 1 }} className="titleLogo">
-            wReflect
-          </div> */}
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ marginRight: '10px' }}>Hi, {`${email}`}</span>
-            <Avatar className="avatarSetting" src={`${picture}`} size="default" />
-          </div>
-          {/* <div style={{ marginRight: 20 }}>
-            <DropDown email={email} picture={picture} />
-          </div> */}
-        </div>
-      </Header>
+      <PageHeader
+        className="topNavBar"
+        onBack={() => history.replace('/teams')}
+        title={title}
+        extra={[
+          ...handleRenderExtra(),
+          <Link key="1" to={`/board/${team?.id}/${boardId || team?.boards[0]?.id}`}>
+            <Button type={title == 'Do Reflect' ? 'primary' : undefined}>Reflect</Button>
+          </Link>,
+          <Link key="2" to={`/actions-tracker/${team?.id}`}>
+            <Button type={title == 'Actions Tracker' ? 'primary' : undefined}>Actions Tracker</Button>
+          </Link>,
+          <Link key="3" to={`/team-health/${team?.id}/${boardId || team?.boards[0]?.id}`}>
+            <Button type={title == 'Health Check' ? 'primary' : undefined}>Health Check</Button>
+          </Link>,
+          <Link key="4" style={{ textDecoration: 'none' }} to={`/manage-members/${team?.id}`}>
+            <Button type={title == 'Manage Members' ? 'primary' : undefined}>Members</Button>
+          </Link>,
+          <Link key="5" style={{ textDecoration: 'none' }} to={`/manage-board/${team?.id}`}>
+            <Button type={title == 'Manage Board' ? 'primary' : undefined}>Board</Button>
+          </Link>,
+          <Link key="6" style={{ textDecoration: 'none' }} to={`/team-details/${team?.id}`}>
+            <Button type={title == 'Setting' ? 'primary' : undefined}>Settings</Button>
+          </Link>,
+        ]}
+      />
     </>
   );
 };

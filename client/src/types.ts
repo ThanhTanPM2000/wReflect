@@ -17,6 +17,56 @@ export type Team = {
   boards: Board[];
 };
 
+export type HealthCheck = {
+  id: string;
+  teamId: string;
+  boardId: string;
+  templateId: string;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+  isAnonymous: boolean;
+  isCustom: boolean;
+  status: StatusHealthCheck;
+  board: Board;
+  team: Team;
+  memberAnswers: [MemberAnswer];
+  memberComments: [MemberComment];
+};
+
+export type MemberAnswer = {
+  id: string;
+  templateId: string;
+  healthCheckId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  answers: [Answer];
+  healthCheck: HealthCheck | null;
+  user: User;
+};
+
+export type MemberComment = {
+  id: string;
+  templateId: string;
+  healthCheckId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  questionId: string;
+  text: string;
+  user: User;
+  healthCheck: HealthCheck | null;
+};
+
+export type Answer = {
+  id: string;
+  questionId: string;
+  value: string;
+  memberAnswersId: string | null;
+};
+
 export type Board = {
   id: string;
   teamId: string;
@@ -30,8 +80,10 @@ export type Board = {
   isAnonymous: boolean;
   votesLimit: number;
   title: string;
-  timerInProgress: number | null;
-  endTime: number | null;
+  timerInProgress: boolean;
+  type: BoardType;
+  currentPhase: PhaseType;
+  endTime: string;
   team: Team;
   columns: Column[];
 };
@@ -42,14 +94,16 @@ export type Column = {
   title: string;
   isActive: boolean;
   boardId: string;
+  position: number;
   board: Board;
   opinions: Opinion[];
 };
 
 export type Opinion = {
   id: string;
-  columnId: string;
+  columnId: string | null;
   authorId: string;
+  memberId: string;
   createdAt: Date;
   updatedAt: Date;
   text: string;
@@ -60,13 +114,13 @@ export type Opinion = {
   isBookmarked: boolean;
   responsible: string;
   mergedAuthors: string[];
-  voters: string[];
   color: string;
   position: number;
   status: OpinionStatus;
   column: Column;
   remarks: Remark[];
   author: User;
+  member: Member;
 };
 
 export type Remark = {
@@ -78,6 +132,7 @@ export type Remark = {
   updatedAt: Date;
   opinion: Opinion;
   author: User;
+  member: Member;
 };
 
 export type Member = {
@@ -90,6 +145,7 @@ export type Member = {
   invitedBy: string | null;
   joinedAt: Date;
   role: string | null;
+  boardActive: string;
   user: User;
   team: Team;
 };
@@ -97,9 +153,6 @@ export type Member = {
 export type UserProfile = {
   id: string;
   userId: string;
-  name: string;
-  nickname: string;
-  picture: string;
   workplace: string | null;
   address: string | null;
   school: string | null;
@@ -128,6 +181,9 @@ export type TeamStatus = 'DOING' | 'DONE';
 export type UserStatus = 'ONLINE' | 'OFFLINE';
 export type Gender = 'UNSPECIFIED' | 'MALE' | 'FEMALE';
 export type OpinionStatus = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
+export type BoardType = 'DEFAULT' | 'PHASE';
+export type PhaseType = 'REFLECT' | 'GROUP' | 'VOTES' | 'DISCUSS';
+export type StatusHealthCheck = 'OPEN' | 'CLOSED';
 
 export type User = {
   id: string;
@@ -135,6 +191,9 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   isAdmin: boolean;
+  name: string;
+  nickname: string;
+  picture: string;
   userStatus: UserStatus;
   profile: UserProfile;
   members: [Member];

@@ -5,6 +5,7 @@ const typeDefs = gql`
   type Opinion {
     id: ID
     columnId: String
+    memberId: String
     authorId: String
     createdAt: String
     updatedAt: String
@@ -19,8 +20,9 @@ const typeDefs = gql`
     color: String
     status: OpinionStatus
     author: User
+    member: Member
     position: Int
-    column: Column
+    column(meId: ID): Column
     remarks: [Remark]
   }
 
@@ -33,6 +35,7 @@ const typeDefs = gql`
 `;
 
 export type createOpinionType = {
+  teamId: string;
   boardId: string;
   columnId: string;
   text: string;
@@ -41,17 +44,23 @@ export type createOpinionType = {
 };
 
 export type updateOpinionType = {
+  teamId: string;
   opinionId: string;
   text?: string;
   upVote?: string[];
+  downVote?: string[];
   isAction?: boolean;
   isBookmarked?: boolean;
   responsible?: string;
   color?: string;
   status?: OpinionStatus;
+  newColumnId?: string;
 };
 
 export type removeOpinionType = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
   opinionId: string;
 };
 

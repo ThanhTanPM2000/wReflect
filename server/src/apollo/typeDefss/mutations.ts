@@ -1,4 +1,6 @@
-import { Remark } from '@prisma/client';
+import { getHealthCheck } from './../../services/healthcheck';
+import { orderOpinion } from './../../services/opinion';
+import { Remark, Opinion, Board, HealthCheck } from '@prisma/client';
 import { orderOpinionType } from './opinionTypeDefs';
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
@@ -12,6 +14,20 @@ const typeDefs = gql`
     count: Int!
   }
 
+  input answerInput {
+    questionId: String!
+    value: String!
+  }
+
+  input commentInput {
+    questionId: String!
+    text: String!
+  }
+
+  type statusResponse {
+    success: Boolean!
+  }
+
   input orderOpinion {
     droppableId: String!
     index: Int!
@@ -20,6 +36,28 @@ const typeDefs = gql`
   input combineOpinion {
     droppableId: String!
     draggableId: String!
+  }
+
+  enum PhaseType {
+    DEFAULT
+    PHASE
+  }
+
+  enum OpinionStatus {
+    NEW
+    IN_PROGRESS
+    DONE
+    REJECTED
+  }
+
+  enum ActionConvertColumn {
+    ACTIONS
+    OPINIONS
+  }
+
+  enum StatusHealthCheck {
+    OPEN
+    CLOSED
   }
 
   type Mutation {
@@ -46,23 +84,119 @@ const typeDefs = gql`
     deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
 
-    createOpinion(boardId: String!, columnId: String, text: String, isAction: Boolean, isCreateBottom: Boolean): Column
+    startSurveyHealthCheck(
+      teamId: String!
+      boardId: String!
+      templateId: String!
+      isAnonymous: Boolean!
+      isCustom: Boolean!
+      status: StatusHealthCheck!
+    ): getHealthCheck
+
+    answerHealthCheck(
+      teamId: String!
+      boardId: String!
+      templateId: String!
+      answers: [answerInput!]!
+      comments: [commentInput!]!
+    ): getHealthCheck
+
+    reopenHealthCheck(teamId: String!, boardId: String!): getHealthCheck
+
+    updateAction(teamId: String!, boardId: String!, columnId: String!, opinion: String!): Team
+    # usingCurrentBoard(teamId: String!, boardId: String!): Team
+
+    createBoard(
+      teamId: String!
+      isPublic: Boolean
+      isLocked: Boolean
+      disableDownVote: Boolean
+      disableUpVote: Boolean
+      isAnonymous: Boolean
+      votesLimit: Int
+      title: String
+      timerInProgress: Boolean
+      type: BoardType
+      currentPhase: PhaseType
+      endTime: String
+      column1: String
+      column2: String
+      column3: String
+      column4: String
+      column5: String
+      isActiveCol1: Boolean
+      isActiveCol2: Boolean
+      isActiveCol3: Boolean
+      isActiveCol4: Boolean
+      isActiveCol5: Boolean
+    ): Board
+
+    updateBoard(
+      teamId: String!
+      boardId: String!
+      isPublic: Boolean
+      isLocked: Boolean
+      disableDownVote: Boolean
+      disableUpVote: Boolean
+      isAnonymous: Boolean
+      votesLimit: Int
+      title: String
+      timerInProgress: Boolean
+      type: BoardType
+      currentPhase: PhaseType
+      endTime: String
+      column1: String
+      column2: String
+      column3: String
+      column4: String
+      column5: String
+      isActiveCol1: Boolean
+      isActiveCol2: Boolean
+      isActiveCol3: Boolean
+      isActiveCol4: Boolean
+      isActiveCol5: Boolean
+    ): Board
+
+    deleteBoard(teamId: String!, boardId: String!): Board
+
+    convertOpinionsInColumn(teamId: String!, boardId: String!, columnId: String!, action: ActionConvertColumn!): Column
+    emptyColumn(teamId: String!, boardId: String!, columnId: String): Column
+
+    createOpinion(
+      teamId: String!
+      boardId: String!
+      columnId: String!
+      text: String
+      isAction: Boolean
+      isCreateBottom: Boolean
+    ): Board
     updateOpinion(
+      teamId: String!
       opinionId: String!
       text: String
       upVote: [String]
+      downVote: [String]
       isAction: Boolean
       isBookmarked: Boolean
-      responsible: Boolean
+      responsible: String
       color: String
-      status: String
-    ): String
-    removeOpinion(opinionId: String): BatchPayload
-    orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): String
-    combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): String
+      status: OpinionStatus
+      newColumnId: String
+    ): Opinion
 
-    createRemark(opinionId: String, text: String): Remark
-    removeRemark(remarkId: String): BatchPayload
+    removeOpinion(teamId: String!, boardId: String!, columnId: String!, opinionId: String!): Board
+    orderOpinion(destination: orderOpinion, source: orderOpinion, draggableId: String): Board
+    combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): Board
+
+    createRemark(
+      teamId: String!
+      boardId: String!
+      columnId: String!
+      opinionId: String!
+      opinionId: String
+      text: String!
+    ): Opinion
+    removeRemark(teamId: String!, boardId: String!, columnId: String!, opinionId: String!, remarkId: String!): Opinion
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
     removeMember(memberId: String!): BatchPayload

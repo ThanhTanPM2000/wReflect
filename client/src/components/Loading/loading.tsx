@@ -1,16 +1,15 @@
 import React from 'react';
-
-import { Spin, Result, Button, Empty } from 'antd';
+import { Spin, Result, Button } from 'antd';
 
 type Props = {
   children: JSX.Element;
-  data: boolean;
+  data: any;
   refetch: () => void;
   loading: boolean;
   error: any;
 };
 
-export default function loading({ children, data, refetch, loading, error }: Props) {
+export default function loading({ children, refetch, loading, error }: Props) {
   return (
     <>
       {loading || error ? (
@@ -39,7 +38,7 @@ export default function loading({ children, data, refetch, loading, error }: Pro
           )}
         </div>
       ) : (
-        <>{data ? children : <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />}</>
+        children
       )}
     </>
   );

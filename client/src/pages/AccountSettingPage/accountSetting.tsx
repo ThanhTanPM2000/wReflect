@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useMutation } from '@apollo/client';
-import { Form, Avatar, Button, Input, Modal, Upload, message, Card, Col } from 'antd';
+import { Form, Avatar, Button, Input, Upload } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import { UserMutations } from '../../grapql-client/mutations';
@@ -41,11 +41,11 @@ const AccountSetting = () => {
             <div className="flex flex-3 flex-ai-c flex-jc-c" style={{ alignContent: 'center' }}>
               <Form.Item
                 rules={[{ required: true, message: 'Please input images' }]}
-                initialValue={me?.profile?.picture}
+                initialValue={me?.picture}
                 name="upload"
               >
                 <div className="flex flex-jc-c flex-ai-c">
-                  <Avatar size={64} src={me?.profile?.picture} icon={<UserOutlined />} />
+                  <Avatar size={64} src={me?.picture} icon={<UserOutlined />} />
                   <Upload
                     action={`${config.SERVER_BASE_URL}/api/upload`}
                     name="photo"

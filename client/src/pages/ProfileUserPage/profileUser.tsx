@@ -1,20 +1,19 @@
 import React, { useState, useContext } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { Row, Tabs, Avatar, Button, Input, Upload, message, Card, Col, Form } from 'antd';
+import { Row, Avatar, Button, Input, Upload, message, Card, Col, Form } from 'antd';
 
 import { UserQueries } from '../../grapql-client/queries';
 import { UserMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
 
-import { UploadOutlined, EditFilled } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 
-const { TextArea, Search } = Input;
-const { TabPane } = Tabs;
+const { TextArea } = Input;
 
 const ProfileUser = () => {
   const me = useContext(SelfContext);
 
-  const { loading, data } = useQuery(UserQueries.getUser, {
+  const { data } = useQuery(UserQueries.getUser, {
     variables: {
       email: me?.email,
     },
@@ -107,7 +106,7 @@ const ProfileUser = () => {
               <div className="flex flex-ai-c flex-jc-sb">
                 <Avatar
                   className="avatarSetting"
-                  src={`${me?.profile?.picture}`}
+                  src={`${me?.picture}`}
                   style={{ height: 150, width: 150, marginTop: 20 }}
                 />
                 <Upload {...props}>
@@ -126,10 +125,10 @@ const ProfileUser = () => {
                   <Form.Item label="School" name="School">
                     <Input placeholder="School..." onChange={onInputChange} value={school} name="school" />
                   </Form.Item>
-                  <Form.Item  style={{ marginTop: 15}}label="Work Place" name="Work Place">
+                  <Form.Item style={{ marginTop: 15 }} label="Work Place" name="Work Place">
                     <Input placeholder="Work Place..." onChange={onInputChange} value={workplace} name="workplace" />
                   </Form.Item>
-                  <Form.Item  style={{ marginTop: 15}}label="Phone Number" name="Phone Number">
+                  <Form.Item style={{ marginTop: 15 }} label="Phone Number" name="Phone Number">
                     <Input
                       placeholder="Phone Number..."
                       onChange={onInputChange}
@@ -137,7 +136,7 @@ const ProfileUser = () => {
                       name="phoneNumbers"
                     />
                   </Form.Item>
-                  <Form.Item  style={{ marginTop: 15}}label="Gender" name="Gender">
+                  <Form.Item style={{ marginTop: 15 }} label="Gender" name="Gender">
                     <Input placeholder="Gender..." onChange={onInputChange} value={gender} name="gender" />
                   </Form.Item>
                 </Form>
@@ -185,7 +184,7 @@ const ProfileUser = () => {
               height: '350px',
               boxShadow: '0 0px 8px 0 rgba(0, 0, 0, 0.2), 0 0px 20px 0 rgba(0, 0, 0, 0.19)',
               overflowY: 'scroll',
-              overflowX: 'hidden'
+              overflowX: 'hidden',
             }}
           >
             <div style={{ flex: 3 }} className="tab-inner">

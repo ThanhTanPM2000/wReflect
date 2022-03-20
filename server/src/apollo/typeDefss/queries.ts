@@ -1,13 +1,5 @@
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
-  input TeamsInput {
-    status: String @constraint(pattern: "^(DOING|DONE)$")
-    isGettingAll: Boolean
-    search: String
-    page: Int
-    size: Int
-  }
-
   type Teams {
     data: [Team]
     total: Int
@@ -22,14 +14,22 @@ const typeDefs = gql`
     boards: [Board]
   }
 
+  type getHealthCheck {
+    memberAnswers: [MemberAnswer]
+    memberComments: [MemberComment]
+    healthCheck: HealthCheck
+  }
+
   type Query {
-    teams(input: TeamsInput): Teams
+    teams(status: String, isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
     getTeamIds: [getTeamIds]
     team(teamId: String!): Team
     user(userId: String!): User
     members(teamId: String!): [Member]
     boards(teamId: String!): [Board]
     board(boardId: String): Board
+
+    getHealthCheck(teamId: String, boardId: String): getHealthCheck
   }
 `;
 

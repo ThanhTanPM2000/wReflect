@@ -8,7 +8,6 @@ import SelfContext from './contexts/selfContext';
 // import { createUploadLink } from 'apollo-upload-client';
 
 import './styles/less/ant.less';
-import { UserQueries } from './grapql-client/queries';
 // const link = createUploadLink({ uri: 'http://localhost:4000/graphql', credentials: 'include' });
 
 const App = (): JSX.Element => {
@@ -19,13 +18,6 @@ const App = (): JSX.Element => {
     setMe(newMe);
     localStorage.setItem('email', newMe?.email || '');
   });
-
-  // if (constructor) {
-  //   (async () => {
-  //     await user.me();
-  //     setConstructor(false);
-  //   })();
-  // }
 
   useEffect(() => {
     (async function () {

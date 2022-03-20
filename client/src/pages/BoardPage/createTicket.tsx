@@ -1,25 +1,26 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 
-import { Input } from 'antd';
-import _ from 'lodash';
+import { Input, notification } from 'antd';
 import { useMutation } from '@apollo/client';
 import { OpinionMutations } from '../../grapql-client/mutations';
-import { BoardQueries, TeamQueries } from '../../grapql-client/queries';
-import { Opinion } from '../../types';
-import board from './board';
+import { Board, Column } from '../../types';
+import Picker, { IEmojiData } from 'emoji-picker-react';
+import { SmileOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
 type Props = {
   index: number;
-  boardId: string;
-  columnId: string;
+  board: Board;
+  column: Column;
   isCreateBottom: boolean;
 };
 
-export default function createTicket({ index, boardId, columnId, isCreateBottom }: Props) {
+export default function createTicket({ board, column, isCreateBottom }: Props) {
   const [text, setText] = useState('');
   const [isAction, setIsAction] = useState(false);
+  const [isIconOpen, setIsIconOpen] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const [createOpinion] = useMutation<OpinionMutations.createOpinionResult, OpinionMutations.createOpinionVars>(
     OpinionMutations.createOpinion,
@@ -27,64 +28,71 @@ export default function createTicket({ index, boardId, columnId, isCreateBottom 
 
   const handleCreateTicket = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    createOpinion({
-      variables: {
-        boardId,
-        columnId,
-        text,
-        isAction,
-        isCreateBottom,
-      },
-      update: async (store, { data }) => {
-        const boardData = store.readQuery<BoardQueries.getBoardResult, BoardQueries.getBoardVars>({
-          query: BoardQueries.getBoard,
-          variables: {
-            boardId,
-          },
-        });
-        const newBoardData = _.cloneDeep(boardData);
-
-        // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
-        const columns = newBoardData?.board.columns.map((column, idx) => {
-          if (idx === index) {
-            return data?.createOpinion || column;
-          }
-          return column;
-        });
-
-        // newBoardData?.board.columns[index].opinions.push(data?.createOpinion as Opinion);
-
-        store.writeQuery({
-          query: BoardQueries.getBoard,
-          variables: {
-            boardId,
-          },
-          data: {
-            board: { ...boardData?.board, columns },
-          },
-        });
-      },
-    });
-    setText('');
+    setDisabled(true);
+    setTimeout(() => {
+      setDisabled(false);
+    }, 2000);
+    if (text && text != '' && text.length > 0) {
+      createOpinion({
+        variables: {
+          teamId: board.teamId,
+          boardId: board.id,
+          columnId: column.id,
+          text,
+          isAction,
+          isCreateBottom,
+        },
+        onError: (error) => {
+          notification.error({
+            placement: 'bottomRight',
+            message: error.message,
+          });
+        },
+      });
+      setText('');
+    }
   };
   const handleOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.currentTarget.value);
   };
 
+  const onEmojiClick = (event: React.MouseEvent<Element, MouseEvent>, data: IEmojiData) => {
+    setText(`${text}${data.emoji}`);
+  };
+
   return (
-    <div className="panel tab">
-      <a className={!isAction ? 'active link' : 'link'} onClick={() => setIsAction(false)}>
-        Opinion
-      </a>
-      <a className={isAction ? 'active link' : 'link'} onClick={() => setIsAction(true)}>
-        Action
-      </a>
-      <TextArea
-        onChange={handleOnChange}
-        onPressEnter={handleCreateTicket}
-        value={text}
-        placeholder={`Press enter to add ${isAction ? 'Action' : 'Opinion'}`}
-      />
-    </div>
+    <>
+      <div style={{ position: 'relative' }} className="panel tab">
+        <section
+          style={{
+            position: 'absolute',
+            bottom: '120px',
+            zIndex: '50',
+          }}
+        >
+          {isIconOpen && <Picker pickerStyle={{ width: '250px', height: '250px' }} onEmojiClick={onEmojiClick} />}
+        </section>
+        <a className={!isAction ? 'active link' : 'link'} onClick={() => setIsAction(false)}>
+          Opinion
+        </a>
+        <a className={isAction ? 'active link' : 'link'} onClick={() => setIsAction(true)}>
+          Action
+        </a>
+        <div
+          style={{ display: 'block', float: 'right', marginLeft: 'auto', cursor: 'pointer' }}
+          onClick={() => setIsIconOpen(!isIconOpen)}
+        >
+          {isIconOpen ? <CloseCircleOutlined /> : <SmileOutlined />}
+        </div>
+        {/* <Picker onEmojiClick={onEmojiClick} /> */}
+        <TextArea
+          onChange={handleOnChange}
+          onPressEnter={handleCreateTicket}
+          value={text}
+          placeholder={`Press enter to add ${isAction ? 'Action' : 'Opinion'}`}
+          disabled={disabled}
+        />
+      </div>
+    </>
   );
 }

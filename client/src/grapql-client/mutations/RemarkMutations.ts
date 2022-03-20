@@ -1,54 +1,52 @@
 import { gql } from '@apollo/client';
-import { Remark } from '../../types';
+
+import { Opinion } from './../../types';
+import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createRemarkResult = {
-  createRemark: Remark;
+  createRemark: Opinion;
 };
 
 export type createRemarkVars = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
   opinionId: string;
   text: string;
 };
 
-const createRemark = gql`
-  mutation Mutation($opinionId: String, $text: String) {
-    createRemark(opinionId: $opinionId, text: $text) {
-      id
-      authorId
-      opinionId
-      text
-      createdAt
-      updatedAt
-      author {
-        id
-        email
-        profile {
-          id
-          name
-          nickname
-          picture
-        }
-      }
+export const createRemark = gql`
+  ${OPINION_FIELDS}
+  mutation Mutation($teamId: String!, $boardId: String!, $columnId: String!, $opinionId: String!, $text: String!) {
+    createRemark(teamId: $teamId, boardId: $boardId, columnId: $columnId, opinionId: $opinionId, text: $text) {
+      ...OpinionFields
     }
   }
 `;
 
 export type removeRemarkResult = {
-  removeResult: {
-    count: number;
-  };
+  removeResult: Opinion;
 };
 
 export type removeRemarkVars = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
+  opinionId: string;
   remarkId: string;
 };
 
 export const removeRemark = gql`
-  mutation Mutation($remarkId: String) {
-    removeRemark(remarkId: $remarkId) {
-      count
+  ${OPINION_FIELDS}
+  mutation RemoveRemark(
+    $teamId: String!
+    $opinionId: String!
+    $boardId: String!
+    $columnId: String!
+    $remarkId: String!
+  ) {
+    removeRemark(teamId: $teamId, opinionId: $opinionId, boardId: $boardId, columnId: $columnId, remarkId: $remarkId) {
+      ...OpinionFields
     }
   }
 `;
-
-export { createRemark };

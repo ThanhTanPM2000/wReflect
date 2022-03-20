@@ -14,7 +14,7 @@ import config from '../../config';
 
 type Props = {
   searchText: string;
-  teamData?: Team;
+  teamData: Team;
 };
 
 const { confirm } = Modal;
@@ -51,7 +51,7 @@ export default function ListMember({ searchText, teamData }: Props) {
             removeMember({
               variables: { memberId: member.id },
             })
-              .then((res) => message.success(`${member?.user?.email} successfully removed`))
+              .then(() => message.success(`${member?.user?.email} successfully removed`))
               .catch((error) => message.error(error.message));
           };
           const menu = (
@@ -110,16 +110,12 @@ export default function ListMember({ searchText, teamData }: Props) {
               }
             >
               <List.Item.Meta
-                avatar={
-                  <Avatar
-                    src={member?.user?.profile?.picture || `${config.SERVER_BASE_URL}/uploads/avatarDefault.png`}
-                  />
-                }
+                avatar={<Avatar src={member?.user?.picture || `${config.SERVER_BASE_URL}/uploads/avatarDefault.png`} />}
                 title={
                   member?.isPendingInvitation ? (
                     'Pending Invitation'
                   ) : (
-                    <a href="https://ant.design">{member?.user?.profile?.nickname || 'Unknown'}</a>
+                    <a href="https://ant.design">{member?.user?.nickname || 'Unknown'}</a>
                   )
                 }
                 description={member?.user?.email}

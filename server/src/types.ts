@@ -1,6 +1,6 @@
 import { TeamStatus } from '.prisma/client';
 import { Request } from 'express';
-import { User, UserProfile } from '@prisma/client';
+import { Member, Team, User, UserProfile } from '@prisma/client';
 
 export type SanitizedUser = {
   id: number;
@@ -11,7 +11,12 @@ export type SanitizedUser = {
 };
 
 export interface RequestWithUserInfo extends Request {
-  user: User & { profile: UserProfile | null };
+  user: User & {
+    profile: UserProfile | null;
+    members: (Member & {
+      team: Team;
+    })[];
+  };
 }
 
 export type UserStatus = 'NotInitiated' | 'Initiated' | 'Completed';

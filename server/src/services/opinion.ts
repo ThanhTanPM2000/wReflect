@@ -1,3 +1,4 @@
+import { isOwnedTeam, isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './team';
 import { Opinion, Column } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
@@ -9,6 +10,9 @@ import {
   removeOpinionType,
   updateOpinionType,
 } from '../apollo/typeDefss/opinionTypeDefs';
+import { RequestWithUserInfo } from '../types';
+import { column } from '.';
+import { Forbidden } from '../errorsManagement';
 
 export const getListOpinions = (columnId: string) => {
   const opinions = prisma.opinion.findMany({
@@ -32,23 +36,11 @@ export const getOpinion = async (opinionId: string) => {
   return opinion;
 };
 
-export const createOpinion = async (meId: string, args: createOpinionType) => {
-  const board = await prisma.board.findFirst({
-    where: {
-      isLocked: false,
-      id: args.boardId,
-      team: {
-        members: {
-          some: {
-            userId: meId,
-          },
-        },
-      },
-    },
-  });
+export const createOpinion = async (req: RequestWithUserInfo, args: createOpinionType) => {
+  const { id: meId, members, email } = req?.user;
 
-  if (!board)
-    throw new ApolloError('You dont have permission to do that or data not found', `${StatusCodes.FORBIDDEN}`);
+  await isMembersOfTeam(args.teamId, meId);
+  await isAllowUpdateBoard(args.boardId, meId);
 
   const max = await prisma.opinion.aggregate({
     where: {
@@ -76,7 +68,10 @@ export const createOpinion = async (meId: string, args: createOpinionType) => {
         },
       };
 
-  const column = await prisma.column.update({
+  const memberId = members.find((member) => member.teamId === args.teamId)?.id;
+  if (!memberId) return Forbidden();
+
+  const myBoard = await prisma.column.update({
     where: {
       id: args.columnId,
     },
@@ -86,96 +81,157 @@ export const createOpinion = async (meId: string, args: createOpinionType) => {
         create: {
           text: args.text,
           isAction: args.isAction,
+          memberId: memberId,
           authorId: meId,
-          updatedBy: meId,
+          updatedBy: email,
           position:
             (max?._max?.position || max?._max?.position == 0) && args.isCreateBottom ? max._max.position + 1 : 0,
         },
       },
     },
-    include: {
-      opinions: {
-        orderBy: {
-          position: 'asc',
+
+    select: {
+      board: {
+        include: {
+          columns: {
+            include: {
+              opinions: {
+                orderBy: {
+                  position: 'asc',
+                },
+              },
+            },
+          },
+          team: {
+            include: {
+              members: {
+                include: {
+                  user: {
+                    include: {
+                      profile: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
   });
 
-  if (!column) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
-  return column;
+  if (!myBoard) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
+  return myBoard;
 };
 
-export const updateOpinion = async (meId: string, args: updateOpinionType) => {
-  const opinion = await prisma.opinion.updateMany({
+export const updateOpinion = async (teamId: string, userId: string, args: updateOpinionType) => {
+  await isOwnedOpinion(args.opinionId, userId);
+
+  const opinion = await prisma.opinion.update({
     where: {
       id: args.opinionId,
-      OR: [
-        {
-          authorId: meId,
-        },
-        {
-          column: {
-            board: {
-              team: {
-                members: {
-                  some: {
-                    isOwner: true,
-                    userId: meId,
-                  },
-                },
-              },
-            },
-          },
-        },
-      ],
     },
     data: {
       text: args?.text,
       upVote: args?.upVote,
+      downVote: args?.downVote,
       isBookmarked: args?.isBookmarked,
       isAction: args?.isAction,
       responsible: args?.responsible,
       color: args?.color,
       status: args?.status,
+      columnId: args?.newColumnId,
     },
   });
-  if (!opinion) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
-  return 'success';
+
+  return opinion;
 };
 
-export const removeOpinion = async (meId: string, args: removeOpinionType) => {
-  const opinion = await prisma.opinion.deleteMany({
+export const removeOpinion = async (req: RequestWithUserInfo, args: removeOpinionType) => {
+  const { id: meId } = req.user;
+
+  const board = await prisma.board.update({
     where: {
-      OR: [
-        {
-          column: {
-            board: {
-              team: {
-                members: {
-                  some: {
-                    userId: meId,
-                    isOwner: true,
-                  },
+      id: args.boardId,
+    },
+    data: {
+      columns: {
+        update: {
+          where: {
+            id: args.columnId,
+          },
+          data: {
+            opinions: {
+              delete: {
+                id: args.opinionId,
+              },
+            },
+          },
+        },
+      },
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
                 },
               },
             },
           },
-          id: args.opinionId,
+        },
+      },
+    },
+  });
+  const column = await prisma.column.findFirst({
+    where: {
+      OR: [
+        {
+          board: {
+            team: {
+              members: {
+                some: {
+                  userId: meId,
+                  isOwner: true,
+                },
+              },
+            },
+          },
+          opinions: {
+            some: {
+              id: args.opinionId,
+            },
+          },
         },
         {
-          authorId: meId,
-          id: args.opinionId,
+          opinions: {
+            some: {
+              id: args.opinionId,
+              authorId: meId,
+            },
+          },
         },
       ],
     },
   });
 
-  if (!opinion) throw new ApolloError('You dont have permission or data not found', `${StatusCodes.FORBIDDEN}`);
-  return opinion;
+  if (!board) throw new ApolloError('You dont have permission or data not found', `${StatusCodes.FORBIDDEN}`);
+  return board;
 };
 
-export const orderOpinion = async (meId: string, args: orderOpinionType) => {
+export const orderOpinion = async (req: RequestWithUserInfo, args: orderOpinionType) => {
   args.destination.droppableId === args.source.droppableId
     ? args.source.index == args.destination.index
       ? undefined
@@ -264,10 +320,44 @@ export const orderOpinion = async (meId: string, args: orderOpinionType) => {
           },
         }),
       ]);
-  return 'success';
+
+  const board = await prisma.board.findFirst({
+    where: {
+      columns: {
+        some: {
+          id: args.source.droppableId,
+        },
+      },
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return board;
 };
 
-export const combineOpinion = async (meId: string, args: combineOpinionType) => {
+export const combineOpinion = async (req: RequestWithUserInfo, args: combineOpinionType) => {
   const currentOpinion = await prisma.opinion.findFirst({
     where: {
       id: args.draggableId,
@@ -293,7 +383,7 @@ export const combineOpinion = async (meId: string, args: combineOpinionType) => 
             data: {
               text: args.text,
               mergedAuthors: {
-                push: currentOpinion.authorId,
+                push: currentOpinion.authorId ?? undefined,
               },
               remarks: {
                 connect: currentOpinion.remarks.map((remark) => {
@@ -333,5 +423,38 @@ export const combineOpinion = async (meId: string, args: combineOpinionType) => 
       },
     }),
   ]);
-  return 'sucess';
+  const board = await prisma.board.findFirst({
+    where: {
+      columns: {
+        some: {
+          id: args.source.droppableId,
+        },
+      },
+    },
+    include: {
+      columns: {
+        include: {
+          opinions: {
+            include: {
+              remarks: true,
+            },
+          },
+        },
+      },
+      team: {
+        include: {
+          members: {
+            include: {
+              user: {
+                include: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return board;
 };
