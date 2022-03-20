@@ -1,4 +1,3 @@
-import { addMembersToTeam } from './member';
 import { StatusCodes } from 'http-status-codes';
 import config from '../config';
 import prisma from './../prisma';
@@ -68,6 +67,50 @@ export const getTeams = async (
 
   return {
     data,
+    total,
+    page,
+    size,
+  };
+};
+
+export const getOwnedTeams = async (isGettingAll = false, page = 1, size = 8, search = '', userId: string) => {
+  const ownedTeams = await prisma.team.findMany({
+    where: {
+      ownerId: userId,
+
+      AND: [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    },
+    ...(!isGettingAll && { skip: (page - 1) * size }),
+    ...(!isGettingAll && { take: size }),
+    orderBy: { createdAt: 'desc' },
+    include: {
+      owner: true,
+    },
+  });
+
+  const total = await prisma.team.count({
+    where: {
+      ownerId: userId,
+      AND: [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    },
+  });
+
+  return {
+    data: ownedTeams,
     total,
     page,
     size,

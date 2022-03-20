@@ -60,13 +60,11 @@ Table Team {
   picture String [not null]
   isPublic Boolean [not null, default: true]
   description String
-  selectedBoard String
   status TeamStatus [not null, default: 'DOING']
   members Member [not null]
-  InviteLink InviteLink [not null]
   boards Board [not null]
-  Owner User [not null]
-  HealthCheck HealthCheck [not null]
+  owner User [not null]
+  healthCheck HealthCheck [not null]
   assessment Assessment [not null]
 }
 
@@ -207,7 +205,6 @@ Table InviteLink {
   updatedAt DateTime [not null]
   expiresAt DateTime [not null]
   type TypeToken [not null, default: 'INVITE']
-  team Team [not null]
 }
 
 Table Member {
@@ -223,9 +220,9 @@ Table Member {
   boardActive String
   user User [not null]
   team Team [not null]
-  Opinion Opinion [not null]
-  Remark Remark [not null]
-  Assessment Assessment [not null]
+  opinions Opinion [not null]
+  remarks Remark [not null]
+  assessments Assessment [not null]
 
   indexes {
     (userId, teamId) [unique]
@@ -249,37 +246,23 @@ Table User {
   updatedAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
   userStatus UserStatus [not null, default: 'OFFLINE']
-  name String [not null]
   nickname String [not null]
   picture String [not null]
-  session Session [not null]
-  profile UserProfile
-  members Member [not null]
-  Notification Notification [not null]
-  Team Team [not null]
-  Opinion Opinion [not null]
-  Remark Remark [not null]
-  MemberAnswers MemberAnswer [not null]
-  MemberComments MemberComment [not null]
-}
-
-Table UserProfile {
-  id String [pk]
-  userId String [not null]
+  gender Gender [not null, default: 'UNSPECIFIED']
   workplace String
   address String
   school String
   introduction String
   talents String
   interests String
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  gender Gender [not null, default: 'UNSPECIFIED']
-  user User [not null]
-
-  indexes {
-    (userId) [unique]
-  }
+  session Session [not null]
+  members Member [not null]
+  notification Notification [not null]
+  teams Team [not null]
+  opinions Opinion [not null]
+  remark Remark [not null]
+  memberAnswers MemberAnswer [not null]
+  memberComments MemberComment [not null]
 }
 
 Enum AssessmentStatus {
@@ -375,12 +358,8 @@ Ref: Remark.authorId > User.id
 
 Ref: Remark.memberId > Member.id
 
-Ref: InviteLink.teamId > Team.id
-
 Ref: Member.userId > User.id
 
 Ref: Member.teamId > Team.id
 
 Ref: Notification.userId > User.id
-
-Ref: UserProfile.userId - User.id

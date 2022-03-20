@@ -81,11 +81,7 @@ export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) 
                 isPendingInvitation: true,
               },
             },
-            profile: {
-              create: {},
-            },
-            nickname: 'Unregistered',
-            name: 'Unregistered',
+            nickname: 'Pending Invitation',
             picture: `${config.SERVER_URL}/uploads/avatarDefault.png`,
           },
         });

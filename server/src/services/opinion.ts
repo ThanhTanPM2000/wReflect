@@ -110,11 +110,7 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
             include: {
               members: {
                 include: {
-                  user: {
-                    include: {
-                      profile: true,
-                    },
-                  },
+                  user: true,
                 },
               },
             },
@@ -188,11 +184,7 @@ export const removeOpinion = async (req: RequestWithUserInfo, args: removeOpinio
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
@@ -347,11 +339,7 @@ export const orderOpinion = async (req: RequestWithUserInfo, args: orderOpinionT
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
@@ -449,11 +437,7 @@ export const combineOpinion = async (req: RequestWithUserInfo, args: combineOpin
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },

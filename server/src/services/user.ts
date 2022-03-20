@@ -9,20 +9,15 @@ export const findOrCreateUserByEmail = async (email: string, picture: string, na
       update: {
         email,
         userStatus: 'ONLINE',
-        nickname,
-        name,
-        picture,
+        // nickname,
+        // name,
+        // picture,
       },
       create: {
         email,
         userStatus: 'ONLINE',
-        name,
         picture,
         nickname,
-      },
-      include: {
-        profile: true,
-        members: true,
       },
     });
     return user;
@@ -45,7 +40,6 @@ export const getListUsers = async (search = '', isGettingAll = false, page = 1, 
       ...(!isGettingAll && { take: size }),
       include: {
         members: true,
-        profile: true,
       },
       skip: (page - 1) * size,
       take: size,
@@ -81,7 +75,7 @@ export const getUser = async (userId: string) => {
       },
       include: {
         members: true,
-        profile: true,
+        teams: true,
       },
     });
     // if (!user) throw new Error(errorName.NOTFOUND);

@@ -30,7 +30,7 @@ export const login = async (req: Request, res: Response): Promise<void | Respons
     setCookie('email', email, oneDayInMilliseconds, res);
     setCookie('token', session.token, oneDayInMilliseconds, res);
     // return res.send({ id: user.id, email, isAdmin: user.isAdmin, picture, status: user.status });
-    return res.send(user);
+    return res.send({ email });
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(StatusCodes.BAD_REQUEST).send(error.errors);

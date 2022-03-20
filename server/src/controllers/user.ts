@@ -7,7 +7,7 @@ import * as services from '../services';
 import config from '../config';
 import logger from '../logger';
 import * as validators from './validators/user';
-import { Team, User, UserProfile } from '@prisma/client';
+import { Team, User } from '@prisma/client';
 
 const clearCookies = (res: Response) => {
   setCookie('email', '', 0, res);
@@ -37,7 +37,6 @@ export const me = async (req: RequestWithUserInfo, res: Response): Promise<void 
     setCookie('email', email, oneDayInMilliseconds, res);
     setCookie('token', token, oneDayInMilliseconds, res);
 
-    console.log(sanitizedUser);
     return res.send(sanitizedUser);
   } catch (err) {
     if (err instanceof ZodError) {

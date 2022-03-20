@@ -4,17 +4,17 @@ const typeDefs = gql`
   type Team {
     id: ID
     name: String
-    ownerUserIds: [String]
     createdAt: String
     startDate: String
     endDate: String
     picture: String
-    numOfMember: Int
     isPublic: Boolean
-    status: TeamStatus
     description: String
+    status: TeamStatus
     members: [Member]
     boards(meId: ID): [Board]
+    owner: User
+    healthCheck: [HealthCheck]
     assessment: [Assessment]
   }
 

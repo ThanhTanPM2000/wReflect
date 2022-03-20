@@ -10,6 +10,5 @@ export * as remark from './remark';
 export * as healthCheck from './healthcheck';
 export * as criteria from './criteria';
 
-export * as profile from './profile';
 export * as nodeMailer from './nodemailer';
 export * as aws from './aws';

@@ -22,13 +22,15 @@ const typeDefs = gql`
 
   type Query {
     teams(status: String, isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
+    getOwnedTeams(isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
     getTeamIds: [getTeamIds]
     team(teamId: String!): Team
-    user(userId: String!): User
     members(teamId: String!): [Member]
     boards(teamId: String!): [Board]
     board(boardId: String): Board
     criteriaList: [Criteria]
+
+    account(userId: String): User
 
     getHealthCheck(teamId: String, boardId: String): getHealthCheck
   }

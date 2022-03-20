@@ -13,6 +13,9 @@ const typeDefs = gql`
     role: String
     user: User
     team: Team
+
+    opinions: [Opinion]
+    remarks: [Remark]
   }
 `;
 

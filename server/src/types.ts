@@ -1,6 +1,6 @@
 import { TeamStatus } from '.prisma/client';
 import { Request } from 'express';
-import { Member, Team, User, UserProfile } from '@prisma/client';
+import { User } from '@prisma/client';
 
 export type SanitizedUser = {
   id: number;

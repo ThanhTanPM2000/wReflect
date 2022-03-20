@@ -27,7 +27,7 @@ export default function createTicket({ board, column, isCreateBottom }: Props) {
 
   const handleCreateTicket = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    if (text && text != '' && text.length > 0) {
+    if (text.trim() && text.trim() != '' && text.length > 0) {
       createOpinion({
         variables: {
           teamId: board.teamId,

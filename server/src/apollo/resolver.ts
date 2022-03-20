@@ -12,10 +12,7 @@ import {
   updateOpinionType,
 } from './typeDefss/opinionTypeDefs';
 import { pubsub } from '../pubSub';
-import logger from '../logger';
 import { updateBoardType, createBoardType, deleteBoardType } from './typeDefss/boardTypeDefs';
-import { prisma, Answer } from '@prisma/client';
-import { string } from 'zod';
 
 const resolvers = {
   Query: {
@@ -25,12 +22,18 @@ const resolvers = {
       const result = await team.getTeams(!!isGettingAll, page, size, search, status, isAdmin ? undefined : id);
       return result;
     },
+    getOwnedTeams: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      const { isGettingAll, search, page, size } = args;
+      const ownedTeams = await team.getOwnedTeams(!!isGettingAll, page, size, search, meId);
+      return ownedTeams;
+    },
     team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id, isAdmin } = req?.user;
       const myTeam = await team.getTeam(args.teamId, isAdmin ? undefined : id);
       return myTeam;
     },
-    user: async (_, args) => {
+    account: async (_, args) => {
       return await user.getUser(args.userId);
     },
 
@@ -46,7 +49,6 @@ const resolvers = {
     },
 
     getHealthCheck: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user || {};
       const result = await healthCheck.getHealthCheck(args?.teamId, args?.boardId);
       return result;
     },
@@ -183,13 +185,13 @@ const resolvers = {
       const array = ['test', 'test2'];
       const anotherArr = ['test3', 'test4'];
       anotherArr.push(...array);
-      console.log(anotherArr);
 
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: data?.board,
       });
       return data?.board;
     },
+
     updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
       const myOpinion = await opinion.updateOpinion(args.teamId, meId, args);
@@ -219,10 +221,6 @@ const resolvers = {
       });
       return board;
     },
-
-    // updateAction: async (_, args, {req}: {req: RequestWithUserInfo} ) => {
-    //   const newTeam = await team.updateAction();
-    // },
 
     createRemark: async (_, args: createRemarkType, { req }: { req: RequestWithUserInfo }) => {
       const opinion = await remark.createRemark(req, args);
@@ -273,14 +271,6 @@ const resolvers = {
         },
       ),
     },
-    // updateMember: {
-    //   subscribe: withFilter(
-    //     () => pubsub.asyncIterator(['ADD_MEMBERS', 'REMOVE_MEMBER']),
-    //     (_, args) => {
-    //       return true;
-    //     },
-    //   ),
-    // },
 
     convertColumn: {
       subscribe: withFilter(

@@ -72,11 +72,7 @@ export const getBoard = async (boardId: string, meId: string) => {
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
@@ -251,11 +247,7 @@ export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardTyp
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
