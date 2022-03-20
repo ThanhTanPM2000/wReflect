@@ -20,6 +20,16 @@ const typeDefs = gql`
     healthCheck: HealthCheck
   }
 
+  enum inviteStatus {
+    JOINED
+    UNJOINED
+    UNLOGIN
+  }
+
+  type inviteResponse {
+    status: inviteStatus
+  }
+
   type Query {
     teams(status: String, isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
     getOwnedTeams(isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
@@ -31,6 +41,7 @@ const typeDefs = gql`
     criteriaList: [Criteria]
 
     account(userId: String): User
+    inviteLink(teamId: String): inviteResponse
 
     getHealthCheck(teamId: String, boardId: String): getHealthCheck
   }

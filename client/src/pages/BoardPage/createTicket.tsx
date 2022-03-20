@@ -22,16 +22,12 @@ export default function createTicket({ board, column, isCreateBottom }: Props) {
   const [isIconOpen, setIsIconOpen] = useState(false);
   const [disabled, setDisabled] = useState(false);
 
-  const [createOpinion] = useMutation<OpinionMutations.createOpinionResult, OpinionMutations.createOpinionVars>(
-    OpinionMutations.createOpinion,
-  );
+  const [createOpinion, { loading }] = useMutation<
+    OpinionMutations.createOpinionResult,
+    OpinionMutations.createOpinionVars
+  >(OpinionMutations.createOpinion);
 
   const handleCreateTicket = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-    setDisabled(true);
-    setTimeout(() => {
-      setDisabled(false);
-    }, 2000);
     if (text.trim() && text.trim() != '' && text.length > 0) {
       createOpinion({
         variables: {
@@ -90,7 +86,7 @@ export default function createTicket({ board, column, isCreateBottom }: Props) {
           onPressEnter={handleCreateTicket}
           value={text}
           placeholder={`Press enter to add ${isAction ? 'Action' : 'Opinion'}`}
-          disabled={disabled}
+          disabled={loading}
         />
       </div>
     </>
