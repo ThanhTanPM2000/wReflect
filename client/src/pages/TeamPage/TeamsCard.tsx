@@ -1,14 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router';
 import { Card, Col, Avatar, Row, Pagination, Empty } from 'antd';
 
-import { NetworkStatus, useQuery, useSubscription } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { SettingOutlined, UsergroupAddOutlined, AimOutlined } from '@ant-design/icons';
 import { Member, Team, TeamStatus } from '../../types';
 import { LoadingSkeleton } from '../../components/Loading';
-import selfContext from '../../contexts/selfContext';
-import { TeamSubscription } from '../../grapql-client/subcriptions';
 
 const { Meta } = Card;
 
@@ -24,16 +22,6 @@ type Props = {
 
 const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
   const history = useHistory();
-  const me = useContext(selfContext);
-
-  useSubscription<TeamSubscription.updateTeamsResult, TeamSubscription.updateTeamsVars>(TeamSubscription.updateTeams, {
-    variables: {
-      meId: me.id,
-    },
-    onSubscriptionData: ({ subscriptionData }) => {
-      if (subscriptionData.data.updateListTeams.success) refetch();
-    },
-  });
 
   const redirect = (team: Team) => {
     history.push(`/board/${team.id}/${team.boards[0].id}`);
