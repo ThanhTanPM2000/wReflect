@@ -4,7 +4,7 @@ import { addMinutes } from 'date-fns';
 import prisma from '../prisma';
 import config from '../config';
 import logger from '../logger';
-import { Member, Team, User, UserProfile } from '@prisma/client';
+import { User } from '@prisma/client';
 
 export const createSession = async (userId: string, sessionDurationMinutes: number) => {
   const session = await prisma.session.create({
@@ -18,29 +18,10 @@ export const createSession = async (userId: string, sessionDurationMinutes: numb
   return session;
 };
 
-export const checkAndExtendSession = async (
-  email: string,
-  token: string,
-): Promise<
-  | (User & {
-      profile: UserProfile | null;
-      members: (Member & {
-        team: Team;
-      })[];
-    })
-  | null
-> => {
+export const checkAndExtendSession = async (email: string, token: string): Promise<User | null> => {
   try {
     const user = await prisma.user.findFirst({
       where: { email },
-      include: {
-        profile: true,
-        members: {
-          include: {
-            team: true,
-          },
-        },
-      },
     });
     if (!user) return null;
     const now = new Date();

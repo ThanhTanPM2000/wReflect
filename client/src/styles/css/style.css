@@ -243,9 +243,6 @@ div#rc-tabs-2-panel-1 {
   align-items: normal !important;
   justify-content: normal !important; }
 
-ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
-  display: none !important; }
-
 ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   margin: 20px 0px 0px 0px; }
 
@@ -254,23 +251,55 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   font-size: 30px;
   font-style: "oblique"; }
 
-.profileUser .bar, .profileUser .actions {
-  padding: 15px 2%;
-  border-top: 1px solid #e7eaea;
-  width: 60%; }
-
-.profileUser .actions {
-  position: relative; }
-
-.profileUser .ant-btn {
-  float: right;
-  width: auto; }
-
-.profileUser .ant-form-item {
-  margin-bottom: 0px; }
-
-.profileUser textarea {
-  resize: none !important; }
+.profileUser {
+  padding: 10px 60px 0px 60px; }
+  .profileUser .headerSection {
+    display: flex;
+    align-items: center; }
+    .profileUser .headerSection .accInfor {
+      flex: 1;
+      display: flex;
+      align-items: center; }
+      .profileUser .headerSection .accInfor .accName {
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; }
+        .profileUser .headerSection .accInfor .accName .gmail {
+          font-size: 30px;
+          font-weight: bold !important; }
+        .profileUser .headerSection .accInfor .accName p {
+          color: gray;
+          font-size: 15px;
+          margin-bottom: 0; }
+          .profileUser .headerSection .accInfor .accName p .user_id {
+            display: inline;
+            background-color: #eff0f2;
+            padding: 2px 6px;
+            border-radius: 4px; }
+    .profileUser .headerSection .actionHeader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      left: auto; }
+  .profileUser .container {
+    margin-top: 20px; }
+    .profileUser .container .inforField {
+      border-bottom: 1px solid #e5e8ed;
+      padding: 20px 0px 20px 0px; }
+      .profileUser .container .inforField .hihihiha {
+        display: flex;
+        align-items: center; }
+        .profileUser .container .inforField .hihihiha div {
+          font-size: 15px; }
+        .profileUser .container .inforField .hihihiha .labelField {
+          flex: 1;
+          font-weight: bold !important; }
+        .profileUser .container .inforField .hihihiha .valueField {
+          flex: 5;
+          font-weight: lighter !important; }
+        .profileUser .container .inforField .hihihiha .actionField {
+          left: auto; }
 
 .manageMembersPage {
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
@@ -827,6 +856,79 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     display: flex;
     justify-content: center;
     align-items: center; }
+
+.personalReflectionPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%; }
+  .personalReflectionPage .manageJudgePage {
+    display: flex;
+    flex-direction: column; }
+    .personalReflectionPage .manageJudgePage .actionSection {
+      gap: 30px;
+      display: flex;
+      flex-direction: row; }
+  .personalReflectionPage .personalSection {
+    height: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background: #f2f3f5;
+    color: #6d7982;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px gray;
+    padding: 10px; }
+    .personalReflectionPage .personalSection .manageJudge,
+    .personalReflectionPage .personalSection .analysis {
+      flex: 1;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+      height: 100%;
+      position: relative;
+      cursor: pointer; }
+    .personalReflectionPage .personalSection .manageJudge.primary,
+    .personalReflectionPage .personalSection .analysis.primary {
+      background-color: white; }
+  .personalReflectionPage .content {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    margin-top: 30px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
+
+.steps-content {
+  min-height: 200px;
+  margin-top: 16px;
+  text-align: center; }
+  .steps-content .dynamic-delete-button {
+    position: relative;
+    top: 4px;
+    margin: 0 8px;
+    color: #999;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s; }
+  .steps-content .dynamic-delete-button:hover {
+    color: #777; }
+  .steps-content .dynamic-delete-button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5; }
+  .steps-content [data-theme='dark'] .dynamic-delete-button {
+    color: rgba(255, 255, 255, 0.45); }
+  .steps-content [data-theme='dark'] .dynamic-delete-button:hover {
+    color: rgba(255, 255, 255, 0.65); }
+  .steps-content .ant-form-item-explain-error {
+    background-color: #ff726f;
+    color: white;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 8px; }
 
 .sidebar .ant-layout-logo {
   height: 32px;

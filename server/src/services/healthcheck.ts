@@ -5,7 +5,7 @@ import {
   reopenHealthCheckArgs,
 } from './../apollo/typeDefss/healthCheckTypeDefs';
 import prisma from '../prisma';
-import { isOwnedTeam } from './team';
+import { isOwnedTeam } from './essential';
 
 export const getHealthCheck = async (teamId: string, boardId: string) => {
   const healthCheck = await prisma.healthCheck.findFirst({

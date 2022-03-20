@@ -1,9 +1,7 @@
 import { answerHealthCheckArgs, startSurveyArgs, reopenHealthCheckArgs } from './typeDefss/healthCheckTypeDefs';
-import { getHealthCheck } from './../services/healthcheck';
-import { updateOpinion } from './../services/opinion';
 import { createRemarkType, removeRemarkType } from './typeDefss/remarkTypeDefs';
 import { RequestWithUserInfo } from './../types';
-import { member, team, user, board, column, opinion, remark, healthCheck } from '../services';
+import { member, team, user, board, column, opinion, remark, healthCheck, criteria } from '../services';
 import { withFilter } from 'graphql-subscriptions';
 
 import {
@@ -14,10 +12,7 @@ import {
   updateOpinionType,
 } from './typeDefss/opinionTypeDefs';
 import { pubsub } from '../pubSub';
-import logger from '../logger';
 import { updateBoardType, createBoardType, deleteBoardType } from './typeDefss/boardTypeDefs';
-import { prisma, Answer } from '@prisma/client';
-import { string } from 'zod';
 
 const resolvers = {
   Query: {
@@ -27,12 +22,18 @@ const resolvers = {
       const result = await team.getTeams(!!isGettingAll, page, size, search, status, isAdmin ? undefined : id);
       return result;
     },
+    getOwnedTeams: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user;
+      const { isGettingAll, search, page, size } = args;
+      const ownedTeams = await team.getOwnedTeams(!!isGettingAll, page, size, search, meId);
+      return ownedTeams;
+    },
     team: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id, isAdmin } = req?.user;
       const myTeam = await team.getTeam(args.teamId, isAdmin ? undefined : id);
       return myTeam;
     },
-    user: async (_, args) => {
+    account: async (_, args) => {
       return await user.getUser(args.userId);
     },
 
@@ -48,17 +49,18 @@ const resolvers = {
     },
 
     getHealthCheck: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user || {};
       const result = await healthCheck.getHealthCheck(args?.teamId, args?.boardId);
       return result;
+    },
+
+    criteriaList: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const criteriaList = await criteria.getListCriteria();
+      return criteriaList;
     },
   },
   Mutation: {
     createTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const myTeam = await team.createTeam(req, args);
-      pubsub.publish('CREATE_TEAM', {
-        createdTeam: myTeam,
-      });
 
       return myTeam;
     },
@@ -148,6 +150,12 @@ const resolvers = {
       pubsub.publish('ADD_MEMBERS', {
         addMembers: team,
       });
+
+      pubsub.publish('UPDATE_LIST_TEAMS', {
+        updateListTeams: {
+          success: true,
+        },
+      });
       return {
         success,
         errors,
@@ -159,6 +167,11 @@ const resolvers = {
       pubsub.publish('REMOVE_MEMBER', {
         addMembers: team,
       });
+      pubsub.publish('UPDATE_LIST_TEAMS', {
+        updateListTeams: {
+          success: true,
+        },
+      });
       return await member.removeMember(meId, args.memberId);
     },
     changeRoleMember: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -168,11 +181,17 @@ const resolvers = {
 
     createOpinion: async (_, args: createOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const data = await opinion.createOpinion(req, args);
+
+      const array = ['test', 'test2'];
+      const anotherArr = ['test3', 'test4'];
+      anotherArr.push(...array);
+
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: data?.board,
       });
       return data?.board;
     },
+
     updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user;
       const myOpinion = await opinion.updateOpinion(args.teamId, meId, args);
@@ -203,10 +222,6 @@ const resolvers = {
       return board;
     },
 
-    // updateAction: async (_, args, {req}: {req: RequestWithUserInfo} ) => {
-    //   const newTeam = await team.updateAction();
-    // },
-
     createRemark: async (_, args: createRemarkType, { req }: { req: RequestWithUserInfo }) => {
       const opinion = await remark.createRemark(req, args);
       pubsub.publish('UPDATE_OPINION', {
@@ -223,14 +238,14 @@ const resolvers = {
     },
   },
   Subscription: {
-    // createBoard: {
-    //   subcribe: withFilter(
-    //     () => pubsub.asyncIterator(['CREATE_BOARD']),
-    //     (_, args) => {
-    //       return true;
-    //     },
-    //   ),
-    // },
+    updateListTeams: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['UPDATE_LIST_TEAMS']),
+        (_, args) => {
+          return true;
+        },
+      ),
+    },
     updateBoard: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(['CREATE_BOARD', 'UPDATE_BOARD', 'ORDER_OPINION']),
@@ -256,14 +271,6 @@ const resolvers = {
         },
       ),
     },
-    // updateMember: {
-    //   subscribe: withFilter(
-    //     () => pubsub.asyncIterator(['ADD_MEMBERS', 'REMOVE_MEMBER']),
-    //     (_, args) => {
-    //       return true;
-    //     },
-    //   ),
-    // },
 
     convertColumn: {
       subscribe: withFilter(

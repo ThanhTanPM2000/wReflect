@@ -8,17 +8,19 @@ import {
   DeleteFilled,
 } from '@ant-design/icons';
 import { Droppable } from 'react-beautiful-dnd';
-import { Board, Column, Member } from '../../types';
+import { Board, Column, Member, Team } from '../../types';
 import CreateTicket from './createTicket';
 import OpinionComponent from './opinion';
-import { Dropdown, Menu, Modal } from 'antd';
+import { Dropdown, Menu, Modal, notification } from 'antd';
 import { useMutation } from '@apollo/client';
 import { ColumnMutations } from '../../grapql-client/mutations';
+import { onError } from '@apollo/client/link/error';
 
 type Props = {
   index: number;
-  iMember?: Member;
+  iMember: Member;
   column: Column;
+  team: Team;
   board: Board;
   currentNumVotes: number | undefined;
   setCurrentNumVotes: (votes: number) => void;
@@ -31,6 +33,7 @@ export default function ColumnComponent({
   column,
   iMember,
   board,
+  team,
   index,
   currentNumVotes,
   setCurrentNumVotes,
@@ -42,6 +45,15 @@ export default function ColumnComponent({
 
   const [emptyColumn] = useMutation<ColumnMutations.emptyColumnResult, ColumnMutations.emptyColumnVars>(
     ColumnMutations.emptyColumn,
+    {
+      onError: () => {
+        notification.error({
+          message: 'Failed',
+          description: "Something failed, Can't empty column",
+          placement: 'bottomRight',
+        });
+      },
+    },
   );
 
   const menu = (
@@ -134,6 +146,7 @@ export default function ColumnComponent({
                   iMember={iMember}
                   currentNumVotes={currentNumVotes}
                   setCurrentNumVotes={setCurrentNumVotes}
+                  team={team}
                   board={board}
                   column={column}
                   index={index}

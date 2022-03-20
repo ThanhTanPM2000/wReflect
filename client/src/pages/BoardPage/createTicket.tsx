@@ -32,7 +32,7 @@ export default function createTicket({ board, column, isCreateBottom }: Props) {
     setTimeout(() => {
       setDisabled(false);
     }, 2000);
-    if (text && text != '' && text.length > 0) {
+    if (text.trim() && text.trim() != '' && text.length > 0) {
       createOpinion({
         variables: {
           teamId: board.teamId,
@@ -45,7 +45,7 @@ export default function createTicket({ board, column, isCreateBottom }: Props) {
         onError: (error) => {
           notification.error({
             placement: 'bottomRight',
-            message: error.message,
+            message: 'Cant create a ticket',
           });
         },
       });

@@ -39,6 +39,7 @@ export default {
   AUTH0_CLIENT_ID: parseString('AUTH0_CLIENT_ID'),
   AUTH0_CLIENT_SECRET: parseString('AUTH0_CLIENT_SECRET'),
   AUTH0_DOMAIN: parseString('AUTH0_DOMAIN'),
+  AUTH0_API_V2_MANAGEMENT: parseString('AUTH0_API_V2_MANAGEMENT'),
   PORT: parseNumber('PORT'),
   NODE_ENV: parseString('NODE_ENV'),
   SERVER_URL: parseString('SERVER_URL'),

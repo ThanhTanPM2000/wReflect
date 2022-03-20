@@ -1,11 +1,11 @@
-import { NotFound, Forbidden } from './../errorsManagement';
+import error from './../errorsManagement';
 import { Opinion } from '@prisma/client';
 import { RequestWithUserInfo } from './../types';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import { createRemarkType, removeRemarkType } from './../apollo/typeDefss/remarkTypeDefs';
 import prisma from '../prisma';
-import { board } from '.';
+import { board, user } from '.';
 
 export const getListRemarks = (opinionId: string) => {
   const opinions = prisma.remark.findMany({
@@ -17,7 +17,12 @@ export const getListRemarks = (opinionId: string) => {
 };
 
 export const createRemark = async (req: RequestWithUserInfo, args: createRemarkType) => {
-  const { id: meId, members } = req.user;
+  const { id: meId } = req.user;
+
+  const currentUser = await user.getUser(meId);
+  if (!currentUser) {
+    return error.NotFound();
+  }
 
   const board = await prisma.board.findFirst({
     where: {
@@ -42,10 +47,10 @@ export const createRemark = async (req: RequestWithUserInfo, args: createRemarkT
     },
   });
 
-  if (!board) return NotFound();
+  if (!board) return error.NotFound();
 
-  const memberId = members.find((member) => member.teamId === args.teamId)?.id;
-  if (!memberId) return Forbidden();
+  const memberId = currentUser.members.find((member) => member.teamId === args.teamId)?.id;
+  if (!memberId) return error.Forbidden();
 
   const opinion = await prisma.opinion.update({
     where: {
@@ -91,7 +96,7 @@ export const removeRemark = async (req: RequestWithUserInfo, args: removeRemarkT
     },
   });
 
-  if (!board) return NotFound();
+  if (!board) return error.NotFound();
 
   const opinion = await prisma.opinion.update({
     where: {

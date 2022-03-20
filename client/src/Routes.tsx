@@ -12,14 +12,11 @@ import { ManageMembers } from './pages/ManageMembersPage';
 import { Board } from './pages/BoardPage';
 import { AccountSetting } from './pages/AccountSettingPage';
 import { UserManagements } from './components/UserManagements';
-import { ProfileUser } from './pages/ProfileUserPage';
 import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/ManageBoardPage';
-import { Footer } from 'antd/lib/layout/layout';
-import { useSubscription } from '@apollo/client';
-import { BoardSubscription, OpinionSubscription } from './grapql-client/subcriptions';
 import HealthCheck from './pages/HealthCheck/HealthCheck';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
+import { PersonalReflection } from './pages/PersonalReflection';
 
 type Props = {
   me: null | User;
@@ -33,36 +30,6 @@ const Routes = ({ me }: Props) => {
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
   const picture = me?.picture || null;
-
-  const subcriptionFunc = () => {
-    if (me?.id) {
-      useSubscription<BoardSubscription.updateBoardResult, BoardSubscription.updateBoardVars>(
-        BoardSubscription.updateBoard,
-        {
-          variables: {
-            meId: me.id,
-          },
-        },
-      );
-      useSubscription<BoardSubscription.deleteBoardResult, BoardSubscription.deleteBoardVars>(
-        BoardSubscription.deleteBoard,
-        {
-          variables: {
-            meId: me.id,
-          },
-        },
-      );
-
-      useSubscription<OpinionSubscription.updateOpinionResult, OpinionSubscription.updateOpinionVars>(
-        OpinionSubscription.updateOpinion,
-        {
-          variables: {
-            meId: me.id,
-          },
-        },
-      );
-    }
-  };
 
   return (
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
@@ -88,12 +55,13 @@ const Routes = ({ me }: Props) => {
                       <Switch>
                         <Route path="/teams" exact component={Team} />
                         <>
-                          {subcriptionFunc()}
                           <Switch>
+                            {/* <Route path={`/team-details//:teamId`} children={[]} render={({ match }) => <TeamDetailsPage />} /> */}
                             <Route
                               path="/manage-members/:teamId"
                               render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
                             />
+                            <Route path="/personal-reflect" render={({ match }) => <PersonalReflection />} />
                             <Route
                               path="/board/:teamId/:boardId"
                               exact
@@ -113,8 +81,11 @@ const Routes = ({ me }: Props) => {
                                 <HealthCheck teamId={match.params.teamId} boardId={match.params.boardId} />
                               )}
                             />
-                            <Route path="/me" component={ProfileUser} />
-                            <Route path="/account" component={AccountSetting} />
+                            <Route
+                              path="/me"
+                              exact
+                              render={({ match }) => <AccountSetting userId={match.params.userId} />}
+                            />
                             <Route
                               path="/manage-board/:teamId"
                               render={({ match }) => <ManageBoardPage teamId={match.params.teamId} />}
@@ -132,9 +103,9 @@ const Routes = ({ me }: Props) => {
                     )}
                   </Switch>
                 </Content>
-                <Footer>
+                {/* <Footer>
                   <span>wReflect ©2022</span>
-                </Footer>
+                </Footer> */}
               </Layout>
             </>
           ) : (

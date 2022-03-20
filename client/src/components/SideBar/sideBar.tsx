@@ -63,7 +63,7 @@ const SideBar = ({ isAdmin }: Props) => {
           </div>
           <div className="flex flex-dir-r flex-ai-c flex-jc-c">
             <Tooltip title={me?.email} placement="left">
-              <Avatar crossOrigin="use-credentials"    src={me?.picture} />
+              <Avatar src={me?.picture} />
             </Tooltip>
           </div>
           <Menu className="flex flex-1" theme="dark" defaultSelectedKeys={['1']} mode="inline">
@@ -95,9 +95,9 @@ const SideBar = ({ isAdmin }: Props) => {
                     Task
                   </Menu.Item>
                 </SubMenu> */}
-                {/* <Menu.Item icon={<UserOutlined />} key="account">
+                <Menu.Item icon={<UserOutlined />} key="account">
                   <Link to="/me">Account</Link>
-                </Menu.Item> */}
+                </Menu.Item>
               </>
             )}
 

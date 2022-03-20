@@ -17,6 +17,39 @@ Table Session {
   }
 }
 
+Table Assessment {
+  id String [pk]
+  name String [not null]
+  startDate DateTime [not null]
+  endDate DateTime [not null]
+  teamId String [not null]
+  team Team [not null]
+  ownerId String [not null]
+  ownerMember Member [not null]
+  status AssessmentStatus [not null]
+  assessmentOnCriteriaList AssessmentOnCriteria [not null]
+}
+
+Table AssessmentOnCriteria {
+  assessmentId String [not null]
+  assessment Assessment [not null]
+  criteriaId String [not null]
+  criteria Criteria [not null]
+  createdAt DateTime [default: `now()`, not null]
+  createdBy String [not null]
+
+  indexes {
+    (assessmentId, criteriaId) [pk]
+  }
+}
+
+Table Criteria {
+  id String [pk]
+  name String [unique, not null]
+  description String [not null]
+  assessmentOnCriteriaList AssessmentOnCriteria [not null]
+}
+
 Table Team {
   id String [pk]
   name String [not null]
@@ -27,13 +60,12 @@ Table Team {
   picture String [not null]
   isPublic Boolean [not null, default: true]
   description String
-  selectedBoard String
   status TeamStatus [not null, default: 'DOING']
   members Member [not null]
-  InviteLink InviteLink [not null]
   boards Board [not null]
-  Owner User [not null]
-  HealthCheck HealthCheck [not null]
+  owner User [not null]
+  healthCheck HealthCheck [not null]
+  assessment Assessment [not null]
 }
 
 Table Board {
@@ -173,7 +205,6 @@ Table InviteLink {
   updatedAt DateTime [not null]
   expiresAt DateTime [not null]
   type TypeToken [not null, default: 'INVITE']
-  team Team [not null]
 }
 
 Table Member {
@@ -189,8 +220,9 @@ Table Member {
   boardActive String
   user User [not null]
   team Team [not null]
-  Opinion Opinion [not null]
-  Remark Remark [not null]
+  opinions Opinion [not null]
+  remarks Remark [not null]
+  assessments Assessment [not null]
 
   indexes {
     (userId, teamId) [unique]
@@ -214,37 +246,30 @@ Table User {
   updatedAt DateTime [not null]
   isAdmin Boolean [not null, default: false]
   userStatus UserStatus [not null, default: 'OFFLINE']
-  name String [not null]
   nickname String [not null]
   picture String [not null]
-  session Session [not null]
-  profile UserProfile
-  members Member [not null]
-  Notification Notification [not null]
-  Team Team [not null]
-  Opinion Opinion [not null]
-  Remark Remark [not null]
-  MemberAnswers MemberAnswer [not null]
-  MemberComments MemberComment [not null]
-}
-
-Table UserProfile {
-  id String [pk]
-  userId String [not null]
+  gender Gender [not null, default: 'UNSPECIFIED']
   workplace String
   address String
   school String
   introduction String
   talents String
   interests String
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  gender Gender [not null, default: 'UNSPECIFIED']
-  user User [not null]
+  session Session [not null]
+  members Member [not null]
+  notification Notification [not null]
+  teams Team [not null]
+  opinions Opinion [not null]
+  remark Remark [not null]
+  memberAnswers MemberAnswer [not null]
+  memberComments MemberComment [not null]
+}
 
-  indexes {
-    (userId) [unique]
-  }
+Enum AssessmentStatus {
+  PLANNED
+  DOING
+  COMPLETE
+  REOPENED
 }
 
 Enum BoardType {
@@ -293,6 +318,14 @@ Enum UserStatus {
 
 Ref: Session.userId > User.id
 
+Ref: Assessment.teamId > Team.id
+
+Ref: Assessment.ownerId > Member.id
+
+Ref: AssessmentOnCriteria.assessmentId > Assessment.id
+
+Ref: AssessmentOnCriteria.criteriaId > Criteria.id
+
 Ref: Team.ownerId > User.id
 
 Ref: Board.teamId > Team.id
@@ -325,12 +358,8 @@ Ref: Remark.authorId > User.id
 
 Ref: Remark.memberId > Member.id
 
-Ref: InviteLink.teamId > Team.id
-
 Ref: Member.userId > User.id
 
 Ref: Member.teamId > Team.id
 
 Ref: Notification.userId > User.id
-
-Ref: UserProfile.userId - User.id

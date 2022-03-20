@@ -24,8 +24,6 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
   const history = useHistory();
 
   const redirect = (team: Team) => {
-    // const boardId = team.members.find((member) => member.userId === me?.id)?.boardActive;
-    // boardId ? history.push(`/board/${team.id}/${team.boards[0].id}`) : history.push(`/board/${team.id}/${boardId}`);
     history.push(`/board/${team.id}/${team.boards[0].id}`);
   };
 
@@ -34,7 +32,7 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
     TeamQueries.getTeamsVars
   >(TeamQueries.getTeams, {
     variables: { isGettingAll: false, search: searchText, page, size },
-    fetchPolicy: 'cache-first', // Used for first execution
+    fetchPolicy: 'cache-and-network', // Used for first execution
     notifyOnNetworkStatusChange: true,
   });
 
@@ -53,7 +51,7 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize }: Props) => {
       >
         {data && data?.teams.data.length > 0 ? (
           <>
-            <div className="flex flex-1 flex-dir-c" style={{ overflow: 'auto' }}>
+            <div className="flex flex-1 flex-dir-c">
               <Row
                 className="flex flex-dir-r"
                 style={{ height: '100%', padding: '10px' }}

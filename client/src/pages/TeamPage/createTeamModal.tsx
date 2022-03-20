@@ -57,12 +57,12 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
   };
 
   const props = {
-    beforeUpload: async (file: RcFile) => {
-      if (file.type !== 'image/png') {
-        message.error(`${file.name} is not a png file`);
-      }
-      return file.type === 'image/png' ? true : Upload.LIST_IGNORE;
-    },
+    // beforeUpload: async (file: RcFile) => {
+    //   if (file.type !== 'image/png') {
+    //     message.error(`${file.name} is not a png file`);
+    //   }
+    //   return file.type === 'image/png' ? true : Upload.LIST_IGNORE;
+    // },
     onChange: (info: UploadChangeParam<UploadFile<any>>) => {
       console.log(info.fileList);
     },
@@ -85,14 +85,27 @@ const CreateTeamModal = ({ isVisible, setIsVisible }: Props) => {
           hasFeedback
           label="Team Name"
           rules={[
-            { required: true, message: 'Please input your team name' },
+            {
+              required: true,
+              whitespace: true,
+              message: 'Please input your team name',
+            },
             { min: 5, message: 'Team name must be minimum 5 characters.' },
             { max: 25, message: 'Team name must be maximum 25 characters.' },
           ]}
         >
           <Input bordered placeholder="Input team name" type="text" name="name" />
         </Form.Item>
-        <Form.Item name="teamDescription" hasFeedback label="Description">
+        <Form.Item
+          rules={[
+            {
+              whitespace: true,
+            },
+          ]}
+          name="teamDescription"
+          hasFeedback
+          label="Description"
+        >
           <TextArea bordered placeholder="Description of the team" rows={4} name="description" />
         </Form.Item>
         <Form.Item

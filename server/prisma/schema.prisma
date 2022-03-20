@@ -26,23 +26,60 @@ model Session {
   @@index([expiresAt])
 }
 
+model Assessment {
+  id                       String                 @id @default(uuid())
+  name                     String
+  startDate                DateTime
+  endDate                  DateTime
+  teamId                   String
+  team                     Team                   @relation(fields: [teamId], references: [id])
+  ownerId                  String
+  ownerMember              Member                 @relation(fields: [ownerId], references: [id])
+  status                   AssessmentStatus
+  assessmentOnCriteriaList AssessmentOnCriteria[]
+}
+
+model AssessmentOnCriteria {
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  criteriaId   String
+  criteria     Criteria   @relation(fields: [criteriaId], references: [id])
+  createdAt    DateTime   @default(now())
+  createdBy    String
+
+  @@id([assessmentId, criteriaId])
+}
+
+model Criteria {
+  id                       String                 @id @default(uuid())
+  name                     String                 @unique
+  description              String
+  assessmentOnCriteriaList AssessmentOnCriteria[]
+}
+
+enum AssessmentStatus {
+  PLANNED
+  DOING
+  COMPLETE
+  REOPENED
+}
+
 model Team {
-  id            String        @id @default(uuid())
-  name          String
-  ownerId       String
-  createdAt     DateTime      @default(now())
-  startDate     DateTime
-  endDate       DateTime
-  picture       String
-  isPublic      Boolean       @default(true)
-  description   String?
-  selectedBoard String?
-  status        TeamStatus    @default(DOING)
-  members       Member[]
-  InviteLink    InviteLink[]
-  boards        Board[]
-  Owner         User          @relation(fields: [ownerId], references: [id])
-  HealthCheck   HealthCheck[]
+  id          String        @id @default(uuid())
+  name        String
+  ownerId     String
+  createdAt   DateTime      @default(now())
+  startDate   DateTime
+  endDate     DateTime
+  picture     String
+  isPublic    Boolean       @default(true)
+  description String?
+  status      TeamStatus    @default(DOING)
+  members     Member[]
+  boards      Board[]
+  owner       User          @relation(fields: [ownerId], references: [id])
+  healthCheck HealthCheck[]
+  assessment  Assessment[]
 }
 
 model Board {
@@ -170,13 +207,6 @@ model Opinion {
   remarks       Remark[]
 }
 
-// enum ColorPicker {
-//   PINK
-//   GRAY
-//   GREEN
-
-// }
-
 model Remark {
   id        String   @id @default(uuid())
   memberId  String
@@ -214,7 +244,6 @@ model InviteLink {
   updatedAt DateTime  @updatedAt
   expiresAt DateTime
   type      TypeToken @default(INVITE)
-  team      Team      @relation(fields: [teamId], references: [id])
 }
 
 enum TypeToken {
@@ -234,9 +263,10 @@ model Member {
   boardActive         String?
   user                User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   team                Team      @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  Opinion             Opinion[]
-  Remark              Remark[]
+  opinions            Opinion[]
+  remarks             Remark[]
 
+  assessments Assessment[]
   @@unique([userId, teamId])
 }
 
@@ -257,37 +287,25 @@ model User {
   updatedAt    DateTime       @updatedAt
   isAdmin      Boolean        @default(false)
   userStatus   UserStatus     @default(OFFLINE)
-  name         String         @db.VarChar(100)
   nickname     String         @db.VarChar(150)
   picture      String         @db.VarChar(500)
+  gender       Gender         @default(UNSPECIFIED)
+  workplace    String?        @db.VarChar(300)
+  address      String?        @db.VarChar(300)
+  school       String?        @db.VarChar(300)
+  introduction String?        @db.VarChar(500)
+  talents      String?        @db.VarChar(500)
+  interests    String?        @db.VarChar(500)
   session      Session[]
-  profile      UserProfile?
   members      Member[]
-  Notification Notification[]
+  notification Notification[]
 
-  Team           Team[]
-  Opinion        Opinion[]
-  Remark         Remark[]
-  MemberAnswers  MemberAnswer[]
-  MemberComments MemberComment[]
+  teams          Team[]
+  opinions       Opinion[]
+  remark         Remark[]
+  memberAnswers  MemberAnswer[]
+  memberComments MemberComment[]
   @@index([email])
-}
-
-model UserProfile {
-  id           String   @id @default(uuid())
-  userId       String
-  workplace    String?  @db.VarChar(300)
-  address      String?  @db.VarChar(300)
-  school       String?  @db.VarChar(300)
-  introduction String?  @db.VarChar(500)
-  talents      String?  @db.VarChar(500)
-  interests    String?  @db.VarChar(500)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  gender       Gender   @default(UNSPECIFIED)
-  user         User     @relation(fields: [userId], references: [id])
-
-  @@unique([userId])
 }
 
 enum Gender {

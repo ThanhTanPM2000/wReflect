@@ -1,25 +1,46 @@
 import React from 'react';
 import auth0 from 'auth0-js';
-import { notification } from 'antd';
+import { Anchor, notification } from 'antd';
+import { auth } from '../../apis';
+
+const { Link } = Anchor;
 
 type EmailVerificationNoticeProps = {
+  sub: null | string;
   email: null | string;
   needsEmailVerification: null | boolean;
   webAuth: auth0.WebAuth;
 };
 
-function EmailVerificationNotice({ email, needsEmailVerification, webAuth }: EmailVerificationNoticeProps) {
+function EmailVerificationNotice({ sub, email, needsEmailVerification, webAuth }: EmailVerificationNoticeProps) {
   if (!email) {
     return null;
   }
+
+  const handleOnResendVerification = async () => {
+    const data = await auth.resendVerificationEmail(sub);
+    if (data.status === 'pending') {
+      notification.success({
+        message: `Resend Successful`,
+        description: 'Please check your email, your resend verification email successful',
+        placement: 'bottomRight',
+      });
+    }
+  };
 
   if (needsEmailVerification) {
     return (
       <>
         {notification.error({
           message: `Notification`,
-          description: `${email}, please visit your email to complete email verification.`,
-          placement: 'bottomLeft',
+          description: (
+            <div>
+              {`${email}, please visit your email to complete email verification. \n`}{' '}
+              <a onClick={() => handleOnResendVerification()}>Resend?</a>
+            </div>
+          ),
+          // description: `${email}, please visit your email to complete email verification.`,
+          placement: 'bottomRight',
         })}
       </>
     );

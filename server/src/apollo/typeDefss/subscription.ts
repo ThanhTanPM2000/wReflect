@@ -1,8 +1,13 @@
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
+  type statusRequest {
+    success: Boolean
+  }
+
   type Subscription {
-    updateBoard(meId: ID!): Board
+    updateListTeams(meId: ID!): statusRequest
+    updateBoard(meId: ID!, boardId: ID!): Board
     deleteBoard(meId: ID!): Board
     convertColumn(meId: ID!): Column
     updateOpinion(meId: ID!): Opinion

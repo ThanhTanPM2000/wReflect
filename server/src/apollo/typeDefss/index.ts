@@ -13,6 +13,9 @@ import { default as HealthCheck } from './healthCheckTypeDefs';
 import { default as MemberAnswer } from './memberAnswersTypeDefs';
 import { default as MemberComment } from './memberCommentsTypeDefs';
 import { default as Answer } from './answerTypeDefs';
+import { default as Assessment } from './assessmentTypeDefs';
+import { default as AssessmentOnCriteria } from './assessmentOnCriteriaTypeDefs';
+import { default as Criteria } from './criteriaTypeDefs';
 
 export default [
   Answer,
@@ -30,4 +33,7 @@ export default [
   HealthCheck,
   MemberAnswer,
   MemberComment,
+  Assessment,
+  AssessmentOnCriteria,
+  Criteria,
 ];

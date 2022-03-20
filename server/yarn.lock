@@ -5833,6 +5833,11 @@ onetime@^5.1.0, onetime@^5.1.2:
   dependencies:
     mimic-fn "^2.1.0"
 
+openssl@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/openssl/-/openssl-2.0.0.tgz#7204cad363e83e0d7860da95dd0a0fc9d1d7a20c"
+  integrity sha512-0FgKhQ/e+XCtTTgn3qZO2g3y+Y3FC/LGvt77oObmMR4ZkZvsV1CuG/mMZClZgZqVKr0+tkemP+I3Uub4WXkHYw==
+
 optionator@^0.8.1:
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.8.3.tgz#84fa1d036fe9d3c7e21d99884b601167ec8fb495"

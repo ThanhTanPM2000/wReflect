@@ -1,16 +1,22 @@
 import React, { useContext } from 'react';
 import { useMutation } from '@apollo/client';
-import { Form, Avatar, Button, Input, Upload } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, DownOutlined } from '@ant-design/icons';
 
 import { UserMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
 
-import { UploadOutlined } from '@ant-design/icons';
 import { user } from '../../apis';
-import config from '../../config';
+import { Avatar, Tabs, Button, Dropdown, Menu } from 'antd';
+import moment from 'moment';
+import OwnedTeams from './ownedTeams';
 
-const AccountSetting = () => {
+const { TabPane } = Tabs;
+
+type Props = {
+  userId: string;
+};
+
+const AccountSetting = ({ userId }: Props) => {
   const me = useContext(SelfContext);
   const [updateAcctount] = useMutation(UserMutations.updateUser, {});
 
@@ -19,57 +25,73 @@ const AccountSetting = () => {
     user.me();
   };
 
+  const menu = (
+    <Menu>
+      <Menu.Item key="1" icon={<UserOutlined />}>
+        Change Avatar
+      </Menu.Item>
+      <Menu.Item key="1" icon={<UserOutlined />}>
+        Change Password
+      </Menu.Item>
+      <Menu.Item key="2" icon={<UserOutlined />}>
+        Forgot Password
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <div className="profileUser">
-      <div className="card-wreflect">
-        <div className="panelcont users row" style={{ padding: '0px', margin: '0px 0px 20px' }}>
-          <h3 className="tname">Account Settings</h3>
+      <div className="headerSection">
+        <div className="accInfor">
+          <Avatar size={70} src={me.picture} />
+          <div className="accName">
+            <div className="gmail">{me.email}</div>
+            <p>
+              user_id: <span className="user_id">{me.id}</span>
+            </p>
+          </div>
         </div>
-        <Form onFinish={handleFinish} layout="vertical">
-          <div className="flex flex-dir-r" style={{ padding: '0 40px' }}>
-            <div className="flex flex-5 flex-jc-c">
-              <Form.Item
-                name="email"
-                hasFeedback
-                label="Email"
-                initialValue={me?.email}
-                rules={[{ required: true, message: 'Please input your email' }]}
-              >
-                <Input disabled bordered placeholder={me?.email} type="text" value={me?.email} name="name" />
-              </Form.Item>
-            </div>
-            <div className="flex flex-3 flex-ai-c flex-jc-c" style={{ alignContent: 'center' }}>
-              <Form.Item
-                rules={[{ required: true, message: 'Please input images' }]}
-                initialValue={me?.picture}
-                name="upload"
-              >
-                <div className="flex flex-jc-c flex-ai-c">
-                  <Avatar size={64} src={me?.picture} icon={<UserOutlined />} />
-                  <Upload
-                    action={`${config.SERVER_BASE_URL}/api/upload`}
-                    name="photo"
-                    multiple={false}
-                    listType="picture"
-                    className="flex flex-ai-c flex-jc-c"
-                    maxCount={1}
-                  >
-                    <Button style={{ marginTop: '10px' }} icon={<UploadOutlined />}>
-                      Upload
-                    </Button>
-                  </Upload>
+        <div className="actionHeader">
+          <Dropdown trigger={['click']} overlay={menu}>
+            <Button type="primary">
+              Action <DownOutlined />
+            </Button>
+          </Dropdown>
+        </div>
+      </div>
+      <div className="container">
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="Profile" key="1">
+            <div className="inforField">
+              <div className="hihihiha">
+                <div className="labelField">Name</div>
+                <div className="valueField">
+                  <div>{me.nickname}</div>
                 </div>
-              </Form.Item>
+                <div className="actionField">
+                  <Button>Edit</Button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="bar actions flex flex-dir-r flex-ai-c ">
-            <Form.Item>
-              <Button type="primary" htmlType="submit" className="flex flex-ai-c flex-jc-c">
-                Save Changes
-              </Button>
-            </Form.Item>
-          </div>
-        </Form>
+            <div className="inforField">
+              <div className="hihihiha">
+                <div className="labelField">data</div>
+                <div className="valueField">
+                  <div>{me.nickname}</div>
+                </div>
+                <div className="actionField">
+                  <Button>Edit</Button>
+                </div>
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab="Teams" key="2">
+            <OwnedTeams />
+          </TabPane>
+          <TabPane tab="" key="3">
+            Content of Tab Pane 3
+          </TabPane>
+        </Tabs>
       </div>
     </div>
   );

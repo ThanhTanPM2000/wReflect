@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
 import _, { now } from 'lodash';
-import { NotFound } from '../errorsManagement';
+import error from '../errorsManagement';
 import { P } from 'pino';
 import { argsToArgsConfig } from 'graphql/type/definition';
 
@@ -72,11 +72,7 @@ export const getBoard = async (boardId: string, meId: string) => {
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
@@ -84,7 +80,7 @@ export const getBoard = async (boardId: string, meId: string) => {
     },
   });
 
-  !board && NotFound();
+  !board && error.NotFound();
 
   return board;
 };
@@ -166,7 +162,7 @@ export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardTyp
   });
 
   // if (!team) throw new ApolloError('You dont have permission, or data not found', `${StatusCodes.FORBIDDEN}`);
-  !team && NotFound();
+  !team && error.NotFound();
 
   const board = await prisma.board.update({
     where: {
@@ -251,11 +247,7 @@ export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardTyp
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },

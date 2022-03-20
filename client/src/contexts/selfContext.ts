@@ -1,4 +1,12 @@
 import React from 'react';
-import { User, UserProfile } from '../types';
+import { User } from '../types';
 
-export default React.createContext<null | (User & { profile: UserProfile })>(null);
+export default React.createContext<
+  | null
+  | (User & {
+      teamId: string;
+      boardId: string;
+      setTeamId: (teamId: string) => void;
+      setBoardId: (boardId: string) => void;
+    })
+>(null);

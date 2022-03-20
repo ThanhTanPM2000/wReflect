@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import auth0, { AuthOptions } from 'auth0-js';
 
 import config from '../../config';
-import { auth } from '../../apis';
+import H from 'history';
+import { auth, user } from '../../apis';
 import EmailVerificationNotice from './EmailVerificationNotice';
+import { createSemanticDiagnosticsBuilderProgram } from 'typescript';
+import { useHistory } from 'react-router-dom';
 
 type Props = {
   isLoggedIn: boolean;
@@ -12,10 +15,17 @@ type Props = {
 };
 
 const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
+  const history = useHistory();
   const [email, setEmail] = useState<null | string>(null);
   const [needsEmailVerification, setNeedsEmailVerification] = useState<null | boolean>(null);
+  const [sub, setSub] = useState<null | string>(null);
   const params = new URLSearchParams(location.search);
   const authConfig: AuthOptions = config.AUTH0_WEBAUTH_CONFIG;
+
+  if (redirectUri) {
+    authConfig.redirectUri = redirectUri;
+    authConfig.universalLoginPage = false;
+  }
 
   let isMounted = true;
   const handleLogin = async (
@@ -23,12 +33,18 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
     state: string,
     setEmail: React.Dispatch<null | string>,
     setNeedsEmailVerification: React.Dispatch<null | boolean>,
+    setSub: (sub: string) => void,
+    history: H.History,
   ) => {
     const res = await auth.login(code, state);
     if (!res) {
       return;
     }
     if (isMounted) {
+      if (res.sub) {
+        setSub(res.sub);
+      }
+
       if (res.requiresEmailVerification) {
         setNeedsEmailVerification(res.requiresEmailVerification);
       }
@@ -36,25 +52,30 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
       if (res.email) {
         setEmail(res.email);
       }
+    }
 
-      //Clear search params
-      const indexOfSearchParams = location.href.indexOf('&code');
-      const clearedUrl = indexOfSearchParams !== -1 ? location.href.substring(0, indexOfSearchParams) : location.href;
-      window.history.replaceState({}, '', clearedUrl);
+    //Clear search params
+    const indexOfSearchParams = location.href.indexOf('&code');
+    const clearedUrl = indexOfSearchParams !== -1 ? location.href.substring(0, indexOfSearchParams) : location.href;
+    window.history.replaceState({}, '', clearedUrl);
+
+    const { partnerId, isAdmin } = await user.me();
+    if (location.pathname.includes('wa-client')) {
+      return;
+    }
+
+    if (partnerId || isAdmin) {
+      history.push('accounts');
     }
   };
 
-  if (redirectUri) {
-    authConfig.redirectUri = redirectUri;
-    authConfig.universalLoginPage = false;
-  }
   const webAuth = new auth0.WebAuth(authConfig);
   useEffect(() => {
     if (!isLoggedIn) {
       const code = params.get('code');
       const state = params.get('state');
       if (code && state) {
-        handleLogin(code, state, setEmail, setNeedsEmailVerification);
+        handleLogin(code, state, setEmail, setNeedsEmailVerification, setSub, history);
       }
     }
     return () => {
@@ -73,7 +94,12 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
 
   return (
     <div className="App login-scene">
-      <EmailVerificationNotice email={email} webAuth={webAuth} needsEmailVerification={needsEmailVerification} />
+      <EmailVerificationNotice
+        email={email}
+        sub={sub}
+        webAuth={webAuth}
+        needsEmailVerification={needsEmailVerification}
+      />
       <div onClick={() => webAuth.authorize({ prompt: 'login' })}>{children}</div>
     </div>
   );

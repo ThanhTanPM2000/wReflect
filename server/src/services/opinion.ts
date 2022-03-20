@@ -1,5 +1,4 @@
-import { isOwnedTeam, isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './team';
-import { Opinion, Column } from '@prisma/client';
+import { isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './essential';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
@@ -11,8 +10,8 @@ import {
   updateOpinionType,
 } from '../apollo/typeDefss/opinionTypeDefs';
 import { RequestWithUserInfo } from '../types';
-import { column } from '.';
-import { Forbidden } from '../errorsManagement';
+import error from '../errorsManagement';
+import { user } from '.';
 
 export const getListOpinions = (columnId: string) => {
   const opinions = prisma.opinion.findMany({
@@ -37,10 +36,14 @@ export const getOpinion = async (opinionId: string) => {
 };
 
 export const createOpinion = async (req: RequestWithUserInfo, args: createOpinionType) => {
-  const { id: meId, members, email } = req?.user;
+  const { id: meId, email } = req?.user;
 
   await isMembersOfTeam(args.teamId, meId);
   await isAllowUpdateBoard(args.boardId, meId);
+
+  const currentUser = await user.getUser(meId);
+  if (!currentUser) {
+  }
 
   const max = await prisma.opinion.aggregate({
     where: {
@@ -68,8 +71,9 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
         },
       };
 
-  const memberId = members.find((member) => member.teamId === args.teamId)?.id;
-  if (!memberId) return Forbidden();
+  const memberId = currentUser?.members.find((member) => member.teamId === args.teamId)?.id;
+  // const memberId = currentUser.members.find((member) => member.teamId === args.teamId)?.id;
+  if (!memberId) return error.Forbidden();
 
   const myBoard = await prisma.column.update({
     where: {
@@ -106,11 +110,7 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
             include: {
               members: {
                 include: {
-                  user: {
-                    include: {
-                      profile: true,
-                    },
-                  },
+                  user: true,
                 },
               },
             },
@@ -184,11 +184,7 @@ export const removeOpinion = async (req: RequestWithUserInfo, args: removeOpinio
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
@@ -343,11 +339,7 @@ export const orderOpinion = async (req: RequestWithUserInfo, args: orderOpinionT
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },
@@ -445,11 +437,7 @@ export const combineOpinion = async (req: RequestWithUserInfo, args: combineOpin
         include: {
           members: {
             include: {
-              user: {
-                include: {
-                  profile: true,
-                },
-              },
+              user: true,
             },
           },
         },

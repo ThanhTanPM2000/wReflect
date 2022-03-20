@@ -39,7 +39,7 @@ export const upload = multer({
       cb(null, { fieldName: file.fieldname });
     },
     key: function (req: RequestWithUserInfo, file, cb) {
-      const { name } = req.user;
+      const { email } = req.user;
       const fileName = Date.now().toString() + file.originalname;
       const fullPath = `${name}/${fileName}`;
       cb(null, fullPath);

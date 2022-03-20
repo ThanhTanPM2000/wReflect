@@ -4,15 +4,9 @@ const typeDefs = gql`
   type Profile {
     id: ID!
     userId: String!
-    workplace: String
-    address: String
-    school: String
-    introduction: String
-    talent: String
-    interest: String
+    
     createdAt: String!
     updatedAt: String!
-    gender: Gender
     user: User
   }
 

@@ -13,6 +13,7 @@ export type Team = {
   isPublic: boolean;
   description: string | null;
   status: TeamStatus;
+  Owner: User;
   members: Member[];
   boards: Board[];
 };
@@ -84,7 +85,6 @@ export type Board = {
   type: BoardType;
   currentPhase: PhaseType;
   endTime: string;
-  team: Team;
   columns: Column[];
 };
 
@@ -153,15 +153,9 @@ export type Member = {
 export type UserProfile = {
   id: string;
   userId: string;
-  workplace: string | null;
-  address: string | null;
-  school: string | null;
-  introduction: string | null;
-  talents: string | null;
-  interests: string | null;
+
   createdAt: Date;
   updatedAt: Date;
-  gender: Gender;
   user: User;
 };
 
@@ -175,6 +169,35 @@ export type Session = {
   updatedAt: Date;
 };
 
+export type Assessment = {
+  id: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  teamId: string;
+  ownerId: string;
+  status: AssessmentStatus;
+  team: Team;
+  ownerMember: Member;
+  assessmentOnCriteriaList: AssessmentOnCriteria[];
+};
+
+export type AssessmentOnCriteria = {
+  assessmentId: string;
+  criteriaId: string;
+  createdAt: Date;
+  createdBy: string;
+  assessment: Assessment;
+  criteria: Criteria;
+};
+
+export type Criteria = {
+  id: string;
+  name: string;
+  description: string;
+  assessmentOnCriteriaList: AssessmentOnCriteria[];
+};
+
 export type MemberStatus = 'PENDING_INVITATION' | 'JOINED';
 export type UserOnlineStatus = 'ONLINE' | 'OFFLINE';
 export type TeamStatus = 'DOING' | 'DONE';
@@ -184,6 +207,7 @@ export type OpinionStatus = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
 export type BoardType = 'DEFAULT' | 'PHASE';
 export type PhaseType = 'REFLECT' | 'GROUP' | 'VOTES' | 'DISCUSS';
 export type StatusHealthCheck = 'OPEN' | 'CLOSED';
+export type AssessmentStatus = 'PLANNED' | 'DOING' | 'COMPLETE' | 'REOPENED';
 
 export type User = {
   id: string;
@@ -191,10 +215,15 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   isAdmin: boolean;
-  name: string;
   nickname: string;
   picture: string;
   userStatus: UserStatus;
-  profile: UserProfile;
   members: [Member];
+  workplace: string | null;
+  address: string | null;
+  school: string | null;
+  introduction: string | null;
+  talents: string | null;
+  interests: string | null;
+  gender: Gender;
 };
