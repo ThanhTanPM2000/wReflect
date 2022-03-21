@@ -1,13 +1,15 @@
+import { checkIsMemberOwningTeam } from './essential';
 import { addMemberToTeamType, setRoleMemberType } from '../types';
-import logger from '../logger';
 import prisma from '../prisma';
-import _, { update } from 'lodash';
+import _ from 'lodash';
 
 import { sendMail } from './nodemailer';
 import { User } from '.prisma/client';
 import config from '../config';
 import { ApolloError } from 'apollo-server-errors';
 import { StatusCodes } from 'http-status-codes';
+import * as service from '.';
+import error from '../errorsManagement';
 
 export const getListMembers = async (teamId?: string, userId?: string) => {
   const members = await prisma.member.findMany({
@@ -15,9 +17,14 @@ export const getListMembers = async (teamId?: string, userId?: string) => {
       teamId,
       userId,
     },
-    orderBy: {
-      isOwner: 'desc',
-    },
+    orderBy: [
+      {
+        isSuperOwner: 'desc',
+      },
+      {
+        isOwner: 'desc',
+      },
+    ],
   });
 
   return members;
@@ -30,31 +37,17 @@ export const getMember = async (memberId?: string) => {
     },
   });
 
-  if (!member) throw new ApolloError('Data not found', `${StatusCodes.NOT_FOUND}`);
+  if (!member) throw new ApolloError('Member not found', `${StatusCodes.NOT_FOUND}`);
   return member;
 };
 
 export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) => {
-  const team = await prisma.team.findFirst({
-    where: {
-      id: args.teamId,
-      members: {
-        some: {
-          isOwner: {
-            equals: true,
-          },
-          userId: meId,
-        },
-      },
-    },
-  });
-
-  if (!team) throw new ApolloError(`You are not the owner of this Team`, `${StatusCodes.FORBIDDEN}`);
+  const memberOwnedTeam = await checkIsMemberOwningTeam(args.teamId, meId);
 
   const currentUsers: User[] = await prisma.user.findMany({
     where: {
       email: {
-        in: args.emailUsers,
+        in: args.emailUsers.map((mail) => mail.toLowerCase()),
       },
     },
   });
@@ -68,7 +61,11 @@ export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) 
     for (let idx = 0; idx < newEmail.length; idx++) {
       const email = newEmail[idx];
       try {
-        sendMail(email, `Invite to team ${args.teamId}`, `Someone invite you to team ${team.name} - ${args.teamId}`);
+        sendMail(
+          email,
+          `Invite to team ${args.teamId}`,
+          `Someone invite you to team ${memberOwnedTeam?.team.name} - ${args.teamId}`,
+        );
         warnings.push(`We have sent email invite to ${email}`);
 
         await prisma.user.create({
@@ -81,7 +78,7 @@ export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) 
                 isPendingInvitation: true,
               },
             },
-            nickname: 'Pending Invitation',
+            nickname: 'UnRegistered',
             picture: `${config.SERVER_URL}/uploads/avatarDefault.png`,
           },
         });
@@ -136,57 +133,77 @@ export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) 
   };
 };
 
-export const removeMember = async (meId: string, memberId: string) => {
-  const member = await prisma.member.deleteMany({
+export const removeMember = async (meId: string, args: { memberId: string; teamId: string }) => {
+  const memberOwnedTeam = await checkIsMemberOwningTeam(args.teamId, meId);
+
+  const memberNeedRemove = await service.member.getMember(args.memberId);
+  if (memberNeedRemove.isSuperOwner) {
+    return error.Forbidden("You can't remove Super Owner");
+  }
+  if (!memberOwnedTeam.isSuperOwner && memberNeedRemove.isOwner) {
+    return error.Forbidden('Only super owner can remove of other owner');
+  }
+
+  const team = await prisma.team.update({
     where: {
-      id: memberId,
-      team: {
-        members: {
-          some: {
-            isOwner: true,
-            userId: meId,
-          },
-        },
-      },
-    },
-  });
-
-  if (!member || member?.count == 0) throw new ApolloError(`You are not the owner of Team`, `${StatusCodes.FORBIDDEN}`);
-
-  return member;
-};
-
-export const changeRoleMember = async (meId: string, data: setRoleMemberType) => {
-  const team = await prisma.team.findFirst({
-    where: {
-      id: data.teamId,
-      members: {
-        some: {
-          userId: meId,
-          isOwner: {
-            equals: true,
-          },
-        },
-      },
-    },
-    include: { members: true },
-  });
-
-  if (!team) throw new ApolloError(`You are not the owner of Team ${data.teamId}`, `${StatusCodes.FORBIDDEN}`);
-
-  if (team.members.filter((member) => member.isOwner).length <= 1 && !data.isOwner)
-    throw new ApolloError(`Owner at least one in the team`, `${StatusCodes.METHOD_NOT_ALLOWED}`);
-
-  const member = await prisma.member.update({
-    where: {
-      id: data.memberId,
+      id: args.teamId,
     },
     data: {
-      isOwner: data.isOwner,
+      members: {
+        delete: {
+          id: args.memberId,
+        },
+      },
     },
-    include: {
-      team: true,
-      user: true,
+  });
+
+  if (!team) return error.NotFound('Member not found in this team');
+  return team;
+};
+
+export const changeRoleMember = async (meId: string, args: setRoleMemberType) => {
+  const memberOwnedTeam = await checkIsMemberOwningTeam(args.teamId, meId);
+
+  const memberNeedChangeRole = await service.member.getMember(args.memberId);
+  if (memberNeedChangeRole.isSuperOwner) {
+    return error.Forbidden("You don't have permission to change role of Super Owner");
+  }
+  if (!memberOwnedTeam.isSuperOwner && memberNeedChangeRole.isOwner) {
+    return error.Forbidden('Only super owner can change role of other owner');
+  }
+
+  const team = await prisma.team.update({
+    where: {
+      id: args.teamId,
+    },
+    data: {
+      members: {
+        update: {
+          where: {
+            id: args.memberId,
+          },
+          data: {
+            isOwner: args.isOwner,
+          },
+        },
+      },
+    },
+  });
+
+  if (!team) return error.NotFound("Can't found a member to change role ");
+  return team;
+};
+
+export const updateMeetingNote = async (meId: string, teamId: string, meetingNote: string) => {
+  const member = await prisma.member.update({
+    where: {
+      userId_teamId: {
+        userId: meId,
+        teamId,
+      },
+    },
+    data: {
+      meetingNote,
     },
   });
 

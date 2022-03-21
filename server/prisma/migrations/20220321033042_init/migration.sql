@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "AssessmentStatus" AS ENUM ('PLANNED', 'DOING', 'COMPLETE', 'REOPENED');
+
+-- CreateEnum
 CREATE TYPE "BoardType" AS ENUM ('DEFAULT', 'PHASE');
 
 -- CreateEnum
@@ -12,9 +15,6 @@ CREATE TYPE "OpinionStatus" AS ENUM ('NEW', 'IN_PROGRESS', 'DONE', 'REJECTED');
 
 -- CreateEnum
 CREATE TYPE "TeamStatus" AS ENUM ('DOING', 'DONE');
-
--- CreateEnum
-CREATE TYPE "TypeToken" AS ENUM ('INVITE');
 
 -- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('UNSPECIFIED', 'MALE', 'FEMALE');
@@ -32,24 +32,54 @@ CREATE TABLE "Session" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Assessment" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "startDate" TIMESTAMP(3) NOT NULL,
+    "endDate" TIMESTAMP(3) NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "ownerId" TEXT NOT NULL,
+    "status" "AssessmentStatus" NOT NULL,
+
+    CONSTRAINT "Assessment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AssessmentOnCriteria" (
+    "assessmentId" TEXT NOT NULL,
+    "criteriaId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdBy" TEXT NOT NULL,
+
+    CONSTRAINT "AssessmentOnCriteria_pkey" PRIMARY KEY ("assessmentId","criteriaId")
+);
+
+-- CreateTable
+CREATE TABLE "Criteria" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+
+    CONSTRAINT "Criteria_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Team" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "ownerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
     "picture" TEXT NOT NULL,
     "isPublic" BOOLEAN NOT NULL DEFAULT true,
     "description" TEXT,
-    "selectedBoard" TEXT,
     "status" "TeamStatus" NOT NULL DEFAULT E'DOING',
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Team_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -72,7 +102,7 @@ CREATE TABLE "Board" (
     "currentPhase" "PhaseType" NOT NULL DEFAULT E'REFLECT',
     "endTime" TIMESTAMP(3),
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Board_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -89,7 +119,7 @@ CREATE TABLE "HealthCheck" (
     "isCustom" BOOLEAN NOT NULL,
     "status" "StatusHealthCheck" NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "HealthCheck_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -99,9 +129,9 @@ CREATE TABLE "MemberAnswer" (
     "healthCheckId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
+    "memberId" TEXT NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "MemberAnswer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -111,7 +141,7 @@ CREATE TABLE "Answer" (
     "value" TEXT NOT NULL,
     "memberAnswersId" TEXT,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Answer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -121,11 +151,11 @@ CREATE TABLE "MemberComment" (
     "healthCheckId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" TEXT NOT NULL,
+    "memberId" TEXT NOT NULL,
     "questionId" TEXT NOT NULL,
     "text" TEXT NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "MemberComment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -137,7 +167,7 @@ CREATE TABLE "Column" (
     "position" INTEGER NOT NULL,
     "boardId" TEXT NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Column_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -145,7 +175,6 @@ CREATE TABLE "Opinion" (
     "id" TEXT NOT NULL,
     "columnId" TEXT,
     "authorId" TEXT NOT NULL,
-    "memberId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "text" TEXT NOT NULL,
@@ -160,32 +189,19 @@ CREATE TABLE "Opinion" (
     "position" INTEGER NOT NULL,
     "status" "OpinionStatus" NOT NULL DEFAULT E'NEW',
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Opinion_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Remark" (
     "id" TEXT NOT NULL,
-    "memberId" TEXT NOT NULL,
     "authorId" TEXT NOT NULL,
     "opinionId" TEXT NOT NULL,
     "text" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "InviteLink" (
-    "id" TEXT NOT NULL,
-    "teamId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
-    "type" "TypeToken" NOT NULL DEFAULT E'INVITE',
-
-    PRIMARY KEY ("id")
+    CONSTRAINT "Remark_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -194,14 +210,15 @@ CREATE TABLE "Member" (
     "userId" TEXT NOT NULL,
     "teamId" TEXT NOT NULL,
     "isOwner" BOOLEAN NOT NULL DEFAULT false,
+    "isSuperOwner" BOOLEAN NOT NULL DEFAULT false,
     "isPendingInvitation" BOOLEAN NOT NULL DEFAULT false,
     "isGuess" BOOLEAN NOT NULL DEFAULT false,
+    "meetingNote" TEXT NOT NULL DEFAULT E'',
     "invitedBy" TEXT,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "role" TEXT,
-    "boardActive" TEXT,
+    "recentlyAt" TIMESTAMP(3) NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Member_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -213,7 +230,7 @@ CREATE TABLE "Notification" (
     "linkRedirect" TEXT,
     "isSeen" BOOLEAN NOT NULL,
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -224,119 +241,108 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "userStatus" "UserStatus" NOT NULL DEFAULT E'OFFLINE',
-    "name" VARCHAR(100) NOT NULL,
     "nickname" VARCHAR(150) NOT NULL,
     "picture" VARCHAR(500) NOT NULL,
-
-    PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "UserProfile" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "gender" "Gender" NOT NULL DEFAULT E'UNSPECIFIED',
     "workplace" VARCHAR(300),
     "address" VARCHAR(300),
     "school" VARCHAR(300),
     "introduction" VARCHAR(500),
     "talents" VARCHAR(500),
     "interests" VARCHAR(500),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "gender" "Gender" NOT NULL DEFAULT E'UNSPECIFIED',
 
-    PRIMARY KEY ("id")
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Session.userId_token_unique" ON "Session"("userId", "token");
+CREATE INDEX "Session_expiresAt_idx" ON "Session"("expiresAt");
 
 -- CreateIndex
-CREATE INDEX "Session.expiresAt_index" ON "Session"("expiresAt");
+CREATE UNIQUE INDEX "Session_userId_token_key" ON "Session"("userId", "token");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "HealthCheck.boardId_unique" ON "HealthCheck"("boardId");
+CREATE UNIQUE INDEX "Criteria_name_key" ON "Criteria"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MemberAnswer.healthCheckId_userId_unique" ON "MemberAnswer"("healthCheckId", "userId");
+CREATE UNIQUE INDEX "HealthCheck_boardId_key" ON "HealthCheck"("boardId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MemberComment.healthCheckId_questionId_userId_unique" ON "MemberComment"("healthCheckId", "questionId", "userId");
+CREATE UNIQUE INDEX "HealthCheck_teamId_boardId_key" ON "HealthCheck"("teamId", "boardId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Member.userId_teamId_unique" ON "Member"("userId", "teamId");
+CREATE UNIQUE INDEX "MemberAnswer_healthCheckId_memberId_key" ON "MemberAnswer"("healthCheckId", "memberId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
+CREATE UNIQUE INDEX "MemberComment_healthCheckId_questionId_memberId_key" ON "MemberComment"("healthCheckId", "questionId", "memberId");
 
 -- CreateIndex
-CREATE INDEX "User.email_index" ON "User"("email");
+CREATE UNIQUE INDEX "Member_userId_teamId_key" ON "Member"("userId", "teamId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserProfile.userId_unique" ON "UserProfile"("userId");
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE INDEX "User_email_idx" ON "User"("email");
 
 -- AddForeignKey
-ALTER TABLE "Session" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Team" ADD FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Assessment" ADD CONSTRAINT "Assessment_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Assessment" ADD CONSTRAINT "Assessment_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Member"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HealthCheck" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AssessmentOnCriteria" ADD CONSTRAINT "AssessmentOnCriteria_assessmentId_fkey" FOREIGN KEY ("assessmentId") REFERENCES "Assessment"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "HealthCheck" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AssessmentOnCriteria" ADD CONSTRAINT "AssessmentOnCriteria_criteriaId_fkey" FOREIGN KEY ("criteriaId") REFERENCES "Criteria"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MemberAnswer" ADD FOREIGN KEY ("healthCheckId") REFERENCES "HealthCheck"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Board" ADD CONSTRAINT "Board_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MemberAnswer" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "HealthCheck" ADD CONSTRAINT "HealthCheck_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Answer" ADD FOREIGN KEY ("memberAnswersId") REFERENCES "MemberAnswer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "HealthCheck" ADD CONSTRAINT "HealthCheck_boardId_fkey" FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MemberComment" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "MemberAnswer" ADD CONSTRAINT "MemberAnswer_healthCheckId_fkey" FOREIGN KEY ("healthCheckId") REFERENCES "HealthCheck"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MemberComment" ADD FOREIGN KEY ("healthCheckId") REFERENCES "HealthCheck"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "MemberAnswer" ADD CONSTRAINT "MemberAnswer_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Answer" ADD CONSTRAINT "Answer_memberAnswersId_fkey" FOREIGN KEY ("memberAnswersId") REFERENCES "MemberAnswer"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "MemberComment" ADD CONSTRAINT "MemberComment_healthCheckId_fkey" FOREIGN KEY ("healthCheckId") REFERENCES "HealthCheck"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Opinion" ADD FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "MemberComment" ADD CONSTRAINT "MemberComment_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Opinion" ADD FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Column" ADD CONSTRAINT "Column_boardId_fkey" FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Remark" ADD FOREIGN KEY ("opinionId") REFERENCES "Opinion"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Opinion" ADD CONSTRAINT "Opinion_columnId_fkey" FOREIGN KEY ("columnId") REFERENCES "Column"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Remark" ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Opinion" ADD CONSTRAINT "Opinion_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Remark" ADD FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Remark" ADD CONSTRAINT "Remark_opinionId_fkey" FOREIGN KEY ("opinionId") REFERENCES "Opinion"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "InviteLink" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Remark" ADD CONSTRAINT "Remark_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Member" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Member" ADD CONSTRAINT "Member_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Member" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Member" ADD CONSTRAINT "Member_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Notification" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UserProfile" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

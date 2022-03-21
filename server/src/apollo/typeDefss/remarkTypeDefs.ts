@@ -9,8 +9,7 @@ const typeDefs = gql`
     createdAt: String
     updatedAt: String
     opinion: Opinion
-    author: User
-    member: Member
+    author: Member
   }
 `;
 

@@ -7,31 +7,12 @@ import _, { now } from 'lodash';
 import error from '../errorsManagement';
 import { P } from 'pino';
 import { argsToArgsConfig } from 'graphql/type/definition';
+import { checkIsMemberOwningTeam, allowUpdatingBoard } from './essential';
 
-export const getListBoardOfTeam = async (teamId: string, userId?: string) => {
-  const where = userId
-    ? {
-        team: {
-          OR: [
-            {
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-            {
-              isPublic: true,
-            },
-          ],
-        },
-      }
-    : undefined;
-
+export const getListBoardOfTeam = async (teamId: string) => {
   const boards = await prisma.board.findMany({
     where: {
       teamId,
-      ...where,
     },
   });
 
@@ -136,33 +117,11 @@ export const createBoard = async (req: RequestWithUserInfo, args: createBoardTyp
     },
   });
 
-  await prisma.member.update({
-    where: {
-      userId_teamId: {
-        userId: meId,
-        teamId: args.teamId,
-      },
-    },
-    data: {
-      boardActive: board.id,
-    },
-  });
-
   return board;
 };
 
-export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardType) => {
-  const { id: meId } = req?.user;
-
-  const team = await prisma.team.findFirst({
-    where: {
-      id: args.teamId,
-      ownerId: meId,
-    },
-  });
-
-  // if (!team) throw new ApolloError('You dont have permission, or data not found', `${StatusCodes.FORBIDDEN}`);
-  !team && error.NotFound();
+export const updateBoard = async (meId: string, args: updateBoardType) => {
+  await checkIsMemberOwningTeam(args.teamId, meId);
 
   const board = await prisma.board.update({
     where: {
@@ -258,24 +217,15 @@ export const updateBoard = async (req: RequestWithUserInfo, args: updateBoardTyp
   return board;
 };
 
-export const deleteBoard = async (req: RequestWithUserInfo, args: deleteBoardType) => {
-  const { id: meId } = req?.user;
+export const deleteBoard = async (meId: string, args: deleteBoardType) => {
+  const memberOwnedTeam = await checkIsMemberOwningTeam(args.teamId, meId);
 
+  if (memberOwnedTeam?.team?.boards?.length <= 1) {
+    return error.METHOD_NOT_ALLOWED('Only have 1 board in this team, method delete not allowed');
+  }
   const deletingBoard = await prisma.board.delete({
     where: {
       id: args.boardId,
-    },
-  });
-
-  await prisma.member.update({
-    where: {
-      userId_teamId: {
-        userId: meId,
-        teamId: args?.teamId,
-      },
-    },
-    data: {
-      boardActive: null,
     },
   });
 

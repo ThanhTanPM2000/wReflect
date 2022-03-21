@@ -53,7 +53,6 @@ Table Criteria {
 Table Team {
   id String [pk]
   name String [not null]
-  ownerId String [not null]
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
@@ -63,7 +62,6 @@ Table Team {
   status TeamStatus [not null, default: 'DOING']
   members Member [not null]
   boards Board [not null]
-  owner User [not null]
   healthCheck HealthCheck [not null]
   assessment Assessment [not null]
 }
@@ -88,7 +86,7 @@ Table Board {
   endTime DateTime
   team Team [not null]
   columns Column [not null]
-  HealthCheck HealthCheck
+  healthCheck HealthCheck
 }
 
 Table HealthCheck {
@@ -107,6 +105,10 @@ Table HealthCheck {
   team Team [not null]
   memberAnswers MemberAnswer [not null]
   memberComments MemberComment [not null]
+
+  indexes {
+    (teamId, boardId) [unique]
+  }
 }
 
 Table MemberAnswer {
@@ -115,13 +117,13 @@ Table MemberAnswer {
   healthCheckId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  userId String [not null]
+  memberId String [not null]
   answers Answer [not null]
   healthCheck HealthCheck [not null]
-  user User [not null]
+  member Member [not null]
 
   indexes {
-    (healthCheckId, userId) [unique]
+    (healthCheckId, memberId) [unique]
   }
 }
 
@@ -139,14 +141,14 @@ Table MemberComment {
   healthCheckId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  userId String [not null]
+  memberId String [not null]
   questionId String [not null]
   text String [not null]
-  user User [not null]
+  member Member [not null]
   healthCheck HealthCheck [not null]
 
   indexes {
-    (healthCheckId, questionId, userId) [unique]
+    (healthCheckId, questionId, memberId) [unique]
   }
 }
 
@@ -165,7 +167,6 @@ Table Opinion {
   id String [pk]
   columnId String
   authorId String [not null]
-  memberId String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   text String [not null]
@@ -179,32 +180,20 @@ Table Opinion {
   color String [not null, default: 'pink']
   position Int [not null]
   status OpinionStatus [not null, default: 'NEW']
-  author User [not null]
-  member Member [not null]
+  author Member [not null]
   column Column
   remarks Remark [not null]
 }
 
 Table Remark {
   id String [pk]
-  memberId String [not null]
   authorId String [not null]
   opinionId String [not null]
   text String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   opinion Opinion [not null]
-  author User [not null]
-  member Member [not null]
-}
-
-Table InviteLink {
-  id String [pk]
-  teamId String [not null]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  expiresAt DateTime [not null]
-  type TypeToken [not null, default: 'INVITE']
+  author Member [not null]
 }
 
 Table Member {
@@ -212,17 +201,20 @@ Table Member {
   userId String [not null]
   teamId String [not null]
   isOwner Boolean [not null, default: false]
+  isSuperOwner Boolean [not null, default: false]
   isPendingInvitation Boolean [not null, default: false]
   isGuess Boolean [not null, default: false]
+  meetingNote String
   invitedBy String
   joinedAt DateTime [default: `now()`, not null]
-  role String
-  boardActive String
+  recentlyAt DateTime [not null]
   user User [not null]
   team Team [not null]
   opinions Opinion [not null]
   remarks Remark [not null]
   assessments Assessment [not null]
+  memberComments MemberComment [not null]
+  memberAnswers MemberAnswer [not null]
 
   indexes {
     (userId, teamId) [unique]
@@ -258,11 +250,6 @@ Table User {
   session Session [not null]
   members Member [not null]
   notification Notification [not null]
-  teams Team [not null]
-  opinions Opinion [not null]
-  remark Remark [not null]
-  memberAnswers MemberAnswer [not null]
-  memberComments MemberComment [not null]
 }
 
 Enum AssessmentStatus {
@@ -301,10 +288,6 @@ Enum TeamStatus {
   DONE
 }
 
-Enum TypeToken {
-  INVITE
-}
-
 Enum Gender {
   UNSPECIFIED
   MALE
@@ -326,8 +309,6 @@ Ref: AssessmentOnCriteria.assessmentId > Assessment.id
 
 Ref: AssessmentOnCriteria.criteriaId > Criteria.id
 
-Ref: Team.ownerId > User.id
-
 Ref: Board.teamId > Team.id
 
 Ref: HealthCheck.boardId - Board.id
@@ -336,27 +317,23 @@ Ref: HealthCheck.teamId > Team.id
 
 Ref: MemberAnswer.healthCheckId > HealthCheck.id
 
-Ref: MemberAnswer.userId > User.id
+Ref: MemberAnswer.memberId > Member.id
 
 Ref: Answer.memberAnswersId > MemberAnswer.id
 
-Ref: MemberComment.userId > User.id
+Ref: MemberComment.memberId > Member.id
 
 Ref: MemberComment.healthCheckId > HealthCheck.id
 
 Ref: Column.boardId > Board.id
 
-Ref: Opinion.authorId > User.id
-
-Ref: Opinion.memberId > Member.id
+Ref: Opinion.authorId > Member.id
 
 Ref: Opinion.columnId > Column.id
 
 Ref: Remark.opinionId > Opinion.id
 
-Ref: Remark.authorId > User.id
-
-Ref: Remark.memberId > Member.id
+Ref: Remark.authorId > Member.id
 
 Ref: Member.userId > User.id
 

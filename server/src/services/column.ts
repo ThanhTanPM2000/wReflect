@@ -1,6 +1,6 @@
 import error from './../errorsManagement';
 import prisma from '../prisma';
-import { isOwnedTeam } from './essential';
+import { checkIsMemberOwningTeam } from './essential';
 
 export const getListColumns = (boardId: string) => {
   const columns = prisma.column.findMany({
@@ -24,7 +24,7 @@ export const getColumn = async (columnId: string) => {
 };
 
 export const convert = async (teamId: string, boardId: string, columnId: string, userId: string, isAction: boolean) => {
-  await isOwnedTeam(teamId, userId);
+  await checkIsMemberOwningTeam(teamId, userId);
   const column = await prisma.column.update({
     where: {
       id: columnId,
@@ -47,8 +47,9 @@ export const convert = async (teamId: string, boardId: string, columnId: string,
 };
 
 export const emptyColumn = async (teamId: string, boardId: string, columnId: string, userId: string) => {
-  await isOwnedTeam(teamId, userId);
-  const column = await prisma.column.update({
+  await checkIsMemberOwningTeam(teamId, userId);
+
+  const columnWithDeletingOpinions = await prisma.column.update({
     where: {
       id: columnId,
     },
@@ -61,5 +62,5 @@ export const emptyColumn = async (teamId: string, boardId: string, columnId: str
     },
   });
 
-  return column;
+  return columnWithDeletingOpinions;
 };

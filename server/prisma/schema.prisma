@@ -20,7 +20,7 @@ model Session {
   data      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([userId, token])
   @@index([expiresAt])
@@ -67,7 +67,6 @@ enum AssessmentStatus {
 model Team {
   id          String        @id @default(uuid())
   name        String
-  ownerId     String
   createdAt   DateTime      @default(now())
   startDate   DateTime
   endDate     DateTime
@@ -77,7 +76,6 @@ model Team {
   status      TeamStatus    @default(DOING)
   members     Member[]
   boards      Board[]
-  owner       User          @relation(fields: [ownerId], references: [id])
   healthCheck HealthCheck[]
   assessment  Assessment[]
 }
@@ -102,7 +100,7 @@ model Board {
   endTime         DateTime?
   team            Team         @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   columns         Column[]
-  HealthCheck     HealthCheck?
+  healthCheck     HealthCheck?
 }
 
 model HealthCheck {
@@ -121,6 +119,8 @@ model HealthCheck {
   team           Team              @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   memberAnswers  MemberAnswer[]
   memberComments MemberComment[]
+
+  @@unique([teamId, boardId])
 }
 
 model MemberAnswer {
@@ -129,12 +129,12 @@ model MemberAnswer {
   healthCheckId String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  userId        String
+  memberId      String
   answers       Answer[]
   healthCheck   HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  member        Member      @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([healthCheckId, userId])
+  @@unique([healthCheckId, memberId])
 }
 
 model Answer {
@@ -151,13 +151,13 @@ model MemberComment {
   healthCheckId String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  userId        String
+  memberId      String
   questionId    String
   text          String
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  member        Member      @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   healthCheck   HealthCheck @relation(fields: [healthCheckId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([healthCheckId, questionId, userId])
+  @@unique([healthCheckId, questionId, memberId])
 }
 
 enum BoardType {
@@ -187,7 +187,6 @@ model Opinion {
   id            String        @id @default(uuid())
   columnId      String?
   authorId      String
-  memberId      String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   text          String
@@ -201,23 +200,20 @@ model Opinion {
   color         String        @default("pink")
   position      Int
   status        OpinionStatus @default(NEW)
-  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  member        Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  author        Member        @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   column        Column?       @relation(fields: [columnId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   remarks       Remark[]
 }
 
 model Remark {
   id        String   @id @default(uuid())
-  memberId  String
   authorId  String
   opinionId String
   text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   opinion   Opinion  @relation(fields: [opinionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author    Member   @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum StatusHealthCheck {
@@ -237,36 +233,26 @@ enum TeamStatus {
   DONE
 }
 
-model InviteLink {
-  id        String    @id @default(uuid())
-  teamId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  expiresAt DateTime
-  type      TypeToken @default(INVITE)
-}
-
-enum TypeToken {
-  INVITE
-}
-
 model Member {
-  id                  String    @id @default(uuid())
+  id                  String   @id @default(uuid())
   userId              String
   teamId              String
-  isOwner             Boolean   @default(false)
-  isPendingInvitation Boolean   @default(false)
-  isGuess             Boolean   @default(false)
+  isOwner             Boolean  @default(false)
+  isSuperOwner        Boolean  @default(false)
+  isPendingInvitation Boolean  @default(false)
+  isGuess             Boolean  @default(false)
+  meetingNote         String?
   invitedBy           String?
-  joinedAt            DateTime  @default(now())
-  role                String?
-  boardActive         String?
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  team                Team      @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  opinions            Opinion[]
-  remarks             Remark[]
+  joinedAt            DateTime @default(now())
+  recentlyAt          DateTime @updatedAt
 
-  assessments Assessment[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  team           Team            @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  opinions       Opinion[]
+  remarks        Remark[]
+  assessments    Assessment[]
+  memberComments MemberComment[]
+  memberAnswers  MemberAnswer[]
   @@unique([userId, teamId])
 }
 
@@ -281,30 +267,26 @@ model Notification {
 }
 
 model User {
-  id           String         @id @default(uuid())
-  email        String         @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  isAdmin      Boolean        @default(false)
-  userStatus   UserStatus     @default(OFFLINE)
-  nickname     String         @db.VarChar(150)
-  picture      String         @db.VarChar(500)
-  gender       Gender         @default(UNSPECIFIED)
-  workplace    String?        @db.VarChar(300)
-  address      String?        @db.VarChar(300)
-  school       String?        @db.VarChar(300)
-  introduction String?        @db.VarChar(500)
-  talents      String?        @db.VarChar(500)
-  interests    String?        @db.VarChar(500)
-  session      Session[]
-  members      Member[]
-  notification Notification[]
+  id           String     @id @default(uuid())
+  email        String     @unique
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  isAdmin      Boolean    @default(false)
+  userStatus   UserStatus @default(OFFLINE)
+  nickname     String     @db.VarChar(150)
+  picture      String     @db.VarChar(500)
+  gender       Gender     @default(UNSPECIFIED)
+  workplace    String?    @db.VarChar(300)
+  address      String?    @db.VarChar(300)
+  school       String?    @db.VarChar(300)
+  introduction String?    @db.VarChar(500)
+  talents      String?    @db.VarChar(500)
+  interests    String?    @db.VarChar(500)
 
-  teams          Team[]
-  opinions       Opinion[]
-  remark         Remark[]
-  memberAnswers  MemberAnswer[]
-  memberComments MemberComment[]
+  session Session[]
+  members Member[]
+
+  notification Notification[]
   @@index([email])
 }
 

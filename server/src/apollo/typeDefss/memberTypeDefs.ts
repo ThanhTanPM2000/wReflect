@@ -6,16 +6,20 @@ const typeDefs = gql`
     userId: String!
     teamId: String!
     isOwner: Boolean!
+    isSuperOwner: Boolean!
     isPendingInvitation: Boolean!
     isGuess: Boolean!
+    meetingNote: String
     invitedBy: String
     joinedAt: String!
-    role: String
+
     user: User
     team: Team
-
     opinions: [Opinion]
     remarks: [Remark]
+    assessments: [Assessment]
+    memberComments: [MemberComment]
+    memberAnswers: [MemberAnswer]
   }
 `;
 

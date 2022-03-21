@@ -2,9 +2,11 @@ import { StatusCodes } from 'http-status-codes';
 import config from '../config';
 import prisma from './../prisma';
 import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
-import { Team, TeamStatus } from '@prisma/client';
+import { Team, TeamStatus, Member } from '@prisma/client';
 import { errorName } from '../constant/errorsConstant';
 import { ForbiddenError, ApolloError } from 'apollo-server-errors';
+import { checkIsMemberOwningTeam } from './essential';
+import error from '../errorsManagement';
 
 export const getTeams = async (
   isGettingAll = false,
@@ -41,10 +43,12 @@ export const getTeams = async (
     },
     ...(!isGettingAll && { skip: (page - 1) * size }),
     ...(!isGettingAll && { take: size }),
-    orderBy: { createdAt: 'desc' },
-
+    orderBy: {
+      createdAt: 'desc',
+    },
     include: {
       boards: true,
+      members: true,
     },
   });
 
@@ -73,44 +77,35 @@ export const getTeams = async (
   };
 };
 
-export const getOwnedTeams = async (isGettingAll = false, page = 1, size = 8, search = '', userId: string) => {
-  const ownedTeams = await prisma.team.findMany({
+export const getMyTeams = async (isGettingAll = false, page = 1, size = 8, search = '', meId: string) => {
+  const myTeams = await prisma.team.findMany({
     where: {
-      ownerId: userId,
-
-      AND: [
-        {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
+      members: {
+        some: {
+          userId: meId,
         },
-      ],
+      },
+      name: {
+        contains: search,
+        mode: 'insensitive',
+      },
     },
     ...(!isGettingAll && { skip: (page - 1) * size }),
     ...(!isGettingAll && { take: size }),
     orderBy: { createdAt: 'desc' },
-    include: {
-      owner: true,
-    },
   });
 
   const total = await prisma.team.count({
     where: {
-      ownerId: userId,
-      AND: [
-        {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-      ],
+      name: {
+        contains: search,
+        mode: 'insensitive',
+      },
     },
   });
 
   return {
-    data: ownedTeams,
+    data: myTeams,
     total,
     page,
     size,
@@ -125,6 +120,13 @@ export const getTeam = async (teamId: string, userId?: string) => {
             isPublic: true,
           },
           {
+            boards: {
+              some: {
+                isPublic: true,
+              },
+            },
+          },
+          {
             members: {
               some: {
                 userId,
@@ -137,10 +139,11 @@ export const getTeam = async (teamId: string, userId?: string) => {
 
   const team = await prisma.team.findFirst({
     where: {
-      ...where,
       id: teamId,
+      ...where,
     },
   });
+  if (!team) return error.NotFound();
 
   return team;
 };
@@ -157,7 +160,6 @@ export const createTeam = async (req: RequestWithUserInfo, data: createTeamType)
       ...data,
       startDate,
       endDate,
-      ownerId: meId,
       boards: {
         create: {
           createdBy: meId,
@@ -197,7 +199,7 @@ export const createTeam = async (req: RequestWithUserInfo, data: createTeamType)
       },
       members: {
         create: {
-          isOwner: true,
+          isSuperOwner: true,
           userId: meId,
         },
       },
@@ -240,24 +242,19 @@ export const updateTeam = async (req: RequestWithUserInfo, data: updateTeamType)
   return team[0];
 };
 
-export const changeTeamAccess = async (req: RequestWithUserInfo, teamId: string, isPublic: boolean) => {
-  const { id: meId } = req?.user;
-  const team = await prisma.team.updateMany({
+export const changeTeamAccess = async (meId: string, teamId: string, isPublic: boolean) => {
+  await checkIsMemberOwningTeam(teamId, meId);
+
+  const team = await prisma.team.update({
     where: {
       id: teamId,
-      members: {
-        some: {
-          userId: meId,
-          isOwner: true,
-        },
-      },
     },
     data: {
       isPublic: isPublic,
     },
   });
 
-  if (!team) throw new ApolloError("You don't have permission for this request", `${StatusCodes.FORBIDDEN}`);
+  if (!team) return error.NotFound();
   return team;
 };
 

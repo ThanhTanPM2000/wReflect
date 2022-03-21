@@ -1,4 +1,4 @@
-import { isOwnedOpinion, isMembersOfTeam, isAllowUpdateBoard } from './essential';
+import { checkIsMemberOfTeam, allowUpdatingBoard } from './essential';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 import prisma from '../prisma';
@@ -11,7 +11,7 @@ import {
 } from '../apollo/typeDefss/opinionTypeDefs';
 import { RequestWithUserInfo } from '../types';
 import error from '../errorsManagement';
-import { user } from '.';
+import { member, user } from '.';
 
 export const getListOpinions = (columnId: string) => {
   const opinions = prisma.opinion.findMany({
@@ -35,15 +35,9 @@ export const getOpinion = async (opinionId: string) => {
   return opinion;
 };
 
-export const createOpinion = async (req: RequestWithUserInfo, args: createOpinionType) => {
-  const { id: meId, email } = req?.user;
-
-  await isMembersOfTeam(args.teamId, meId);
-  await isAllowUpdateBoard(args.boardId, meId);
-
-  const currentUser = await user.getUser(meId);
-  if (!currentUser) {
-  }
+export const createOpinion = async (meId: string, args: createOpinionType) => {
+  const member = await checkIsMemberOfTeam(args.teamId, meId);
+  await allowUpdatingBoard(member, args.boardId);
 
   const max = await prisma.opinion.aggregate({
     where: {
@@ -71,10 +65,6 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
         },
       };
 
-  const memberId = currentUser?.members.find((member) => member.teamId === args.teamId)?.id;
-  // const memberId = currentUser.members.find((member) => member.teamId === args.teamId)?.id;
-  if (!memberId) return error.Forbidden();
-
   const myBoard = await prisma.column.update({
     where: {
       id: args.columnId,
@@ -85,9 +75,8 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
         create: {
           text: args.text,
           isAction: args.isAction,
-          memberId: memberId,
-          authorId: meId,
-          updatedBy: email,
+          authorId: member.id,
+          updatedBy: member.id,
           position:
             (max?._max?.position || max?._max?.position == 0) && args.isCreateBottom ? max._max.position + 1 : 0,
         },
@@ -125,7 +114,7 @@ export const createOpinion = async (req: RequestWithUserInfo, args: createOpinio
 };
 
 export const updateOpinion = async (teamId: string, userId: string, args: updateOpinionType) => {
-  await isOwnedOpinion(args.opinionId, userId);
+  // await isOwnedOpinion(args.opinionId, userId);
 
   const opinion = await prisma.opinion.update({
     where: {

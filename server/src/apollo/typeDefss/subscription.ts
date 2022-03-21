@@ -6,10 +6,14 @@ const typeDefs = gql`
   }
 
   type Subscription {
-    updateListTeams(meId: ID!): statusRequest
+    subOnUpdateTeams(meId: ID!): statusRequest
+    subOnUpdateTeam(meId: ID!): Team
+
     updateBoard(meId: ID!, boardId: ID!): Board
     deleteBoard(meId: ID!): Board
-    convertColumn(meId: ID!): Column
+
+    subOnUpdateColumn(meId: ID!): Column
+
     updateOpinion(meId: ID!): Opinion
 
     updateGetHealthCheckData(boardId: String!, meId: ID!): getHealthCheck

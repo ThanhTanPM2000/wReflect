@@ -5,7 +5,6 @@ const typeDefs = gql`
   type Opinion {
     id: ID
     columnId: String
-    memberId: String
     authorId: String
     createdAt: String
     updatedAt: String
@@ -18,10 +17,9 @@ const typeDefs = gql`
     responsible: String
     mergedAuthors: [String]
     color: String
-    status: OpinionStatus
-    author: User
-    member: Member
     position: Int
+    status: OpinionStatus
+    author: Member
     column(meId: ID): Column
     remarks: [Remark]
   }

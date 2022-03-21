@@ -15,19 +15,15 @@ const typeDefs = gql`
     userStatus: UserStatus
     nickname: String
     picture: String!
+    gender: Gender
     workplace: String
     address: String
     school: String
     introduction: String
     talent: String
     interest: String
-    gender: Gender
+
     members: [Member]
-    teams: [Team]
-    opinions: [Opinion]
-    remark: [Remark]
-    memberAnswers: [MemberAnswer]
-    memberComments: [MemberComment]
   }
 `;
 

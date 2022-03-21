@@ -1,10 +1,7 @@
-import { getHealthCheck } from './../../services/healthcheck';
-import { orderOpinion } from './../../services/opinion';
-import { Remark, Opinion, Board, HealthCheck } from '@prisma/client';
-import { orderOpinionType } from './opinionTypeDefs';
 import { gql } from 'apollo-server-express';
 const typeDefs = gql`
   type AddMembersMutationResponse {
+    team: Team
     success: [String]
     warnings: [String]
     errors: [String]
@@ -61,6 +58,8 @@ const typeDefs = gql`
   }
 
   type Mutation {
+    updateMeetingNote(teamId: String!, meetingNote: String!): Member
+
     createTeam(
       name: String!
       description: String
@@ -82,7 +81,7 @@ const typeDefs = gql`
     ): Team
 
     deleteTeam(teamId: String!): BatchPayload
-    changeTeamAccess(teamId: String!, isPublic: Boolean!): BatchPayload
+    changeTeamAccess(teamId: String!, isPublic: Boolean!): Team
 
     startSurveyHealthCheck(
       teamId: String!
@@ -199,8 +198,8 @@ const typeDefs = gql`
     removeRemark(teamId: String!, boardId: String!, columnId: String!, opinionId: String!, remarkId: String!): Opinion
 
     addMembers(emailUsers: [String!], teamId: String!): AddMembersMutationResponse
-    removeMember(memberId: String!): BatchPayload
-    changeRoleMember(memberId: String!, teamId: String!, isOwner: Boolean!): Member
+    removeMember(memberId: String!, teamId: String!): Team
+    changeRoleMember(memberId: String!, teamId: String!, isOwner: Boolean!): Team
   }
 `;
 

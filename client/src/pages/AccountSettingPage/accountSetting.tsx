@@ -6,7 +6,7 @@ import { UserMutations } from '../../grapql-client/mutations';
 import SelfContext from '../../contexts/selfContext';
 
 import { user } from '../../apis';
-import { Avatar, Tabs, Button, Dropdown, Menu } from 'antd';
+import { Avatar, Tabs, Button, Dropdown, Menu, notification } from 'antd';
 import moment from 'moment';
 import OwnedTeams from './ownedTeams';
 
@@ -18,10 +18,17 @@ type Props = {
 
 const AccountSetting = ({ userId }: Props) => {
   const me = useContext(SelfContext);
-  const [updateAcctount] = useMutation(UserMutations.updateUser, {});
+  const [updateAccount] = useMutation(UserMutations.updateUser, {
+    onError: (error) => {
+      notification.error({
+        message: error?.message,
+        placement: "bottomRight"
+      });
+    },
+  });
 
   const handleFinish = (values: any) => {
-    updateAcctount({ variables: { picture: values['email'] } });
+    updateAccount({ variables: { picture: values['email'] } });
     user.me();
   };
 

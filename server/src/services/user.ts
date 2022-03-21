@@ -1,17 +1,44 @@
+import { update } from 'lodash';
 import { errorName } from '../constant/errorsConstant';
 import prisma from '../prisma';
 import logger from '../logger';
+import { pubsub } from '../pubSub';
 
 export const findOrCreateUserByEmail = async (email: string, picture: string, name, nickname: string) => {
   try {
+    const findUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+      include: {
+        members: true,
+      },
+    });
+
+    const updateData =
+      findUser && findUser.nickname === 'UnRegistered' && findUser.members[0].isPendingInvitation
+        ? {
+            nickname,
+            picture,
+            members: {
+              updateMany: {
+                where: {
+                  userId: findUser.id,
+                },
+                data: {
+                  isPendingInvitation: false,
+                },
+              },
+            },
+          }
+        : undefined;
+
     const user = await prisma.user.upsert({
       where: { email },
       update: {
         email,
         userStatus: 'ONLINE',
-        // nickname,
-        // name,
-        // picture,
+        ...updateData,
       },
       create: {
         email,
@@ -20,6 +47,15 @@ export const findOrCreateUserByEmail = async (email: string, picture: string, na
         nickname,
       },
     });
+
+    // if (updateData) {
+    //   const team = prisma.team.find
+
+    //   pubsub.publish('ADD_MEMBER', {
+    //     subOnUpdateTeam: ,
+    //   });
+    // }
+
     return user;
   } catch (error) {
     logger.info('Error in findOrCreateUserByEmail');
@@ -75,7 +111,6 @@ export const getUser = async (userId: string) => {
       },
       include: {
         members: true,
-        teams: true,
       },
     });
     // if (!user) throw new Error(errorName.NOTFOUND);

@@ -13,7 +13,6 @@ const typeDefs = gql`
     status: TeamStatus
     members: [Member]
     boards(meId: ID): [Board]
-    owner: User
     healthCheck: [HealthCheck]
     assessment: [Assessment]
   }

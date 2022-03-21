@@ -5,7 +5,7 @@ import {
   reopenHealthCheckArgs,
 } from './../apollo/typeDefss/healthCheckTypeDefs';
 import prisma from '../prisma';
-import { isOwnedTeam } from './essential';
+import { checkIsMemberOwningTeam, checkIsMemberOfTeam } from './essential';
 
 export const getHealthCheck = async (teamId: string, boardId: string) => {
   const healthCheck = await prisma.healthCheck.findFirst({
@@ -17,12 +17,12 @@ export const getHealthCheck = async (teamId: string, boardId: string) => {
       memberAnswers: {
         include: {
           answers: true,
-          user: true,
+          member: true,
         },
       },
       memberComments: {
         include: {
-          user: true,
+          member: true,
         },
       },
     },
@@ -50,12 +50,12 @@ export const createHealthCheck = async (userId: string, args: startSurveyArgs) =
       memberAnswers: {
         include: {
           answers: true,
-          user: true,
+          member: true,
         },
       },
       memberComments: {
         include: {
-          user: true,
+          member: true,
         },
       },
     },
@@ -69,9 +69,11 @@ export const createHealthCheck = async (userId: string, args: startSurveyArgs) =
 };
 
 export const setAnswerHealthCheck = async (userId: string, args: answerHealthCheckArgs) => {
+  const member = await checkIsMemberOfTeam(args.teamId, userId);
+
   const createManyMemberComments = args.comments.map((comment) => {
     return {
-      userId,
+      memberId: member.id,
       templateId: args.templateId,
       questionId: comment.questionId,
       text: comment.text,
@@ -85,7 +87,7 @@ export const setAnswerHealthCheck = async (userId: string, args: answerHealthChe
     data: {
       memberAnswers: {
         create: {
-          userId,
+          memberId: member.id,
           templateId: args.templateId,
           answers: {
             createMany: {
@@ -104,12 +106,12 @@ export const setAnswerHealthCheck = async (userId: string, args: answerHealthChe
       memberAnswers: {
         include: {
           answers: true,
-          user: true,
+          member: true,
         },
       },
       memberComments: {
         include: {
-          user: true,
+          member: true,
         },
       },
     },
@@ -123,7 +125,7 @@ export const setAnswerHealthCheck = async (userId: string, args: answerHealthChe
 };
 
 export const reopenHealthCheck = async (userId: string, args: reopenHealthCheckArgs) => {
-  isOwnedTeam(userId, args.teamId);
+  checkIsMemberOwningTeam(userId, args.teamId);
 
   const healthCheck = await prisma.healthCheck.delete({
     where: {
@@ -133,12 +135,12 @@ export const reopenHealthCheck = async (userId: string, args: reopenHealthCheckA
       memberAnswers: {
         include: {
           answers: true,
-          user: true,
+          member: true,
         },
       },
       memberComments: {
         include: {
-          user: true,
+          member: true,
         },
       },
     },

@@ -1,96 +1,124 @@
 import prisma from './../prisma';
 import error from '../errorsManagement';
+import { Member, User } from '@prisma/client';
 
-export const isMembersOfTeam = async (teamId: string, userId: string) => {
-  const team = await prisma.team.findFirst({
+export const checkIsMemberOfTeam = async (teamId: string, userId: string) => {
+  const member = await prisma.member.findUnique({
     where: {
-      id: teamId,
-      members: {
-        some: {
-          userId,
-        },
+      userId_teamId: {
+        userId,
+        teamId,
       },
+    },
+    include: {
+      user: true,
+      team: true,
     },
   });
 
-  !team && error.Forbidden();
+  if (!member) {
+    return error.NotFound();
+  }
+  return member;
 };
 
-export const isAllowUpdateBoard = async (boardId: string, userId: string) => {
+export const allowUpdatingBoard = async (member: Member & { user: User }, boardId: string) => {
+  const where =
+    member.isSuperOwner || member.isOwner
+      ? undefined
+      : {
+          isLocked: false,
+        };
   const board = await prisma.board.findFirst({
     where: {
-      isLocked: false,
       id: boardId,
-      team: {
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
+      ...where,
     },
   });
 
-  !board && error.Forbidden();
+  if (!board) {
+    return error.HandleError(member);
+  }
+  return board;
 };
 
-export const isOwnedTeam = async (teamId: string, userId: string) => {
-  const team = await prisma.team.findFirst({
+export const checkIsMemberOwningTeam = async (teamId: string, meId: string) => {
+  const memberOwnedTeam = await prisma.member.findFirst({
     where: {
-      id: teamId,
-      members: {
-        some: {
-          userId,
-          isOwner: true,
-        },
-      },
-    },
-  });
-
-  !team && error.Forbidden();
-};
-
-export const isOwnedOpinion = async (opinionId: string, userId: string) => {
-  const opinion = await prisma.opinion.findFirst({
-    where: {
-      id: opinionId,
+      teamId,
+      userId: meId,
       OR: [
         {
-          responsible: {
-            equals: 'not-assigned',
-          },
-          column: {
-            board: {
-              team: {
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            },
-          },
+          isOwner: true,
         },
         {
-          responsible: userId,
-        },
-        {
-          column: {
-            board: {
-              team: {
-                members: {
-                  some: {
-                    userId,
-                    isOwner: true,
-                  },
-                },
-              },
-            },
-          },
+          isSuperOwner: true,
         },
       ],
     },
+    include: {
+      user: true,
+      team: {
+        include: {
+          boards: true,
+        },
+      },
+    },
   });
 
-  !opinion && error.Forbidden();
+  if (!memberOwnedTeam) return error.Forbidden();
+  return memberOwnedTeam;
+};
+
+export const allowUpdatingOpinion = async (member: Member & { user: User }, opinionId: string) => {
+  const where =
+    member.isOwner || member.isSuperOwner
+      ? undefined
+      : {
+          OR: [
+            {
+              authorId: member.id,
+            },
+            {
+              isAction: true,
+              responsible: {
+                in: ['not-responsible', member.id],
+              },
+            },
+          ],
+        };
+
+  const opinion = await prisma.opinion.findFirst({
+    where: {
+      id: opinionId,
+      ...where,
+    },
+  });
+
+  if (!opinion) {
+    return error.HandleError(member);
+  }
+  return opinion;
+};
+
+export const allowUpdatingRemark = async (member: Member & { user: User }, remarkId: string) => {
+  const where =
+    member.isSuperOwner || member.isOwner
+      ? undefined
+      : {
+          authorId: member.id,
+        };
+
+  const remark = await prisma.remark.findFirst({
+    where: {
+      id: remarkId,
+      ...where,
+    },
+  });
+
+  if (!remark) {
+    return error.HandleError(member);
+  }
+
+  return remark;
 };
