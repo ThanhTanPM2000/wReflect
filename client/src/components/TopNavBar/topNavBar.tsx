@@ -81,13 +81,11 @@ const TopNavBar = ({ title, iMember, team, boardId }: Props) => {
   };
 
   const boardOptions = () => {
-    return team?.boards
-      ?.filter((board) => !board.isLocked)
-      ?.map((board) => (
-        <Option key={board.id} value={board.id}>
-          {board.title}
-        </Option>
-      ));
+    return team?.boards?.map((board) => (
+      <Option key={board.id} value={board.id}>
+        {board.title}
+      </Option>
+    ));
   };
 
   const handleRenderExtra = () => {

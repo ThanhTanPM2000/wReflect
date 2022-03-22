@@ -207,7 +207,6 @@ Table Member {
   meetingNote String
   invitedBy String
   joinedAt DateTime [default: `now()`, not null]
-  recentlyAt DateTime [not null]
   user User [not null]
   team Team [not null]
   opinions Opinion [not null]

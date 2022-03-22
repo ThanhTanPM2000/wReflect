@@ -542,21 +542,23 @@ export default function OpinionComponent({
               </>
             )}
 
-            <div className="remarks">
-              <Badge size="small" count={opinion.remarks.length} showZero={false}>
-                {opinion.remarks.length > 0 ? (
-                  <MessageFilled
-                    onClick={() => setIsOpenRemark(true)}
-                    style={{ fontSize: '20px', cursor: 'pointer' }}
-                  />
-                ) : (
-                  <MessageOutlined
-                    onClick={() => setIsOpenRemark(true)}
-                    style={{ fontSize: '20px', cursor: 'pointer' }}
-                  />
-                )}
-              </Badge>
-            </div>
+            {board.currentPhase == 'DISCUSS' && (
+              <div className="remarks">
+                <Badge size="small" count={opinion.remarks.length} showZero={false}>
+                  {opinion.remarks.length > 0 ? (
+                    <MessageFilled
+                      onClick={() => setIsOpenRemark(true)}
+                      style={{ fontSize: '20px', cursor: 'pointer' }}
+                    />
+                  ) : (
+                    <MessageOutlined
+                      onClick={() => setIsOpenRemark(true)}
+                      style={{ fontSize: '20px', cursor: 'pointer' }}
+                    />
+                  )}
+                </Badge>
+              </div>
+            )}
           </div>
           <Remark
             iMember={iMember}

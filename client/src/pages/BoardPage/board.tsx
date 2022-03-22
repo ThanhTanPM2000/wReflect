@@ -297,12 +297,12 @@ export default function board({ teamId, boardId }: Props) {
                           Reset All Votes
                         </a>
                       </li> */}
-                      <li>
+                      {/* <li>
                         <StarOutlined className="boardPanelIcon " />
                         <a className="addBoard" onClick={() => setIsCreateModalVisible(true)}>
                           Show Bookmarks
                         </a>
-                      </li>
+                      </li> */}
                       <li>
                         <SnippetsOutlined className="boardPanelIcon " />
                         <a className="addBoard" onClick={() => setIsVisibleMeetingNote(true)}>

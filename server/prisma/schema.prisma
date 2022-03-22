@@ -234,25 +234,24 @@ enum TeamStatus {
 }
 
 model Member {
-  id                  String   @id @default(uuid())
+  id                  String          @id @default(uuid())
   userId              String
   teamId              String
-  isOwner             Boolean  @default(false)
-  isSuperOwner        Boolean  @default(false)
-  isPendingInvitation Boolean  @default(false)
-  isGuess             Boolean  @default(false)
+  isOwner             Boolean         @default(false)
+  isSuperOwner        Boolean         @default(false)
+  isPendingInvitation Boolean         @default(false)
+  isGuess             Boolean         @default(false)
   meetingNote         String?
   invitedBy           String?
-  joinedAt            DateTime @default(now())
-  recentlyAt          DateTime @updatedAt
+  joinedAt            DateTime        @default(now())
+  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  team                Team            @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  opinions            Opinion[]
+  remarks             Remark[]
+  assessments         Assessment[]
+  memberComments      MemberComment[]
+  memberAnswers       MemberAnswer[]
 
-  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  team           Team            @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  opinions       Opinion[]
-  remarks        Remark[]
-  assessments    Assessment[]
-  memberComments MemberComment[]
-  memberAnswers  MemberAnswer[]
   @@unique([userId, teamId])
 }
 
