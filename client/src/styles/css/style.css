@@ -947,6 +947,11 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     font-family: "Baloo Bhai";
     font-size: 23px; }
 
+.modal-userguide {
+  width: 1000px !important; }
+  .modal-userguide .ant-modal-footer .ant-btn-primary {
+    display: none; }
+
 .topNavBar {
   inset: 0 0 auto 0;
     inset-position: absolute;
