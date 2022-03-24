@@ -1,3 +1,4 @@
+import { MEMBER_FIELDS } from './../fragments/memberFragment';
 import { gql } from '@apollo/client';
 import { HealthCheck, MemberAnswer, MemberComment } from '../../types';
 
@@ -17,17 +18,18 @@ export type reopenHealthCheckVars = {
 };
 
 export const updateGetHealthCheckData = gql`
+  ${MEMBER_FIELDS}
   subscription UpdateGetHealthCheckData($meId: ID!, $boardId: String!) {
     updateGetHealthCheckData(meId: $meId, boardId: $boardId) {
       memberAnswers {
         id
         templateId
         updatedAt
-        userId
         createdAt
         healthCheckId
-        user {
-          email
+        memberId
+        member {
+          ...MemberFields
         }
         answers {
           questionId
@@ -40,11 +42,11 @@ export const updateGetHealthCheckData = gql`
         healthCheckId
         createdAt
         updatedAt
-        userId
+        memberId
         questionId
         text
-        user {
-          email
+        member {
+          ...MemberFields
         }
       }
       healthCheck {

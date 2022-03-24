@@ -107,27 +107,29 @@ const resolvers = {
     //   return await team.changeCurrentBoard
     // },
     createBoard: async (_, args: createBoardType, { req }: { req: RequestWithUserInfo }) => {
-      const myBoard = await board.createBoard(req, args);
+      const { id: meId } = req?.user || {};
+      const team = await board.createBoard(meId, args);
       pubsub.publish('CREATE_BOARD', {
-        updateBoard: myBoard,
+        subOnUpdateTeam: team,
       });
-      return myBoard;
+      return team;
     },
     updateBoard: async (_, args: updateBoardType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};
       const myBoard = await board.updateBoard(meId, args);
       pubsub.publish('UPDATE_BOARD', {
         updateBoard: myBoard,
+        teamId: args.teamId,
       });
       return myBoard;
     },
     deleteBoard: async (_, args: deleteBoardType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req.user || {};
-      const deletingBoard = await board.deleteBoard(meId, args);
+      const team = await board.deleteBoard(meId, args);
       pubsub.publish('DELETE_BOARD', {
-        deleteBoard: deletingBoard,
+        subOnUpdateTeam: team,
       });
-      return deletingBoard;
+      return team;
     },
     convertOpinionsInColumn: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};
@@ -189,16 +191,12 @@ const resolvers = {
     createOpinion: async (_, args: createOpinionType, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req.user;
 
-      const data = await opinion.createOpinion(meId, args);
+      const columnContaintCreatingOpinion = await opinion.createOpinion(meId, args);
 
-      const array = ['test', 'test2'];
-      const anotherArr = ['test3', 'test4'];
-      anotherArr.push(...array);
-
-      pubsub.publish('UPDATE_BOARD', {
-        updateBoard: data?.board,
+      pubsub.publish('CREATE_OPINION', {
+        subOnUpdateColumn: columnContaintCreatingOpinion,
       });
-      return data?.board;
+      return columnContaintCreatingOpinion;
     },
 
     updateOpinion: async (_, args: updateOpinionType, { req }: { req: RequestWithUserInfo }) => {
@@ -210,9 +208,10 @@ const resolvers = {
       return myOpinion;
     },
     removeOpinion: async (_, args: removeOpinionType, { req }: { req: RequestWithUserInfo }) => {
-      const board = await opinion.removeOpinion(req, args);
-      pubsub.publish('UPDATE_BOARD', {
-        updateBoard: board,
+      const { id: meId } = req?.user || {};
+      const column = await opinion.removeOpinion(meId, args);
+      pubsub.publish('REMOVE_OPINION', {
+        subOnUpdateColumn: column,
       });
       return board;
     },
@@ -268,7 +267,15 @@ const resolvers = {
     },
     subOnUpdateTeam: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(['UPDATE_TEAM', 'ADD_MEMBER', 'CHANGE_MEMBER_ROLE', 'REMOVE_MEMBER']),
+        () =>
+          pubsub.asyncIterator([
+            'UPDATE_TEAM',
+            'ADD_MEMBER',
+            'CHANGE_MEMBER_ROLE',
+            'REMOVE_MEMBER',
+            'CREATE_BOARD',
+            'DELETE_BOARD',
+          ]),
         (_, args) => {
           return true;
         },
@@ -277,19 +284,19 @@ const resolvers = {
     updateBoard: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(['CREATE_BOARD', 'UPDATE_BOARD', 'ORDER_OPINION']),
-        (_, args) => {
-          return true;
+        (_, args, a) => {
+          return _.teamId === args?.teamId;
         },
       ),
     },
-    deleteBoard: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(['DELETE_BOARD']),
-        (_, args) => {
-          return true;
-        },
-      ),
-    },
+    // deleteBoard: {
+    //   subscribe: withFilter(
+    //     () => pubsub.asyncIterator(['DELETE_BOARD']),
+    //     (_, args) => {
+    //       return true;
+    //     },
+    //   ),
+    // },
 
     updateGetHealthCheckData: {
       subscribe: withFilter(
@@ -302,7 +309,7 @@ const resolvers = {
 
     subOnUpdateColumn: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(['CONVERT_COLUMN', 'EMPTY_COLUMN']),
+        () => pubsub.asyncIterator(['CREATE_OPINION', 'REMOVE_OPINION', 'CONVERT_COLUMN', 'EMPTY_COLUMN']),
         (_, args) => {
           return true;
         },

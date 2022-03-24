@@ -60,7 +60,7 @@ export default function board({ teamId, boardId }: Props) {
       variables: {
         teamId,
       },
-      fetchPolicy: 'network-only', // Used for first execution
+      fetchPolicy: 'cache-and-network', // Used for first execution
       nextFetchPolicy: 'cache-only',
       onCompleted: (data) => {
         setBoard(data?.team?.boards?.find((board) => board?.id === boardId) || null);
@@ -199,6 +199,8 @@ export default function board({ teamId, boardId }: Props) {
 
       orderOpinion({
         variables: {
+          teamId: data?.team?.id,
+          boardId: board.id,
           destination: result?.destination,
           source: result?.source,
           draggableId: result?.draggableId,
@@ -378,6 +380,13 @@ export default function board({ teamId, boardId }: Props) {
                                     timerInProgress: false,
                                   },
                                 });
+                              else {
+                                notification.warning({
+                                  message: 'Permission denied',
+                                  description: 'Only Super Owner and Owners can change stage of Wreflect process.',
+                                  placement: 'bottomRight',
+                                });
+                              }
                             }}
                           >
                             <BulbOutlined />
@@ -398,6 +407,13 @@ export default function board({ teamId, boardId }: Props) {
                                     timerInProgress: false,
                                   },
                                 });
+                              else {
+                                notification.warning({
+                                  message: 'Permission denied',
+                                  description: 'Only Super Owner and Owners can change stage of Wreflect process.',
+                                  placement: 'bottomRight',
+                                });
+                              }
                             }}
                           >
                             <UngroupOutlined />
@@ -418,6 +434,13 @@ export default function board({ teamId, boardId }: Props) {
                                     timerInProgress: false,
                                   },
                                 });
+                              else {
+                                notification.warning({
+                                  message: 'Permission denied',
+                                  description: 'Only Super Owner and Owners can change stage of Wreflect process.',
+                                  placement: 'bottomRight',
+                                });
+                              }
                             }}
                           >
                             <LikeOutlined />
@@ -438,13 +461,20 @@ export default function board({ teamId, boardId }: Props) {
                                     timerInProgress: false,
                                   },
                                 });
+                              else {
+                                notification.warning({
+                                  message: 'Permission denied',
+                                  description: 'Only Admin can change stage of Wreflect process.',
+                                  placement: 'bottomRight',
+                                });
+                              }
                             }}
                           >
                             <MessageOutlined />
                             Discuss
                           </div>
                         </div>
-                        {(iMember.isOwner || iMember.isSuperOwner) && (
+                        {(iMember?.isOwner || iMember?.isSuperOwner) && (
                           <>
                             {board.currentPhase === 'DISCUSS' ? (
                               <div
@@ -459,6 +489,13 @@ export default function board({ teamId, boardId }: Props) {
                                         isLocked: true,
                                       },
                                     });
+                                  else {
+                                    notification.warning({
+                                      message: 'Permission denied',
+                                      description: 'Only Admin can change stage of Wreflect process.',
+                                      placement: 'bottomRight',
+                                    });
+                                  }
                                 }}
                               >
                                 <>

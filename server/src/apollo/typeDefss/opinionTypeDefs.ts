@@ -63,6 +63,8 @@ export type removeOpinionType = {
 };
 
 export type orderOpinionType = {
+  teamId: string;
+  boardId: string;
   destination: {
     droppableId: string;
     index: number;

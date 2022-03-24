@@ -26,12 +26,13 @@ export type subOnUpdateTeamResult = {
 
 export type subOnUpdateTeamVars = {
   meId: string;
+  teamId: string;
 };
 
 export const subOnUpdateTeam = gql`
   ${TEAM_FIELDS}
-  subscription subOnUpdateTeam($meId: ID!) {
-    subOnUpdateTeam(meId: $meId) {
+  subscription subOnUpdateTeam($meId: ID!, $teamId: ID!) {
+    subOnUpdateTeam(meId: $meId, teamId: $teamId) {
       ...TeamFields
     }
   }

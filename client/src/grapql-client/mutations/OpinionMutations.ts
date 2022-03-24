@@ -1,3 +1,4 @@
+import { COLUMN_FIELDS } from './../fragments/columnFragment';
 import { Board, Column, Opinion, OpinionStatus } from './../../types';
 import { gql } from '@apollo/client';
 import { BOARD_FIELDS } from '../fragments/boardFragment';
@@ -17,7 +18,7 @@ export type createOpinionResult = {
 };
 
 export const createOpinion = gql`
-  ${BOARD_FIELDS}
+  ${COLUMN_FIELDS}
   mutation Mutation(
     $teamId: String!
     $boardId: String!
@@ -34,7 +35,7 @@ export const createOpinion = gql`
       isAction: $isAction
       isCreateBottom: $isCreateBottom
     ) {
-      ...BoardFields
+      ...ColumnFields
     }
   }
 `;
@@ -102,10 +103,10 @@ export type removeOpinionVars = {
 };
 
 export const removeOpinion = gql`
-  ${BOARD_FIELDS}
+  ${COLUMN_FIELDS}
   mutation RemoveOpinion($teamId: String!, $boardId: String!, $columnId: String!, $opinionId: String!) {
     removeOpinion(teamId: $teamId, boardId: $boardId, columnId: $columnId, opinionId: $opinionId) {
-      ...BoardFields
+      ...ColumnFields
     }
   }
 `;
