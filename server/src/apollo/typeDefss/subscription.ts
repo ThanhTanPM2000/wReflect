@@ -15,7 +15,7 @@ const typeDefs = gql`
 
     updateOpinion(meId: ID!, teamId: ID!): Opinion
 
-    updateGetHealthCheckData(meId: ID!, teamId: ID!): getHealthCheck
+    subOnUpdateHealthCheck(meId: ID!, teamId: ID!): getHealthCheck
   }
 `;
 

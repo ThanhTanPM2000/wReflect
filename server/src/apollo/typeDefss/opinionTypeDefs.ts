@@ -77,6 +77,8 @@ export type orderOpinionType = {
 };
 
 export type combineOpinionType = {
+  teamId: string;
+  boardId: string;
   combine: {
     draggableId: string;
     droppableId: string;

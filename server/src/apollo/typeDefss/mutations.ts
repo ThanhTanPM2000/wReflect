@@ -191,7 +191,14 @@ const typeDefs = gql`
       source: orderOpinion
       draggableId: String
     ): Board
-    combineOpinion(combine: combineOpinion, source: orderOpinion, draggableId: String, text: String): Board
+    combineOpinion(
+      teamId: String!
+      boardId: String!
+      combine: combineOpinion
+      source: orderOpinion
+      draggableId: String
+      text: String
+    ): Board
 
     createRemark(
       teamId: String!
