@@ -3,8 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
 dotenv.config();
 import http from 'http';
-import https from 'https';
-import fs from 'fs';
 import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -22,8 +20,6 @@ import apiRouter from './apiRouter';
 import { resolvers, typeDefs } from './apollo';
 import sessionManager from './middleware/sessionManager';
 import depthLimit from 'graphql-depth-limit';
-
-// import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 
 async function startApolloServer(typeDefs, resolvers) {
   const app = express();

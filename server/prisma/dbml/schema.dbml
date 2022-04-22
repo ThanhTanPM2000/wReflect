@@ -20,34 +20,49 @@ Table Session {
 Table Assessment {
   id String [pk]
   name String [not null]
+  createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
   teamId String [not null]
-  team Team [not null]
-  ownerId String [not null]
-  ownerMember Member [not null]
+  creatorId String [not null]
   status AssessmentStatus [not null]
+  team Team [not null]
+  creator Member [not null]
   assessmentOnCriteriaList AssessmentOnCriteria [not null]
 }
 
 Table AssessmentOnCriteria {
+  id String [pk]
   assessmentId String [not null]
-  assessment Assessment [not null]
   criteriaId String [not null]
-  criteria Criteria [not null]
   createdAt DateTime [default: `now()`, not null]
   createdBy String [not null]
+  assessment Assessment [not null]
+  criteria Criteria [not null]
+  assessorOnAssessments AssessorOnAssessment [not null]
 
   indexes {
-    (assessmentId, criteriaId) [pk]
+    (assessmentId, criteriaId) [unique]
   }
+}
+
+Table AssessorOnAssessment {
+  id String [pk]
+  assessmentOnCriteriaId String [not null]
+  assessorId String [not null]
+  concerningMemberId String [not null]
+  point Int
+  comment String
+  assessor Member [not null]
+  concerningMember Member [not null]
+  assessmentOnCriteria AssessmentOnCriteria [not null]
 }
 
 Table Criteria {
   id String [pk]
   name String [unique, not null]
   description String [not null]
-  assessmentOnCriteriaList AssessmentOnCriteria [not null]
+  AssessmentOnCriteriaList AssessmentOnCriteria [not null]
 }
 
 Table Team {
@@ -62,8 +77,28 @@ Table Team {
   status TeamStatus [not null, default: 'DOING']
   members Member [not null]
   boards Board [not null]
-  healthCheck HealthCheck [not null]
-  assessment Assessment [not null]
+  healthChecks HealthCheck [not null]
+  templates Template [not null]
+  assessments Assessment [not null]
+}
+
+Table Template {
+  id String [pk]
+  title String [not null]
+  type String [not null]
+  teamId String
+  description String [not null]
+  team Team
+  healthCheckQuestions TemplateQuestion [not null]
+}
+
+Table TemplateQuestion {
+  id String [pk]
+  title String [not null]
+  templateId String [not null]
+  healthCheckTemplate Template [not null]
+  description String [not null]
+  MemberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
 }
 
 Table Board {
@@ -78,6 +113,7 @@ Table Board {
   disableUpVote Boolean [not null, default: false]
   isAnonymous Boolean [not null, default: false]
   votesLimit Int [not null, default: 25]
+  meetingNote String [not null, default: 'My meeting note...']
   currentColumnId String
   title String [not null]
   timerInProgress Boolean [not null, default: false]
@@ -103,6 +139,7 @@ Table HealthCheck {
   status StatusHealthCheck [not null]
   board Board [not null]
   team Team [not null]
+  MemberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
   memberAnswers MemberAnswer [not null]
   memberComments MemberComment [not null]
 
@@ -111,56 +148,27 @@ Table HealthCheck {
   }
 }
 
-Table MemberAnswer {
+Table MemberOnHealthCheckOnQuestion {
   id String [pk]
-  templateId String [not null]
   healthCheckId String [not null]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  memberId String [not null]
-  answers Answer [not null]
-  healthCheck HealthCheck [not null]
-  member Member [not null]
-
-  indexes {
-    (healthCheckId, memberId) [unique]
-  }
-}
-
-Table Answer {
-  id String [pk]
   questionId String [not null]
-  value String [not null]
-  memberAnswersId String
-  memberAnswer MemberAnswer
-}
-
-Table MemberComment {
-  id String [pk]
-  templateId String [not null]
-  healthCheckId String [not null]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
   memberId String [not null]
-  questionId String [not null]
-  text String [not null]
-  member Member [not null]
+  point String [not null]
+  comment String [not null]
   healthCheck HealthCheck [not null]
-
-  indexes {
-    (healthCheckId, questionId, memberId) [unique]
-  }
+  question TemplateQuestion [not null]
+  member Member [not null]
 }
 
 Table Column {
   id String [pk]
+  boardId String [not null]
   color String [not null, default: 'white']
   title String [not null]
   isActive Boolean [not null, default: true]
   position Int [not null]
-  opinions Opinion [not null]
-  boardId String [not null]
   board Board [not null]
+  opinions Opinion [not null]
 }
 
 Table Opinion {
@@ -210,10 +218,13 @@ Table Member {
   user User [not null]
   team Team [not null]
   opinions Opinion [not null]
-  remarks Remark [not null]
+  Remarks Remark [not null]
   assessments Assessment [not null]
   memberComments MemberComment [not null]
   memberAnswers MemberAnswer [not null]
+  MemberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
+  assessors AssessorOnAssessment [not null]
+  concerningMembers AssessorOnAssessment [not null]
 
   indexes {
     (userId, teamId) [unique]
@@ -227,7 +238,7 @@ Table Notification {
   description String [not null]
   linkRedirect String
   isSeen Boolean [not null]
-  user User [not null]
+  User User [not null]
 }
 
 Table User {
@@ -246,16 +257,57 @@ Table User {
   introduction String
   talents String
   interests String
-  session Session [not null]
+  sessions Session [not null]
   members Member [not null]
-  notification Notification [not null]
+  notifications Notification [not null]
+}
+
+Table MemberAnswer {
+  id String [pk]
+  templateId String [not null]
+  healthCheckId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  memberId String [not null]
+  answers Answer [not null]
+  healthCheck HealthCheck [not null]
+  member Member [not null]
+
+  indexes {
+    (healthCheckId, memberId) [unique]
+  }
+}
+
+Table Answer {
+  id String [pk]
+  questionId String [not null]
+  value String [not null]
+  memberAnswersId String
+  memberAnswer MemberAnswer
+}
+
+Table MemberComment {
+  id String [pk]
+  templateId String [not null]
+  healthCheckId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  memberId String [not null]
+  questionId String [not null]
+  text String [not null]
+  member Member [not null]
+  healthCheck HealthCheck [not null]
+
+  indexes {
+    (healthCheckId, questionId, memberId) [unique]
+  }
 }
 
 Enum AssessmentStatus {
-  PLANNED
-  DOING
-  COMPLETE
-  REOPENED
+  Planned
+  Doing
+  Complete
+  Reopened
 }
 
 Enum BoardType {
@@ -302,11 +354,21 @@ Ref: Session.userId > User.id
 
 Ref: Assessment.teamId > Team.id
 
-Ref: Assessment.ownerId > Member.id
+Ref: Assessment.creatorId > Member.id
 
 Ref: AssessmentOnCriteria.assessmentId > Assessment.id
 
 Ref: AssessmentOnCriteria.criteriaId > Criteria.id
+
+Ref: AssessorOnAssessment.assessorId > Member.id
+
+Ref: AssessorOnAssessment.concerningMemberId > Member.id
+
+Ref: AssessorOnAssessment.assessmentOnCriteriaId > AssessmentOnCriteria.id
+
+Ref: Template.teamId > Team.id
+
+Ref: TemplateQuestion.templateId > Template.id
 
 Ref: Board.teamId > Team.id
 
@@ -314,15 +376,11 @@ Ref: HealthCheck.boardId - Board.id
 
 Ref: HealthCheck.teamId > Team.id
 
-Ref: MemberAnswer.healthCheckId > HealthCheck.id
+Ref: MemberOnHealthCheckOnQuestion.healthCheckId > HealthCheck.id
 
-Ref: MemberAnswer.memberId > Member.id
+Ref: MemberOnHealthCheckOnQuestion.questionId > TemplateQuestion.id
 
-Ref: Answer.memberAnswersId > MemberAnswer.id
-
-Ref: MemberComment.memberId > Member.id
-
-Ref: MemberComment.healthCheckId > HealthCheck.id
+Ref: MemberOnHealthCheckOnQuestion.memberId > Member.id
 
 Ref: Column.boardId > Board.id
 
@@ -339,3 +397,13 @@ Ref: Member.userId > User.id
 Ref: Member.teamId > Team.id
 
 Ref: Notification.userId > User.id
+
+Ref: MemberAnswer.healthCheckId > HealthCheck.id
+
+Ref: MemberAnswer.memberId > Member.id
+
+Ref: Answer.memberAnswersId > MemberAnswer.id
+
+Ref: MemberComment.memberId > Member.id
+
+Ref: MemberComment.healthCheckId > HealthCheck.id

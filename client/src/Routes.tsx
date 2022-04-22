@@ -42,10 +42,7 @@ const Routes = ({ me }: Props) => {
               <SideBar email={email} isAdmin={isAdmin} />
               <Layout className="site-layout">
                 {/* <TopNavBar email={email} picture={picture} /> */}
-                <Content
-                  className="flex flex-1"
-                  style={{ margin: '10px 16px', padding: '10px', gap: '10px', overflow: 'auto' }}
-                >
+                <Content className="flex flex-1" style={{ margin: '10px 16px', padding: '10px', gap: '10px' }}>
                   <Switch>
                     {/* <Route exact path="/" component={Team} /> */}
                     {isAdmin ? (
@@ -58,9 +55,7 @@ const Routes = ({ me }: Props) => {
                         <Route path="/teams" exact component={Team} />
                         <>
                           <Switch>
-                            {/* <Route path={`/team-details//:teamId`} children={[]} render={({ match }) => <TeamDetailsPage />} /> */}
-
-                            {/* <Route path="/personal-reflect" render={({ match }) => <PersonalReflection />} /> */}
+                            <Route path="/personal-reflect" render={({ match }) => <PersonalReflection />} />
                             <Route
                               path="/board/:teamId/:boardId"
                               exact

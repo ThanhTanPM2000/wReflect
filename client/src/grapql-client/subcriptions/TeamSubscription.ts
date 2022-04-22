@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { Team } from '../../types';
 
 export type subOnUpdateTeamsResult = {
-  updateListTeams: {
+  subOnUpdateTeams: {
     success: boolean;
   };
 };
@@ -14,7 +14,7 @@ export type subOnUpdateTeamsVars = {
 
 export const subOnUpdateTeams = gql`
   subscription Teams($meId: ID!) {
-    updateListTeams(meId: $meId) {
+    subOnUpdateTeams(meId: $meId) {
       success
     }
   }

@@ -26,19 +26,19 @@ const TeamsCard = ({ searchText, page, size, setPage, setSize, status }: Props) 
   const history = useHistory();
   const me = useContext(selfContext);
 
-  // useSubscription<TeamSubscription.subOnUpdateTeamResult, TeamSubscription.subOnUpdateTeamVars>(
-  //   TeamSubscription.subOnUpdateTeam,
-  //   {
-  //     variables: {
-  //       meId: me?.id,
-  //     },
-  //     onSubscriptionData: ({ subscriptionData }) => {
-  //       if (subscriptionData?.data?.subOnUpdateTeam) {
-  //         refetch();
-  //       }
-  //     },
-  //   },
-  // );
+  useSubscription<TeamSubscription.subOnUpdateTeamsResult, TeamSubscription.subOnUpdateTeamsVars>(
+    TeamSubscription.subOnUpdateTeams,
+    {
+      variables: {
+        meId: me?.id,
+      },
+      onSubscriptionData: ({ subscriptionData }) => {
+        if (subscriptionData?.data?.subOnUpdateTeams) {
+          refetch();
+        }
+      },
+    },
+  );
 
   const redirect = (team: Team) => {
     history.push(`/board/${team.id}/${team?.boards[0]?.id}`);

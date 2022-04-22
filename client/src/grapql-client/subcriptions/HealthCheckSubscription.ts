@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { HealthCheck, MemberAnswer, MemberComment } from '../../types';
 
 export type reopenHealthCheckResult = {
-  updateGetHealthCheckData: {
+  subOnUpdateHealthCheck: {
     getHealthCheck: {
       memberAnswers: [MemberAnswer];
       memberComments: [MemberComment];
@@ -13,14 +13,14 @@ export type reopenHealthCheckResult = {
 };
 
 export type reopenHealthCheckVars = {
-  boardId: string;
   meId: string;
+  teamId: string;
 };
 
 export const updateGetHealthCheckData = gql`
   ${MEMBER_FIELDS}
-  subscription UpdateGetHealthCheckData($meId: ID!, $boardId: String!) {
-    updateGetHealthCheckData(meId: $meId, boardId: $boardId) {
+  subscription UpdateGetHealthCheckData($meId: ID!, $teamId: ID!) {
+    subOnUpdateHealthCheck(meId: $meId, teamId: $teamId) {
       memberAnswers {
         id
         templateId

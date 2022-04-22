@@ -70,6 +70,11 @@ export default function OpinionComponent({
     },
   );
 
+  const [convertOpinion, { loading: loadConvertingOpinion }] = useMutation<
+    OpinionMutations.convertToActionResult,
+    OpinionMutations.convertToActionVars
+  >(OpinionMutations.convertOpinion);
+
   const [removeOpinion] = useMutation<OpinionMutations.removeOpinionResult, OpinionMutations.removeOpinionVars>(
     OpinionMutations.removeOpinion,
     {
@@ -85,8 +90,22 @@ export default function OpinionComponent({
   const menu = (
     <Menu>
       {board.currentPhase === 'DISCUSS' && (
-        <Menu.Item key="3" icon={<FireFilled />}>
-          Convet to Action
+        <Menu.Item
+          onClick={() =>
+            convertOpinion({
+              variables: {
+                teamId: team?.id,
+                boardId: board?.id,
+                columnId: column?.id,
+                opinionId: opinion?.id,
+                isAction: opinion?.isAction ? false : true,
+              },
+            })
+          }
+          key="3"
+          icon={<FireFilled />}
+        >
+          {opinion?.isAction ? 'Convert to Opinion' : 'Convert to Action'}
         </Menu.Item>
       )}
       <Menu.Item onClick={() => setIsEdit(true)} key="2" icon={<EditFilled />}>
@@ -331,7 +350,7 @@ export default function OpinionComponent({
               />
             )}
 
-            <div className="owner-opinion">
+            <div style={{ marginRight: 'auto', marginLeft: '10px' }} className="owner-opinion">
               {board.isAnonymous ? (
                 <h4>Anonymous</h4>
               ) : (
@@ -531,7 +550,7 @@ export default function OpinionComponent({
                     style={{ fontSize: '20px', marginLeft: '5px', cursor: 'pointer' }}
                   />
                 </div>
-                <div className="myVotes">
+                <div style={{ marginLeft: 'auto' }} className="myVotes">
                   [Your votes{' '}
                   {`${
                     opinion?.upVote.filter((voteIds) => voteIds == iMember?.id).length +

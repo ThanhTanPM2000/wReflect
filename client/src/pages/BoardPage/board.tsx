@@ -159,14 +159,16 @@ export default function board({ teamId, boardId }: Props) {
 
       combineOpinion({
         variables: {
-          combine: result.combine,
-          source: result.source,
-          draggableId: result.draggableId,
+          teamId: data?.team?.id,
+          boardId: board?.id,
+          combine: result?.combine,
+          source: result?.source,
+          draggableId: result?.draggableId,
           text: combineText,
         },
         onError: () => {
           client.cache.writeQuery({
-            query: BoardQueries.getBoard,
+            query: BoardQueries?.getBoard,
             variables: {
               boardId,
             },
@@ -222,16 +224,16 @@ export default function board({ teamId, boardId }: Props) {
 
   return (
     <>
+      <TopNavBar
+        iMember={iMember}
+        team={data?.team}
+        boardId={boardId}
+        title="Do Reflect"
+        selectedBoard={board}
+        setSelectedBoard={setBoard}
+      />
       <Loading refetch={refetch} data={board} loading={loading} error={error}>
         <>
-          <TopNavBar
-            iMember={iMember}
-            team={data?.team}
-            boardId={boardId}
-            title="Do Reflect"
-            selectedBoard={board}
-            setSelectedBoard={setBoard}
-          />
           {data?.team && board ? (
             <>
               <ConfigBoardModal teamId={teamId} setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
@@ -255,7 +257,11 @@ export default function board({ teamId, boardId }: Props) {
               />
               <div className="boardTools">
                 <div className="countDown">
-                  {board.timerInProgress && board.endTime ? <CountDown endTime={board.endTime} /> : '--:--:--'}
+                  {board.timerInProgress && board.endTime ? (
+                    <CountDown endTime={board?.endTime?.valueOf()} />
+                  ) : (
+                    '--:--:--'
+                  )}
                 </div>
                 {board?.currentPhase === 'VOTES' && (
                   <div className="currentLimitVotes">Votes {`${currentNumVotes}/${board?.votesLimit}`}</div>
@@ -328,29 +334,27 @@ export default function board({ teamId, boardId }: Props) {
                       {data?.team?.members?.map((member) => (
                         // <div onClick={() => history.push(`/manage-members/${teamId}`)} key={member?.user?.email}>
                         <>
-                          {member.isOwner || member.isSuperOwner ? (
-                            <Tooltip title={member?.user?.nickname} key={member?.user?.email} placement="bottom">
+                          <Tooltip title={member?.user?.nickname} key={member?.user?.email} placement="bottom">
+                            {member.isOwner || member.isSuperOwner ? (
                               <Badge offset={[-15, -3]} count={<CrownFilled style={{ color: '#F79C2D' }} />}>
                                 <Avatar
                                   style={{ marginRight: '1px' }}
                                   size="default"
                                   shape="circle"
                                   key={member?.user?.email}
-                                  src={member?.user?.picture}
+                                  src={<img src={member?.user?.picture} referrerPolicy="no-referrer" />}
                                 />
                               </Badge>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title={member?.user?.nickname} key={member?.user?.email} placement="bottom">
+                            ) : (
                               <Avatar
                                 style={{ marginRight: '1px' }}
                                 size="default"
                                 shape="circle"
                                 key={member?.user?.email}
-                                src={member?.user?.picture}
+                                src={<img src={member?.user?.picture} referrerPolicy="no-referrer" />}
                               />
-                            </Tooltip>
-                          )}
+                            )}
+                          </Tooltip>
                         </>
                         // </div>
                       ))}

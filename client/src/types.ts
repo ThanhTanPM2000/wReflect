@@ -15,6 +15,7 @@ export type Team = {
   status: TeamStatus;
   members: Member[];
   boards: Board[];
+  assessments: Assessment[];
 };
 
 export type HealthCheck = {
@@ -83,7 +84,7 @@ export type Board = {
   timerInProgress: boolean;
   type: BoardType;
   currentPhase: PhaseType;
-  endTime: string;
+  endTime: Date;
   columns: Column[];
 };
 
@@ -142,7 +143,6 @@ export type Member = {
   meetingNote: string;
   invitedBy: string | null;
   joinedAt: Date;
-
   user: User;
   team: Team;
   opinions: [Opinion];
@@ -150,6 +150,8 @@ export type Member = {
   assessments: [Assessment];
   memberComments: [MemberComment];
   memberAnswers: [MemberAnswer];
+  assessors: [AssessorOnAssessment];
+  concerningMembers: [AssessorOnAssessment];
 };
 
 export type UserProfile = {
@@ -184,12 +186,25 @@ export type Assessment = {
 };
 
 export type AssessmentOnCriteria = {
+  id: string;
   assessmentId: string;
   criteriaId: string;
   createdAt: Date;
   createdBy: string;
   assessment: Assessment;
   criteria: Criteria;
+  assessorOnAssessments: AssessorOnAssessment[];
+};
+
+export type AssessorOnAssessment = {
+  id: string;
+  assessorOnCriteriaId: string;
+  assessorId: string;
+  concerningMemberId: string;
+  point: number;
+  comment: string;
+  assessor: Member;
+  concerningMember: Member;
 };
 
 export type Criteria = {
@@ -208,7 +223,7 @@ export type OpinionStatus = 'NEW' | 'IN_PROGRESS' | 'DONE' | 'REJECTED';
 export type BoardType = 'DEFAULT' | 'PHASE';
 export type PhaseType = 'REFLECT' | 'GROUP' | 'VOTES' | 'DISCUSS';
 export type StatusHealthCheck = 'OPEN' | 'CLOSED';
-export type AssessmentStatus = 'PLANNED' | 'DOING' | 'COMPLETE' | 'REOPENED';
+export type AssessmentStatus = 'Planned' | 'Doing' | 'Complete' | 'Reopened';
 
 export type User = {
   id: string;

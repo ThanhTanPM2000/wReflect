@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { TeamQueries } from '../../grapql-client/queries';
 import { columnActionTrackerDefault } from '../../const/boardTemplateOption';
 import { TopNavBar } from '../../components/TopNavBar';
-import { OpinionMutations } from '../../grapql-client/mutations';
+import { OpinionMutations, TeamMutations } from '../../grapql-client/mutations';
 import ActionSelect from './actionSelect';
 import CreateAction from './createAction';
 import selfContext from '../../contexts/selfContext';
@@ -104,9 +104,9 @@ export default function actionsTracker({ teamId }: Props) {
   const iMember = data?.team?.members.find((member) => member.userId === me?.id);
 
   return (
-    <Loading refetch={refetch} data={data?.team} loading={loading} error={error}>
-      <>
-        <TopNavBar iMember={iMember} team={data?.team} title="Actions Tracker" />
+    <>
+      <TopNavBar iMember={iMember} team={data?.team} title="Actions Tracker" />
+      <Loading refetch={refetch} data={data?.team} loading={loading} error={error}>
         <div className="actionsTracker">
           <div className="header">
             <h2>Actions Tracker</h2>
@@ -197,7 +197,10 @@ export default function actionsTracker({ teamId }: Props) {
                                                     {opinion.isAction && (
                                                       <div className={`opinionCol ${opinion.color}`}>
                                                         <div className="opinionHeader"></div>
-                                                        <div className="opinionContent">
+                                                        <div
+                                                          style={{ flex: 1, flexDirection: 'column' }}
+                                                          className="opinionContent"
+                                                        >
                                                           <p>
                                                             {opinion?.text?.split('\n').map((str) => {
                                                               return (
@@ -249,7 +252,7 @@ export default function actionsTracker({ teamId }: Props) {
             <label className="error"></label>
           </div>
         </div>
-      </>
-    </Loading>
+      </Loading>
+    </>
   );
 }

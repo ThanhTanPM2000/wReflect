@@ -178,6 +178,7 @@ export type reopenHealthCheckVars = {
 };
 
 export const reopenHealthCheck = gql`
+  ${MEMBER_FIELDS}
   mutation Mutation($teamId: String!, $boardId: String!) {
     reopenHealthCheck(teamId: $teamId, boardId: $boardId) {
       memberAnswers {
@@ -189,8 +190,11 @@ export const reopenHealthCheck = gql`
         templateId
         healthCheckId
         createdAt
+        member {
+          ...MemberFields
+        }
         updatedAt
-        userId
+        memberId
       }
       memberComments {
         id
@@ -198,7 +202,10 @@ export const reopenHealthCheck = gql`
         healthCheckId
         createdAt
         updatedAt
-        userId
+        memberId
+        member {
+          ...MemberFields
+        }
         questionId
         text
       }

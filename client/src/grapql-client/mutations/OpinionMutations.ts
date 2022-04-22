@@ -1,8 +1,8 @@
+import { OPINION_FIELDS } from './../fragments/opinionFragments';
 import { COLUMN_FIELDS } from './../fragments/columnFragment';
 import { Board, Column, Opinion, OpinionStatus } from './../../types';
 import { gql } from '@apollo/client';
 import { BOARD_FIELDS } from '../fragments/boardFragment';
-import { OPINION_FIELDS } from '../fragments/opinionFragments';
 
 export type createOpinionVars = {
   teamId: string;
@@ -36,6 +36,39 @@ export const createOpinion = gql`
       isCreateBottom: $isCreateBottom
     ) {
       ...ColumnFields
+    }
+  }
+`;
+
+export type convertToActionResult = {
+  convertToAction: Opinion;
+};
+
+export type convertToActionVars = {
+  teamId: string;
+  boardId: string;
+  columnId: string;
+  opinionId: string;
+  isAction: boolean;
+};
+
+export const convertOpinion = gql`
+  ${OPINION_FIELDS}
+  mutation convertOpinion(
+    $teamId: String!
+    $boardId: String!
+    $columnId: String!
+    $opinionId: String!
+    $isAction: Boolean!
+  ) {
+    convertOpinion(
+      teamId: $teamId
+      boardId: $boardId
+      columnId: $columnId
+      opinionId: $opinionId
+      isAction: $isAction
+    ) {
+      ...OpinionFields
     }
   }
 `;
@@ -116,6 +149,8 @@ export type combineOpinionResult = {
 };
 
 export type combineOpinionVars = {
+  teamId: string;
+  boardId: string;
   combine: {
     draggableId: string;
     droppableId: string;
@@ -130,8 +165,22 @@ export type combineOpinionVars = {
 
 export const combineOpinion = gql`
   ${BOARD_FIELDS}
-  mutation Mutation($combine: combineOpinion, $source: orderOpinion, $draggableId: String, $text: String) {
-    combineOpinion(combine: $combine, source: $source, draggableId: $draggableId, text: $text) {
+  mutation Mutation(
+    $teamId: String!
+    $boardId: String!
+    $combine: combineOpinion
+    $source: orderOpinion
+    $draggableId: String
+    $text: String
+  ) {
+    combineOpinion(
+      teamId: $teamId
+      boardId: $boardId
+      combine: $combine
+      source: $source
+      draggableId: $draggableId
+      text: $text
+    ) {
       ...BoardFields
     }
   }
