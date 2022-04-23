@@ -19,7 +19,7 @@ const typeDefs = gql`
     status: AssessmentStatus
     team: Team
     creator: Member
-    assessmentOnCriteriaList: [AssessmentOnCriteria]
+    evaluations: [Evaluation]
   }
 `;
 

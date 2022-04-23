@@ -2,7 +2,7 @@ import { Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import { QuestionCircleOutlined, MessageFilled, MessageOutlined } from '@ant-design/icons';
-import { AssessmentOnCriteria, Member } from '../../../types';
+import { AnswerOnCriteria, Evaluation, Member } from '../../../types';
 import CommentModal from './commentModal';
 
 type answerType = {
@@ -12,13 +12,15 @@ type answerType = {
 };
 
 type Props = {
+  isAllowEdit: boolean;
   member: Member;
-  answer: answerType;
-  setAnswer: (value: answerType) => void;
-  criteriaQuestion: AssessmentOnCriteria;
+  answer: AnswerOnCriteria;
+  setAnswer: (value: AnswerOnCriteria) => void;
+  // criteriaQuestion: Evaluation;
 };
 
-export default function CriteriaQuestion({ member, answer, criteriaQuestion, setAnswer }: Props) {
+export default function CriteriaQuestion({ isAllowEdit, member, answer, setAnswer }: Props) {
+  const [cursor, setCursor] = useState<'pointer' | 'not-allowed'>('not-allowed');
   const [point, setPoint] = useState<number>(answer?.point);
   const [visible, setVisible] = useState(false);
   const [comment, setComment] = useState<string | null>(answer?.comment);
@@ -29,60 +31,71 @@ export default function CriteriaQuestion({ member, answer, criteriaQuestion, set
   }, [answer]);
 
   useEffect(() => {
+    setCursor(isAllowEdit ? 'pointer' : 'not-allowed');
+  }, [isAllowEdit]);
+
+  useEffect(() => {
     setAnswer({ ...answer, point, comment });
   }, [point, comment]);
+
+  const handleClickPoint = (value: number) => {
+    if (isAllowEdit) {
+      setPoint(value);
+    }
+  };
 
   return (
     <>
       <CommentModal
+        isAllowEdit={isAllowEdit}
         member={member}
-        criteriaQuestion={criteriaQuestion}
+        answer={answer}
         isVisible={visible}
         setVisible={setVisible}
         comment={comment}
         setComment={setComment}
       />
-      <div className="criteriaQuestion" key={`${criteriaQuestion?.assessmentId}${criteriaQuestion?.criteriaId}`}>
+      <div className="criteriaQuestion" style={!isAllowEdit ? { background: '#f2f1f1' } : {}}>
         <div className="criteriaHeader">
-          {criteriaQuestion?.criteria?.name}
-          <Tooltip trigger={['click']} placement="top" title={criteriaQuestion?.criteria?.description}>
+          {answer?.criteria?.name}
+          <Tooltip trigger={['click']} placement="left" title={answer?.criteria?.description}>
             <QuestionCircleOutlined style={{ fontSize: '20px' }} />
           </Tooltip>
         </div>
         <div className="criteriaBody">
           <div className="questionPoint">
-            <div style={{ cursor: 'pointer' }} className="num-wrapper poll-center-items">
+            <div style={{ cursor }} className="num-wrapper poll-center-items">
               <span
-                style={{ cursor: 'pointer' }}
-                onClick={() => setPoint(1)}
+                style={{ cursor }}
+                onClick={() => handleClickPoint(1)}
                 className={`num  orange ${point == 1 && 'is-selected'}`}
               >
                 1
               </span>
               <span
-                style={{ cursor: 'pointer' }}
-                onClick={() => setPoint(2)}
+                style={{ cursor }}
+                onClick={() => handleClickPoint(2)}
                 className={`num blue ${point == 2 && 'is-selected'}`}
               >
                 2
               </span>
               <span
-                style={{ cursor: 'pointer' }}
-                onClick={() => setPoint(3)}
+                style={{ cursor }}
+                onClick={() => handleClickPoint(3)}
                 className={`num purple ${point == 3 && 'is-selected'}`}
               >
                 3
               </span>
               <span
-                style={{ cursor: 'pointer' }}
-                onClick={() => setPoint(4)}
+                style={{ cursor }}
+                onClick={() => handleClickPoint(4)}
                 className={`num lpink ${point == 4 && 'is-selected'}`}
               >
                 4
               </span>
               <span
-                style={{ cursor: 'pointer' }}
-                onClick={() => setPoint(5)}
+                style={{ cursor }}
+                onClick={() => handleClickPoint(5)}
                 className={`num green ${point == 5 && 'is-selected'}`}
               >
                 5

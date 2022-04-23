@@ -11,10 +11,9 @@ import {
   TeamOutlined,
   CarryOutOutlined,
   GoldOutlined,
-  UsergroupDeleteOutlined,
   BarChartOutlined,
   UserOutlined,
-  AimOutlined,
+  BellOutlined,
   QuestionOutlined,
 } from '@ant-design/icons';
 
@@ -92,6 +91,9 @@ const SideBar = ({ isAdmin }: Props) => {
             ) : (
               <>
                 <Menu.Item style={{ marginTop: 20 }} icon={<GoldOutlined />} key="Teams">
+                  <Link to="/teams">Teams</Link>
+                </Menu.Item>
+                <Menu.Item icon={<BellOutlined />} key="notification">
                   <Link to="/teams">Teams</Link>
                 </Menu.Item>
                 {/* <Menu.Item icon={<AimOutlined />} key="actionTracker">

@@ -12,7 +12,19 @@ import {
 } from './TypeDefs/HealthCheck/healthCheckTypeDefs';
 import { createRemarkType, removeRemarkType } from './TypeDefs/remarkTypeDefs';
 import { addMemberToTeamType, RequestWithUserInfo } from './../types';
-import { member, team, user, board, column, opinion, remark, healthCheck, criteria, assessment } from '../services';
+import {
+  member,
+  team,
+  user,
+  board,
+  column,
+  opinion,
+  remark,
+  healthCheck,
+  criteria,
+  assessment,
+  analysis,
+} from '../services';
 import { withFilter } from 'graphql-subscriptions';
 
 import {
@@ -26,6 +38,7 @@ import {
 } from './TypeDefs/opinionTypeDefs';
 import { pubsub } from '../pubSub';
 import { updateBoardType, createBoardType, deleteBoardType } from './TypeDefs/Board/boardTypes';
+import { string } from 'zod';
 
 const resolvers = {
   Query: {
@@ -76,6 +89,16 @@ const resolvers = {
       const { id: meId } = req?.user || {};
       const assessmentData = await assessment.getAssessment(meId, args);
       return assessmentData;
+    },
+
+    getAnalysisAssessment: async (
+      _,
+      args: { teamId: string; assessmentId: string, memberId: string },
+      { req }: { req: RequestWithUserInfo },
+    ) => {
+      const { id: meId } = req?.user || {};
+      const assessment = await analysis?.analysisAssessment(meId, args);
+      return assessment;
     },
   },
   Mutation: {
@@ -423,10 +446,10 @@ const resolvers = {
       const members = await member.getListMembers(_.id);
       return members;
     },
-    assessments: async (currentValue, args: getAssessmentListType, test) => {
-      const assessments = await assessment.getListAssessment(currentValue.id, _.isEmpty(args) ? undefined : args);
-      return assessments;
-    },
+    // assessments: async (currentValue, args: getAssessmentListType, test) => {
+    //   const assessments = await assessment.getListAssessment(currentValue.id, _.isEmpty(args) ? undefined : args);
+    //   return assessments;
+    // },
   },
   // Assessment: {
   //   assessmentOnCriteriaList:  async (_) => {

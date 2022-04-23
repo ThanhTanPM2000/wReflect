@@ -14,9 +14,10 @@ import { default as MemberAnswer } from './memberAnswersTypeDefs';
 import { default as MemberComment } from './memberCommentsTypeDefs';
 import { default as Answer } from './Answer/answerTypeDef';
 import { default as Assessment } from './Assessment/assessmentTypeDef';
-import { default as AssessmentOnCriteria } from './AssessmentOnCriteria/assessmentOnCriteriaTypeDef';
+import { default as Evaluation } from './Evaluation/evaluationTypeDef';
 import { default as Criteria } from './Criteria/criteriaTypeDefs';
-import { default as AssessorOnAssessment } from './assessorOnAssessmentTypeDefs';
+import { default as Result } from './resultTypeDefs';
+import { default as AnswerOnCriteria } from './answerOnCriteriaTypeDefs';
 
 export default [
   Answer,
@@ -35,7 +36,8 @@ export default [
   MemberAnswer,
   MemberComment,
   Assessment,
-  AssessmentOnCriteria,
+  Evaluation,
   Criteria,
-  AssessorOnAssessment,
+  Result,
+  AnswerOnCriteria,
 ];

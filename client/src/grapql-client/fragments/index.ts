@@ -5,5 +5,6 @@ export * as RemarkFragment from './remarkFragment';
 
 export * as AssessmentFragment from './assessmentFragment';
 export * as CriteriaFragment from './criteriaFragment';
-export * as AssessmentOnCriteriaFragment from './assessmentOnCriteriaFragment';
-export * as MemberOnAssessmentOnCriteriaFragment from './assessorOnAssessment';
+export * as EvaluationFragment from './evaluationFragment';
+export * as ResultFragment from './resultFragment';
+export * as AnswerOnCriteriaFragment from './answerOnCriteriaFragment';

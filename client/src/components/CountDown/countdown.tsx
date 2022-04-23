@@ -2,16 +2,17 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 
 type Props = {
+  startTime: number;
   endTime: number;
 };
 
-export default function Countdown({ endTime }: Props) {
+export default function Countdown({ startTime, endTime }: Props) {
   const [duration, setDuration] = useState<moment.Duration>();
 
   useEffect(() => {
     const diffTime = endTime - moment().valueOf();
     setDuration(moment.duration(diffTime, 'milliseconds'));
-  }, [endTime]);
+  }, [endTime, startTime]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {

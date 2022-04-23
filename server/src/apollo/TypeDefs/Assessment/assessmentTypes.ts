@@ -1,3 +1,5 @@
+import { Result } from '@prisma/client';
+
 export type createAssessmentType = {
   teamId: string;
   nameAssessment: string;
@@ -38,11 +40,12 @@ export type submitDoPersonalReflection = {
   teamId: string;
   assessmentId: string;
   assessorId: string;
-  memberAnswer: {
-    isDone: boolean;
+  results: {
+    id: string;
     concerningMemberId: string;
-    data: {
-      assessmentOnCriteriaId: string;
+    answerOnCriteriaList: {
+      id: string;
+      criteriaId: string;
       point: number;
       comment: string;
     }[];

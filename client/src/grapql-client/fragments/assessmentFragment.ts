@@ -1,9 +1,9 @@
-import { ASSESSMENT_ON_CRITERIA_FIELDS } from './assessmentOnCriteriaFragment';
+import { EVALUATION_FIELDS } from './evaluationFragment';
 import { gql } from '@apollo/client';
 import { MEMBER_FIELDS } from './memberFragment';
 export const ASSESSMENT_FIELDS = gql`
   ${MEMBER_FIELDS}
-  ${ASSESSMENT_ON_CRITERIA_FIELDS}
+  ${EVALUATION_FIELDS}
   fragment AssessmentFields on Assessment {
     id
     name
@@ -15,8 +15,8 @@ export const ASSESSMENT_FIELDS = gql`
       ...MemberFields
     }
     status
-    assessmentOnCriteriaList {
-      ...AssessmentOnCriteriaFields
+    evaluations {
+      ...EvaluationFields
     }
   }
 `;

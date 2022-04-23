@@ -19,8 +19,8 @@ const typeDefs = gql`
     assessments: [Assessment]
     memberComments: [MemberComment]
     memberAnswers: [MemberAnswer]
-    assessors: [AssessorOnAssessment]
-    concerningMembers: [AssessorOnAssessment]
+    results: [Result]
+    evaluations: [Evaluation]
   }
 `;
 

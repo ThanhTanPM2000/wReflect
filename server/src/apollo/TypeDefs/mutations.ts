@@ -36,16 +36,17 @@ const typeDefs = gql`
     draggableId: String!
   }
 
-  input answer {
-    assessmentOnCriteriaId: String!
-    point: Int!
+  input AnswerOnCriteriaInput {
+    id: ID
+    criteriaId: String
+    point: Int
     comment: String
   }
 
-  input memberAnswer {
-    isDone: Boolean!
-    concerningMemberId: String!
-    data: [answer]!
+  input ResultInput {
+    id: ID
+    concerningMemberId: String
+    answerOnCriteriaList: [AnswerOnCriteriaInput]
   }
 
   enum PhaseType {
@@ -261,7 +262,7 @@ const typeDefs = gql`
       teamId: String!
       assessmentId: String!
       assessorId: String!
-      memberAnswer: [memberAnswer]
+      results: [ResultInput]
     ): Assessment
   }
 `;

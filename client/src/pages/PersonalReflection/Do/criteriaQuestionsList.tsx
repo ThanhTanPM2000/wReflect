@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { AssessmentOnCriteria, Member } from '../../../types';
+import { AnswerOnCriteria, Evaluation, Member, Result } from '../../../types';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import CriteriaQuestion from './criteriaQuestion';
 import { point } from '@antv/g2plot';
@@ -8,49 +8,31 @@ import _ from 'lodash';
 import { CriteriaQueries } from '../../../grapql-client/queries';
 import { setAnswerHealthCheck } from '../../../grapql-client/mutations/HealthCheckMutation';
 
-type answerType = {
-  assessmentOnCriteriaId: string;
-  point: number;
-  comment: string;
-};
-
-type memberAnswerType = {
-  isDone: boolean;
-  concerningMemberId: string;
-  data: answerType[];
-};
-
 type Props = {
+  isAllowEdit: boolean;
   member: Member;
-  memberAnswerList: memberAnswerType[];
-  setMemberAnswerList: (value: memberAnswerType) => void;
-  assessmentOnCriteriaList: AssessmentOnCriteria[];
+  result: Result;
+  setResult: (value: Result) => void;
 };
 
 export default function CriteriaQuestionsList({
+  isAllowEdit,
   member,
-  memberAnswerList,
-  assessmentOnCriteriaList,
-  setMemberAnswerList,
-}: Props) {
-  const [memberAnswer, setMemberAnswer] = useState<memberAnswerType>();
+  result,
+  setResult,
+}: // assessmentOnCriteriaList,
+Props) {
+  const [answerOnCriteriaList, setAnswerOnCriteriaList] = useState<AnswerOnCriteria[]>([]);
 
   useEffect(() => {
-    setMemberAnswer({
-      ...memberAnswerList?.find((memberAnswer) => memberAnswer?.concerningMemberId === member?.id),
-    });
-  }, [memberAnswerList]);
+    setAnswerOnCriteriaList(result?.answerOnCriteriaList);
+  }, [result]);
 
-  const handleSelected = (value: answerType) => {
-    setMemberAnswerList({
-      ...memberAnswer,
-      isDone: memberAnswer?.data
-        ?.filter((y) => y?.assessmentOnCriteriaId !== value?.assessmentOnCriteriaId)
-        ?.every((x) => !_?.isNull(x?.point)),
-      data: memberAnswer?.data?.map((answer) => {
-        if (answer?.assessmentOnCriteriaId === value?.assessmentOnCriteriaId) {
-          return value;
-        }
+  const handleSelected = (value: AnswerOnCriteria) => {
+    setResult({
+      ...result,
+      answerOnCriteriaList: answerOnCriteriaList?.map((answer) => {
+        if (value?.id === answer?.id) return value;
         return answer;
       }),
     });
@@ -58,21 +40,18 @@ export default function CriteriaQuestionsList({
 
   return (
     <>
-      <div className="criteriaQuestionList">
-        {assessmentOnCriteriaList?.map((criteriaQuestion) => {
-          const answer: answerType = memberAnswer?.data?.find(
-            (answer) => answer?.assessmentOnCriteriaId === criteriaQuestion?.id,
-          );
+      <div className="criteriaQuestionList" >
+        {answerOnCriteriaList?.map((answer) => {
           return (
             <>
-              <div key={`${criteriaQuestion?.id}`}>
-                <CriteriaQuestion
-                  member={member}
-                  answer={answer}
-                  setAnswer={(value) => handleSelected(value)}
-                  criteriaQuestion={criteriaQuestion}
-                />
-              </div>
+              <CriteriaQuestion
+                isAllowEdit={isAllowEdit}
+                key={`${answer?.id}`}
+                member={member}
+                answer={answer}
+                setAnswer={(value) => handleSelected(value)}
+                // criteriaQuestion={criteriaQuestion}
+              />
             </>
           );
         })}

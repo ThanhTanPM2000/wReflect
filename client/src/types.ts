@@ -150,8 +150,8 @@ export type Member = {
   assessments: [Assessment];
   memberComments: [MemberComment];
   memberAnswers: [MemberAnswer];
-  assessors: [AssessorOnAssessment];
-  concerningMembers: [AssessorOnAssessment];
+  assessors: [Result];
+  concerningMembers: [Result];
 };
 
 export type UserProfile = {
@@ -182,36 +182,42 @@ export type Assessment = {
   status: AssessmentStatus;
   team: Team;
   ownerMember: Member;
-  assessmentOnCriteriaList: AssessmentOnCriteria[];
+  evaluations: Evaluation[];
 };
 
-export type AssessmentOnCriteria = {
+export type Evaluation = {
   id: string;
-  assessmentId: string;
-  criteriaId: string;
-  createdAt: Date;
-  createdBy: string;
-  assessment: Assessment;
-  criteria: Criteria;
-  assessorOnAssessments: AssessorOnAssessment[];
-};
-
-export type AssessorOnAssessment = {
-  id: string;
-  assessorOnCriteriaId: string;
+  name: string;
   assessorId: string;
-  concerningMemberId: string;
-  point: number;
-  comment: string;
+  isSubmit: boolean;
+  assessmentId: string;
   assessor: Member;
+  results: Result[];
+};
+
+export type Result = {
+  id: string;
+  evaluationId: string;
+  concerningMemberId: string;
+  answerOnCriteriaList: AnswerOnCriteria[];
   concerningMember: Member;
+};
+
+export type AnswerOnCriteria = {
+  id: string;
+  criteriaId: string;
+  resultId: string;
+  point?: number;
+  comment?: string;
+  updatedAt: string;
+  criteria: Criteria;
 };
 
 export type Criteria = {
   id: string;
   name: string;
   description: string;
-  assessmentOnCriteriaList: AssessmentOnCriteria[];
+  assessmentOnCriteriaList: Evaluation[];
 };
 
 export type MemberStatus = 'PENDING_INVITATION' | 'JOINED';

@@ -27,72 +27,57 @@ model Session {
 }
 
 model Assessment {
-  id                       String                 @id @default(uuid())
-  name                     String
-  createdAt                DateTime               @default(now())
-  startDate                DateTime
-  endDate                  DateTime
-  teamId                   String
-  creatorId                String
-  status                   AssessmentStatus
-  team                     Team                   @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  creator                  Member                 @relation(fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  assessmentOnCriteriaList AssessmentOnCriteria[]
+  id          String           @id @default(uuid())
+  name        String
+  createdAt   DateTime         @default(now())
+  startDate   DateTime
+  endDate     DateTime
+  teamId      String
+  creatorId   String
+  status      AssessmentStatus
+  team        Team             @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creator     Member           @relation(fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  evaluations Evaluation[]
 }
 
-model MemberResult {
-  id         String  @id @default(uuid())
-  name       String
-  assessorId String
-  isSubmit   Boolean
+model Evaluation {
+  id           String      @id @default(uuid())
+  assessorId   String
+  isSubmit     Boolean
+  assessmentId String?
+  updatedAt    DateTime    @updatedAt()
+  assessor     Member      @relation(fields: [assessorId], references: [id])
+  assessment   Assessment? @relation(fields: [assessmentId], references: [id])
+  results      Result[]
+
+  @@unique([assessmentId, assessorId])
 }
 
-model result {
-  id                 String @id @default(uuid())
-  memberResultId     String
-  concerningMemberId String
+model Result {
+  id                   String             @id @default(uuid())
+  concerningMemberId   String
+  evaluationId         String?
+  answerOnCriteriaList AnswerOnCriteria[]
+  concerningMember     Member             @relation(fields: [concerningMemberId], references: [id])
+  evaluation           Evaluation?        @relation(fields: [evaluationId], references: [id])
 }
 
 model AnswerOnCriteria {
-  id                    String                 @id @default(uuid())
-  criteriaId            String
-  createdAt             DateTime               @default(now())
-  createdBy             String
-  assessment            Assessment             @relation(fields: [assessmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  criteria              Criteria               @relation(fields: [criteriaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  assessorOnAssessments AssessorOnAssessment[]
-}
-
-model AssessmentOnCriteria {
-  id                    String                 @id @default(uuid())
-  assessmentId          String
-  criteriaId            String
-  createdAt             DateTime               @default(now())
-  createdBy             String
-  assessment            Assessment             @relation(fields: [assessmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  criteria              Criteria               @relation(fields: [criteriaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  assessorOnAssessments AssessorOnAssessment[]
-
-  @@unique([assessmentId, criteriaId])
-}
-
-model AssessorOnAssessment {
-  id                     String               @id @default(uuid())
-  assessmentOnCriteriaId String
-  assessorId             String
-  concerningMemberId     String
-  point                  Int?
-  comment                String?
-  assessor               Member               @relation("Assessor", fields: [assessorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  concerningMember       Member               @relation("ConcerningMember", fields: [concerningMemberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  assessmentOnCriteria   AssessmentOnCriteria @relation(fields: [assessmentOnCriteriaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id         String   @id @default(uuid())
+  criteriaId String
+  resultId   String?
+  point      Int?
+  comment    String?
+  updatedAt  DateTime @updatedAt()
+  criteria   Criteria @relation(fields: [criteriaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Result     Result?  @relation(fields: [resultId], references: [id])
 }
 
 model Criteria {
-  id                       String                 @id @default(uuid())
-  name                     String                 @unique
-  description              String
-  AssessmentOnCriteriaList AssessmentOnCriteria[]
+  id                   String             @id @default(uuid())
+  name                 String             @unique
+  description          String
+  answerOnCriteriaList AnswerOnCriteria[]
 }
 
 enum AssessmentStatus {
@@ -287,8 +272,8 @@ model Member {
   memberComments      MemberComment[]
   memberAnswers       MemberAnswer[]
   MemberOnHealthCheck MemberOnHealthCheckOnQuestion[]
-  assessors           AssessorOnAssessment[]          @relation("Assessor")
-  concerningMembers   AssessorOnAssessment[]          @relation("ConcerningMember")
+  results             Result[]
+  evaluations         Evaluation[]
 
   @@unique([userId, teamId])
 }

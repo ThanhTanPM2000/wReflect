@@ -137,7 +137,7 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
           </div>
           <div className="setting-criteria">
             <h3>Criteria List:</h3>
-            <Form.List
+            {/* <Form.List
               name="names"
               initialValue={assessment?.assessmentOnCriteriaList?.map((assessmentOnCre) => assessmentOnCre.criteriaId)}
               rules={[
@@ -224,7 +224,7 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
                   ))}
                 </>
               )}
-            </Form.List>
+            </Form.List> */}
           </div>
         </div>
       </Form>

@@ -39,6 +39,10 @@ code {
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch; }
+  .flex-gap-5 {
+    gap: 5px; }
+  .flex-gap-10 {
+    gap: 10px; }
   .flex-1 {
     flex: 1; }
   .flex-2 {

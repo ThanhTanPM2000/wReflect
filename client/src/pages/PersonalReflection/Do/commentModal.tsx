@@ -1,19 +1,20 @@
 import { Modal, Input, Button } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { AssessmentOnCriteria, Member } from '../../../types';
+import { AnswerOnCriteria, Evaluation, Member } from '../../../types';
 
 const { TextArea } = Input;
 
 type Props = {
+  isAllowEdit: boolean;
+  answer: AnswerOnCriteria;
   member: Member;
-  criteriaQuestion: AssessmentOnCriteria;
   comment: string;
   setComment: (value: string) => void;
   isVisible: boolean;
   setVisible: (value: boolean) => void;
 };
 
-export default function CommentModal({ isVisible, setVisible, comment, setComment, member, criteriaQuestion }: Props) {
+export default function CommentModal({ answer, isAllowEdit, isVisible, setVisible, comment, setComment }: Props) {
   const [value, setValue] = useState(comment);
 
   useEffect(() => {
@@ -31,8 +32,10 @@ export default function CommentModal({ isVisible, setVisible, comment, setCommen
       destroyOnClose
       title={
         <div className="flex flex-ai-c flex-jc-c">
-          <h3 style={{ color: 'white' }}>{member?.user?.nickname}</h3>
-          <div style={{ color: 'white' }}>{criteriaQuestion?.criteria?.name}</div>
+          {/* <h3 style={{ color: 'white' }}>{}</h3> */}
+          <div className="bold" style={{ color: 'white' }}>
+            {answer?.criteria?.name}
+          </div>
         </div>
       }
       centered
@@ -47,7 +50,8 @@ export default function CommentModal({ isVisible, setVisible, comment, setCommen
       <TextArea
         style={{ height: '200px' }}
         autoFocus
-        placeholder="Comment about ..."
+        disabled={!isAllowEdit}
+        placeholder="Comment here..."
         value={value}
         onChange={(value) => setValue(value.currentTarget.value)}
       />

@@ -28,41 +28,49 @@ Table Assessment {
   status AssessmentStatus [not null]
   team Team [not null]
   creator Member [not null]
-  assessmentOnCriteriaList AssessmentOnCriteria [not null]
+  evaluations Evaluation [not null]
 }
 
-Table AssessmentOnCriteria {
+Table Evaluation {
   id String [pk]
-  assessmentId String [not null]
-  criteriaId String [not null]
-  createdAt DateTime [default: `now()`, not null]
-  createdBy String [not null]
-  assessment Assessment [not null]
-  criteria Criteria [not null]
-  assessorOnAssessments AssessorOnAssessment [not null]
+  assessorId String [not null]
+  isSubmit Boolean [not null]
+  assessmentId String
+  updatedAt DateTime [not null]
+  assessor Member [not null]
+  assessment Assessment
+  results Result [not null]
 
   indexes {
-    (assessmentId, criteriaId) [unique]
+    (assessmentId, assessorId) [unique]
   }
 }
 
-Table AssessorOnAssessment {
+Table Result {
   id String [pk]
-  assessmentOnCriteriaId String [not null]
-  assessorId String [not null]
   concerningMemberId String [not null]
+  evaluationId String
+  answerOnCriteriaList AnswerOnCriteria [not null]
+  concerningMember Member [not null]
+  evaluation Evaluation
+}
+
+Table AnswerOnCriteria {
+  id String [pk]
+  criteriaId String [not null]
+  resultId String
   point Int
   comment String
-  assessor Member [not null]
-  concerningMember Member [not null]
-  assessmentOnCriteria AssessmentOnCriteria [not null]
+  updatedAt DateTime [not null]
+  criteria Criteria [not null]
+  Result Result
 }
 
 Table Criteria {
   id String [pk]
   name String [unique, not null]
   description String [not null]
-  AssessmentOnCriteriaList AssessmentOnCriteria [not null]
+  answerOnCriteriaList AnswerOnCriteria [not null]
 }
 
 Table Team {
@@ -223,8 +231,8 @@ Table Member {
   memberComments MemberComment [not null]
   memberAnswers MemberAnswer [not null]
   MemberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
-  assessors AssessorOnAssessment [not null]
-  concerningMembers AssessorOnAssessment [not null]
+  results Result [not null]
+  evaluations Evaluation [not null]
 
   indexes {
     (userId, teamId) [unique]
@@ -356,15 +364,17 @@ Ref: Assessment.teamId > Team.id
 
 Ref: Assessment.creatorId > Member.id
 
-Ref: AssessmentOnCriteria.assessmentId > Assessment.id
+Ref: Evaluation.assessorId > Member.id
 
-Ref: AssessmentOnCriteria.criteriaId > Criteria.id
+Ref: Evaluation.assessmentId > Assessment.id
 
-Ref: AssessorOnAssessment.assessorId > Member.id
+Ref: Result.concerningMemberId > Member.id
 
-Ref: AssessorOnAssessment.concerningMemberId > Member.id
+Ref: Result.evaluationId > Evaluation.id
 
-Ref: AssessorOnAssessment.assessmentOnCriteriaId > AssessmentOnCriteria.id
+Ref: AnswerOnCriteria.criteriaId > Criteria.id
+
+Ref: AnswerOnCriteria.resultId > Result.id
 
 Ref: Template.teamId > Team.id
 

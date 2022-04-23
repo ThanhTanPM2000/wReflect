@@ -10,81 +10,46 @@ import {
 import error from './../errorsManagement';
 import prisma from './../prisma';
 import { checkIsMemberOfTeam, checkIsMemberOwningTeam } from './essential';
-import _ from 'lodash';
+import _, { result } from 'lodash';
 import fs from 'fs';
+import moment from 'moment';
 
 export const createAssessment = async (meId: string, args: createAssessmentType) => {
-  // const memberOfTeam = await checkIsMemberOfTeam(args?.teamId, meId);
   const memberOwnedTeam = await checkIsMemberOwningTeam(args?.teamId, meId);
-
-  const status = new Date(args?.startDate) < new Date() ? 'Planned' : 'Doing';
-  const list: { assessorId: string; concerningMemberId: string; point?: number; comment?: string }[] = [];
-  args?.memberIds?.forEach((memberId) => {
-    args?.memberIds?.forEach((y) => {
-      list?.push({
-        assessorId: memberId,
+  const evaluations = args?.memberIds?.map((memberId) => ({
+    assessorId: memberId,
+    isSubmit: false,
+    results: {
+      create: args?.memberIds?.map((y) => ({
         concerningMemberId: y,
-        comment: '',
-      });
-    });
-  });
+        answerOnCriteriaList: {
+          create: args?.criteriaList?.map((criteriaId) => ({
+            criteriaId: criteriaId,
+          })),
+        },
+      })),
+    },
+  }));
 
-  const creatingCriteria = args?.criteriaList?.map((criteria) => {
-    return {
-      criteriaId: criteria,
-      createdBy: memberOwnedTeam?.id,
-      assessorOnAssessments: {
-        create: list,
-      },
-    };
-  });
-
-  const b = _?.cloneDeep(creatingCriteria);
-  fs.writeFile('test.txt', JSON.stringify(b), (err) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    //file written successfully
-  });
-
-  // const assessment1 = await prisma.assessment.upsert({
-  //   where: {
-  //     id: args?.assessmentId,
-  //   },
-  //   update: {
-  //     name: args?.nameAssessment,
-  //     endDate: args?.endDate,
-  //     // assessmentOnCriteriaList: {},
-  //   },
-  //   create: {
-  //     teamId: args?.teamId,
-  //     name: args?.nameAssessment,
-  //     startDate: args?.startDate,
-  //     endDate: args?.endDate,
-  //     creatorId: memberOwnedTeam?.id,
-  //     status: status,
-  //     assessmentOnCriteriaList: {
-  //       create: [...creatingCriteria],
-  //     },
-  //   },
-  // });
-
-  const assessment = await prisma.assessment.create({
+  const assessment = await prisma.assessment?.create({
     data: {
       teamId: args?.teamId,
+      creatorId: memberOwnedTeam?.id,
+      status:
+        moment() < moment(args?.startDate).startOf('day')
+          ? 'Planned'
+          : moment() > moment(args?.endDate).endOf('days')
+          ? 'Complete'
+          : 'Doing',
       name: args?.nameAssessment,
       startDate: args?.startDate,
       endDate: args?.endDate,
-      creatorId: memberOwnedTeam?.id,
-      status: status,
-      assessmentOnCriteriaList: {
-        create: [...creatingCriteria],
+      evaluations: {
+        create: [...evaluations],
       },
     },
   });
 
-  if (!assessment) return error.NotFound();
   return assessment;
 };
 
@@ -100,7 +65,7 @@ export const getListAssessment = async (
     limit: 8,
   },
 ) => {
-  await checkIsMemberOfTeam(args?.teamId, meId);
+  const memberOfTeam = await checkIsMemberOfTeam(args?.teamId, meId);
   const orderBy =
     args?.orderBy == filterOfGetAssessmentList.NAME
       ? {
@@ -116,20 +81,24 @@ export const getListAssessment = async (
         }
       : undefined;
 
-  const where = args?.search && {
-    OR: [
-      {
-        name: {
-          contains: args?.search,
-        },
-      },
-    ],
-  };
+  const where =
+    memberOfTeam?.isSuperOwner || memberOfTeam?.isOwner
+      ? undefined
+      : {
+          evaluations: {
+            some: {
+              assessorId: memberOfTeam?.id,
+            },
+          },
+        };
 
   const assessments = await prisma.assessment.findMany({
     where: {
       teamId: args?.teamId,
       ...where,
+      name: {
+        contains: args?.search || undefined,
+      },
     },
     ...(!args?.isGettingAll && { skip: args?.offSet }),
     ...(!args?.isGettingAll && { take: args?.limit }),
@@ -138,9 +107,19 @@ export const getListAssessment = async (
     },
     include: {
       creator: true,
-      assessmentOnCriteriaList: {
+      evaluations: {
         include: {
-          criteria: true,
+          assessor: true,
+          results: {
+            include: {
+              concerningMember: true,
+              answerOnCriteriaList: {
+                include: {
+                  criteria: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -150,6 +129,9 @@ export const getListAssessment = async (
     where: {
       teamId: args?.teamId,
       ...where,
+      name: {
+        contains: args?.search || undefined,
+      },
     },
   });
 
@@ -164,20 +146,37 @@ export const getListAssessment = async (
 export const getAssessment = async (meId: string, args: getAssessmentArgs) => {
   const memberOfTeam = await checkIsMemberOfTeam(args?.teamId, meId);
 
+  const where =
+    memberOfTeam?.isSuperOwner || memberOfTeam?.isOwner
+      ? undefined
+      : {
+          assessmentId: args?.assessmentId,
+          assessorId: memberOfTeam?.id,
+        };
+
   const assessment = await prisma.assessment.findUnique({
     where: {
       id: args?.assessmentId,
     },
     include: {
-      assessmentOnCriteriaList: {
+      evaluations: {
+        where: { ...where },
         include: {
-          criteria: true,
-          assessorOnAssessments: {
+          assessor: true,
+          results: {
             include: {
-              assessor: true,
+              concerningMember: true,
+              answerOnCriteriaList: {
+                include: {
+                  criteria: true,
+                },
+                orderBy: {
+                  criteriaId: 'asc',
+                },
+              },
             },
-            where: {
-              assessorId: memberOfTeam?.id,
+            orderBy: {
+              concerningMemberId: 'asc',
             },
           },
         },
@@ -190,95 +189,119 @@ export const getAssessment = async (meId: string, args: getAssessmentArgs) => {
   return assessment;
 };
 
-export const getListAssessmentOnCriteriaList = async (assessmentId: string) => {
-  const assessmentOnCriteriaList = await prisma.assessmentOnCriteria.findMany({
-    where: {
-      assessmentId,
-    },
-  });
+// export const getListAssessmentOnCriteriaList = async (assessmentId: string) => {
+//   const assessmentOnCriteriaList = await prisma.assessmentOnCriteria.findMany({
+//     where: {
+//       assessmentId,
+//     },
+//   });
 
-  return assessmentOnCriteriaList;
-};
+//   return assessmentOnCriteriaList;
+// };
 
-type test = {
-  where: {
-    id: string;
-  };
-  data: {
-    assessorOnAssessments: {
-      upsert: {
-        where: {
-          id: string;
-        };
-        update: {
-          point: number;
-          comment: string;
-        };
-        create: {
-          assessorId: string;
-          concerningMemberId: string;
-          point: number;
-          comment: string;
-        };
-      };
-    };
-  };
-}[];
+// type test = {
+//   where: {
+//     id: string;
+//   };
+//   data: {
+//     assessorOnAssessments: {
+//       upsert: {
+//         where: {
+//           id: string;
+//         };
+//         update: {
+//           point: number;
+//           comment: string;
+//         };
+//         create: {
+//           assessorId: string;
+//           concerningMemberId: string;
+//           point: number;
+//           comment: string;
+//         };
+//       };
+//     };
+//   };
+// }[];
 
 export const submitDoPersonal = async (meId: string, args: submitDoPersonalReflection) => {
   const memberOfTeam = await checkIsMemberOfTeam(args?.teamId, meId);
 
-  const update: test = [];
-  await Promise.all(
-    args?.memberAnswer?.map((answer) => {
-      answer?.data?.map((x) => {
-        update.push({
+  const where =
+    memberOfTeam?.isSuperOwner || memberOfTeam?.isOwner
+      ? undefined
+      : {
+          assessmentId: args?.assessmentId,
+          assessorId: memberOfTeam?.id,
+        };
+
+  const updateResult = args?.results?.map((result) => ({
+    where: {
+      id: result?.id,
+    },
+    data: {
+      concerningMemberId: result?.concerningMemberId,
+      answerOnCriteriaList: {
+        update: result?.answerOnCriteriaList?.map((answer) => ({
           where: {
-            id: x?.assessmentOnCriteriaId,
+            id: answer?.id,
           },
           data: {
-            assessorOnAssessments: {
-              upsert: {
-                where: {
-                  id: x?.assessmentOnCriteriaId,
-                },
-                update: {
-                  point: x?.point,
-                  comment: x?.comment || '',
-                },
-                create: {
-                  assessorId: memberOfTeam?.id,
-                  concerningMemberId: answer?.concerningMemberId,
-                  point: x?.point,
-                  comment: x?.comment || '',
-                },
-              },
-            },
+            ...answer,
           },
-        });
-      });
-    }),
-  );
-  const b = _?.cloneDeep(update);
-  fs.writeFile('test.txt', `${b?.map((x) => JSON.stringify(x))}`, (err) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    //file written successfully
-  });
+        })),
+      },
+    },
+  }));
 
-  const assessment = await prisma.assessment.update({
+  const assessment = await prisma?.assessment?.update({
     where: {
       id: args?.assessmentId,
     },
     data: {
-      assessmentOnCriteriaList: {
-        update: [...update],
+      evaluations: {
+        update: {
+          where: {
+            assessmentId_assessorId: {
+              assessmentId: args?.assessmentId,
+              assessorId: memberOfTeam?.id,
+            },
+          },
+          data: {
+            isSubmit: true,
+            results: {
+              update: updateResult,
+            },
+          },
+        },
+      },
+    },
+    include: {
+      creator: true,
+      evaluations: {
+        where: { ...where },
+        include: {
+          assessor: true,
+          results: {
+            include: {
+              concerningMember: true,
+              answerOnCriteriaList: {
+                include: {
+                  criteria: true,
+                },
+                orderBy: {
+                  criteriaId: 'asc',
+                },
+              },
+            },
+            orderBy: {
+              concerningMemberId: 'asc',
+            },
+          },
+        },
       },
     },
   });
 
-  console.log(assessment);
   return assessment;
 };

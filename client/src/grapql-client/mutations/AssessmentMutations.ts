@@ -1,7 +1,7 @@
 import { ASSESSMENT_FIELDS } from './../fragments/assessmentFragment';
 import { TEAM_FIELDS } from './../fragments/teamFragment';
 import { gql } from '@apollo/client';
-import { Assessment } from '../../types';
+import { Assessment, Result } from '../../types';
 
 export type createAssessmentResult = {
   createAssessment: Assessment;
@@ -47,13 +47,14 @@ export type submitDoPersonalVars = {
   teamId: string;
   assessmentId: string;
   assessorId: string;
-  memberAnswer: {
-    isDone: boolean;
+  results: {
+    id: string;
     concerningMemberId: string;
-    data: {
-      assessmentOnCriteriaId: string;
+    answerOnCriteriaList: {
+      id: string;
+      criteriaId: string;
       point: number;
-      comment?: string;
+      comment: string;
     }[];
   }[];
 };
@@ -64,14 +65,9 @@ export const submitDoPersonalReflection = gql`
     $teamId: String!
     $assessmentId: String!
     $assessorId: String!
-    $memberAnswer: [memberAnswer]
+    $results: [ResultInput]
   ) {
-    doPersonalReflection(
-      teamId: $teamId
-      assessmentId: $assessmentId
-      assessorId: $assessorId
-      memberAnswer: $memberAnswer
-    ) {
+    doPersonalReflection(teamId: $teamId, assessmentId: $assessmentId, assessorId: $assessorId, results: $results) {
       ...AssessmentFields
     }
   }

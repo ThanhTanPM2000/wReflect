@@ -28,6 +28,25 @@ const typeDefs = gql`
     healthCheck: HealthCheck
   }
 
+  type areaRadarChartData {
+    isSubmit: Boolean
+    criteria: Criteria
+    assessor: Member
+    point: Int
+  }
+
+  type rosePlotChartData {
+    criteria: Criteria
+    sum: Int
+    count: Int
+    avg: Float
+  }
+
+  type analysisAssessmentData {
+    areaRadarChartData: [areaRadarChartData]
+    rosePlotChartData: [rosePlotChartData]
+  }
+
   enum inviteStatus {
     JOINED
     UNJOINED
@@ -79,6 +98,8 @@ const typeDefs = gql`
     getHealthCheck(teamId: String, boardId: String): getHealthCheck
 
     getEssentialData: essentialData
+
+    getAnalysisAssessment(teamId: String!, assessmentId: String!, memberId: String!): analysisAssessmentData
   }
 `;
 

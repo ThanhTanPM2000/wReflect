@@ -35,6 +35,7 @@ import { CountDown } from '../../components/CountDown';
 import { Board } from '../../types';
 import ModalMeetingNote from './modalMeetingNote';
 import { isMemberName } from 'typescript';
+import moment from 'moment';
 
 type Props = {
   teamId: string;
@@ -258,7 +259,7 @@ export default function board({ teamId, boardId }: Props) {
               <div className="boardTools">
                 <div className="countDown">
                   {board.timerInProgress && board.endTime ? (
-                    <CountDown endTime={board?.endTime?.valueOf()} />
+                    <CountDown startTime={moment().valueOf()} endTime={board?.endTime?.valueOf()} />
                   ) : (
                     '--:--:--'
                   )}

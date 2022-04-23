@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { AssessmentQueries, CriteriaQueries, TeamQueries } from '../../../grapql-client/queries';
 import { Assessment, Team } from '../../../types';
 import { Button, Input, Pagination, Select, Tooltip } from 'antd';
@@ -12,6 +12,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import UpdateAssessmentModal from './updateAssessmentModal';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Loading } from '../../../components/Loading';
+import selfContext from '../../../contexts/selfContext';
 import _ from 'lodash';
 
 const { Search } = Input;
@@ -33,6 +34,7 @@ export default function ManageJudge({ teamId, setTeam }: Props) {
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const history = useHistory();
   const { path, url } = useRouteMatch();
+  const me = useContext(selfContext);
 
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>();
 
@@ -91,6 +93,8 @@ export default function ManageJudge({ teamId, setTeam }: Props) {
     assessmentDataRefetch();
   };
 
+  const iMember = data?.team?.members.find((member) => member.userId === me?.id);
+
   return (
     <Loading
       refetch={handleRefetch}
@@ -130,11 +134,13 @@ export default function ManageJudge({ teamId, setTeam }: Props) {
                 <SortDescendingOutlined /> Sort By Descending Status
               </Option>
             </Select>
-            <div>
-              <Button onClick={() => setIsCreateModalVisible(true)} type="primary">
-                Create Assessment
-              </Button>
-            </div>
+            {(iMember?.isSuperOwner || iMember?.isOwner) && (
+              <div>
+                <Button onClick={() => setIsCreateModalVisible(true)} type="primary">
+                  Create Assessment
+                </Button>
+              </div>
+            )}
           </div>
           <div className="assessmentContainer"></div>
           <CreatingAssessmentModal

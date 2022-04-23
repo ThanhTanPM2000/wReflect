@@ -1,11 +1,12 @@
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
-  type Criteria {
+  type Result {
     id: ID
-    name: String
-    description: String
+    concerningMemberId: String
+    evaluationId: String
     answerOnCriteriaList: [AnswerOnCriteria]
+    concerningMember: Member
   }
 `;
 
