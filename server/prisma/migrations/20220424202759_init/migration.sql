@@ -17,6 +17,9 @@ CREATE TYPE "OpinionStatus" AS ENUM ('NEW', 'IN_PROGRESS', 'DONE', 'REJECTED');
 CREATE TYPE "TeamStatus" AS ENUM ('DOING', 'DONE');
 
 -- CreateEnum
+CREATE TYPE "UserConnectionStatus" AS ENUM ('Connect', 'Sending');
+
+-- CreateEnum
 CREATE TYPE "Gender" AS ENUM ('UNSPECIFIED', 'MALE', 'FEMALE');
 
 -- CreateEnum
@@ -55,6 +58,7 @@ CREATE TABLE "Evaluation" (
     "assessorId" TEXT NOT NULL,
     "isSubmit" BOOLEAN NOT NULL,
     "assessmentId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     PRIMARY KEY ("id")
@@ -249,6 +253,7 @@ CREATE TABLE "Notification" (
     "description" TEXT NOT NULL,
     "linkRedirect" TEXT,
     "isSeen" BOOLEAN NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY ("id")
 );
@@ -260,6 +265,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
+    "isSeenNotification" BOOLEAN NOT NULL,
     "userStatus" "UserStatus" NOT NULL DEFAULT E'OFFLINE',
     "nickname" VARCHAR(150) NOT NULL,
     "picture" VARCHAR(500) NOT NULL,
@@ -306,6 +312,18 @@ CREATE TABLE "MemberComment" (
     "memberId" TEXT NOT NULL,
     "questionId" TEXT NOT NULL,
     "text" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RemiderNotification" (
+    "id" TEXT NOT NULL,
+    "dateSend" TIMESTAMP(3) NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "sendBy" TEXT NOT NULL,
+    "sendTo" TEXT[],
 
     PRIMARY KEY ("id")
 );

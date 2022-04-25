@@ -27,7 +27,7 @@ export default function RosePlotChart({ rosePlotData }: Props) {
 
   return (
     <>
-      <h3 className="flex flex-ai-c flex-jc-c mb-14">Rose Chart</h3>
+      <h2 className="flex flex-ai-c flex-jc-c mb-14">Rose Chart</h2>
       <Rose
         data={data}
         xField="criteria"

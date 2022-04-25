@@ -258,12 +258,20 @@ const typeDefs = gql`
       memberIds: [String]!
     ): Assessment
 
+    updateAssessment(teamId: String!, assessmentName: String!, assessmentId: String!): Assessment
+
+    deleteAssessment(teamId: String!, assessmentId: String!): Assessment
+
     doPersonalReflection(
       teamId: String!
       assessmentId: String!
       assessorId: String!
       results: [ResultInput]
     ): Assessment
+
+    seenNotification(notificationId: String!): Notification
+    removeNotification(notificationId: String!): Notification
+
   }
 `;
 

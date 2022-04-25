@@ -191,6 +191,7 @@ export type Evaluation = {
   assessorId: string;
   isSubmit: boolean;
   assessmentId: string;
+  createdAt: string;
   assessor: Member;
   results: Result[];
 };
@@ -247,4 +248,34 @@ export type User = {
   introduction: string | null;
   talents: string | null;
   interests: string | null;
+  notifications: Notification[];
+  skillValues: UserOnCriteria[];
+};
+
+export type UserOnCriteria = {
+  id: string;
+  userId: string;
+  criteriaId: string;
+  value: number;
+  criteria: Criteria
+};
+
+export type Notification = {
+  id: string;
+  receiverId: string;
+  senderId: string;
+  title: string;
+  description: string;
+  isSeen: boolean;
+  createdAt: string;
+  receiver: User;
+};
+
+export type RemiderNotification = {
+  id: string;
+  dateSent: string;
+  title: string;
+  description: string;
+  sentBy: string;
+  sentTo: string;
 };

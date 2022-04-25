@@ -18,6 +18,9 @@ import { default as Evaluation } from './Evaluation/evaluationTypeDef';
 import { default as Criteria } from './Criteria/criteriaTypeDefs';
 import { default as Result } from './resultTypeDefs';
 import { default as AnswerOnCriteria } from './answerOnCriteriaTypeDefs';
+import { default as Notification } from './notificationTypeDefs';
+import { default as RemiderNotification } from './remiderNotificationTypeDefs';
+import { default as UserOnCriteria } from './userOnCriteriaTypeDefs';
 
 export default [
   Answer,
@@ -40,4 +43,7 @@ export default [
   Criteria,
   Result,
   AnswerOnCriteria,
+  Notification,
+  RemiderNotification,
+  UserOnCriteria,
 ];

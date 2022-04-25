@@ -26,10 +26,10 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
     criteriaData?.map((criteriaData) => criteriaData.id).slice(0, 5),
   );
 
-  const [createAssessment] = useMutation<
-    AssessmentMutations.createAssessmentResult,
-    AssessmentMutations.createAssessmentVars
-  >(AssessmentMutations.createAssessment, {
+  const [updateAssessment] = useMutation<
+    AssessmentMutations.updateAssessmentResult,
+    AssessmentMutations.updateAssessmentVars
+  >(AssessmentMutations.updateAssessment, {
     onError: (error) => {
       console.log(error);
     },
@@ -54,34 +54,37 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
   const handleUpdate = () => {
     form.validateFields().then(async (values: any) => {
       const nameAssessment = values['name'];
-      const startDate = values['range-picker'] && values['range-picker'][0] ? values['range-picker'][0] : moment();
-      const endDate = values['range-picker'] && values['range-picker'][1] ? values['range-picker'][1] : moment();
-      const criteriaList = values['names'];
-      // createAssessment({
-      //   variables: {
-      //     teamId: team?.id,
-      //     startDate,
-      //     endDate,
-      //     nameAssessment,
-      //     criteriaList,
-      //   },
-      //   onCompleted: () => {
-      //     setVisible(false);
-      //     setSelectedCriteria(criteriaData?.map((criteriaData) => criteriaData.id).slice(0, 5));
-      //   },
-      //   refetchQueries: ['getAssessmentsList'],
-      //   updateQueries: {
-      //     getAssessmentsList: (previousData, { mutationResult }) => {
-      //       return { getAssessmentsList: [mutationResult?.data?.createAssessment] };
-      //     },
-      //   },
-      // });
+      // const startDate = values['range-picker'] && values['range-picker'][0] ? values['range-picker'][0] : moment();
+      // const endDate = values['range-picker'] && values['range-picker'][1] ? values['range-picker'][1] : moment();
+      // const criteriaList = values['names'];
+      await updateAssessment({
+        variables: {
+          teamId: team?.id,
+          assessmentId: assessment?.id,
+          assessmentName: nameAssessment,
+        },
+        onCompleted: () => {
+          setVisible(false);
+          setSelectedCriteria(criteriaData?.map((criteriaData) => criteriaData.id).slice(0, 5));
+        },
+        // refetchQueries: ['getAssessmentsList'],
+      });
     });
   };
 
   function disabledDate(current) {
     return current && current < moment().startOf('day');
   }
+
+  const optionChildAssignees = team?.members.map((member) => {
+    if (!member?.isPendingInvitation) {
+      return (
+        <Option key={member?.id} value={member?.id}>
+          {member?.user?.nickname}
+        </Option>
+      );
+    }
+  });
 
   return (
     <Modal
@@ -99,7 +102,7 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
       footer={
         <>
           <Button onClick={() => setVisible(false)}>Cancle</Button>
-          <Button onClick={() => console.log('updated')} type="primary" htmlType="submit">
+          <Button onClick={() => handleUpdate()} type="primary" htmlType="submit">
             Update
           </Button>
         </>
@@ -132,14 +135,44 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
               name="range-picker"
               label="Start Date - End Date"
             >
-              <RangePicker disabledDate={disabledDate} defaultValue={[moment(), null]} format="DD-MM-YYYY" />
+              <RangePicker disabled disabledDate={disabledDate} defaultValue={[moment(), null]} format="DD-MM-YYYY" />
+            </Form.Item>
+            <Form.Item
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              style={{ textAlign: 'start' }}
+              name="memberDoAssessment"
+              label="Members"
+              initialValue={
+                team?.members?.map((member) => {
+                  if (!member?.isPendingInvitation) return member?.id;
+                }) || []
+              }
+            >
+              <Select
+                disabled
+                showArrow
+                allowClear
+                onClear={() => form.setFieldsValue({ memberDoAssessment: [] })}
+                placeholder="Select..."
+                mode="multiple"
+                style={{ width: '100%' }}
+              >
+                <Option key="selectAll" value="selectAll">
+                  Select All
+                </Option>
+                {optionChildAssignees}
+              </Select>
             </Form.Item>
           </div>
           <div className="setting-criteria">
             <h3>Criteria List:</h3>
-            {/* <Form.List
+            <Form.List
               name="names"
-              initialValue={assessment?.assessmentOnCriteriaList?.map((assessmentOnCre) => assessmentOnCre.criteriaId)}
+              initialValue={selectedCriteria}
               rules={[
                 {
                   validator: async (_, names) => {
@@ -222,9 +255,49 @@ export default function UpdateAssessmentModal({ assessment, criteriaData, team, 
                       </div>
                     </Form.Item>
                   ))}
+                  <div>
+                    <div className="actionOfCriteriaList">
+                      <Button
+                        type="dashed"
+                        disabled
+                        onClick={() => {
+                          // if (criteriaData?.length === selectedCriteria.length) {
+                          // } else {
+                          const addedCriteria = criteriaData?.filter(
+                            (criteria) => !selectedCriteria.includes(criteria?.id),
+                          )[0]?.id;
+                          if (addedCriteria) {
+                            add(addedCriteria);
+                            setSelectedCriteria([...selectedCriteria, addedCriteria]);
+                          }
+                          // }
+                        }}
+                        icon={<PlusOutlined />}
+                      >
+                        Add field
+                      </Button>
+                      <Button
+                        type="dashed"
+                        disabled
+                        onClick={() => {
+                          const addedCriteria = criteriaData?.filter(
+                            (criteria) => !selectedCriteria.includes(criteria?.id),
+                          )[0]?.id;
+                          console.log('criteria', addedCriteria);
+                          if (addedCriteria) {
+                            add(addedCriteria, 0);
+                            setSelectedCriteria([addedCriteria, ...selectedCriteria]);
+                          }
+                        }}
+                        icon={<PlusOutlined />}
+                      >
+                        Add field at head
+                      </Button>
+                    </div>
+                  </div>
                 </>
               )}
-            </Form.List> */}
+            </Form.List>
           </div>
         </div>
       </Form>

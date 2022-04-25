@@ -83,9 +83,9 @@ export default function CreatingAssessmentModal({ assessment, criteriaData, team
     });
   };
 
-  function disabledDate(current) {
-    return current && current < moment().startOf('day');
-  }
+  // function disabledDate(current) {
+  //   return current && current < moment().startOf('day');
+  // }
 
   const handleOnSelectAssigners = (value: string) => {
     if (value === 'selectAll') {
@@ -157,7 +157,11 @@ export default function CreatingAssessmentModal({ assessment, criteriaData, team
               name="range-picker"
               label="Start Date - End Date"
             >
-              <RangePicker disabledDate={disabledDate} defaultValue={[moment(), null]} format="DD-MM-YYYY" />
+              <RangePicker
+                //  disabledDate={disabledDate}
+                defaultValue={[moment(), null]}
+                format="DD-MM-YYYY"
+              />
             </Form.Item>
             <Form.Item
               rules={[

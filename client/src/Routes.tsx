@@ -17,6 +17,7 @@ import { ManageBoardPage } from './pages/ManageBoardPage';
 // import HealthCheck from './pages/HealthCheck/HealthCheck';
 import TeamDetail from './pages/TeamDetailPage/teamDetail';
 import { PersonalReflection } from './pages/PersonalReflection';
+import NotificationPage from './pages/NotificationPage/notificationList';
 
 const HealthCheck = React.lazy(() => import('./pages/HealthCheck/HealthCheck'));
 
@@ -79,6 +80,7 @@ const Routes = ({ me }: Props) => {
                               path="/manage-members/:teamId"
                               render={({ match }) => <ManageMembers teamId={match.params.teamId} />}
                             />
+                            <Route path="/notifications" exact render={({ match }) => <NotificationPage />} />
                             <Route
                               path="/me"
                               exact

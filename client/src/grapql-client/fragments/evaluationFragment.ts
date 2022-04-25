@@ -11,6 +11,7 @@ export const EVALUATION_FIELDS = gql`
     assessorId
     isSubmit
     assessmentId
+    createdAt
     assessor {
       ...MemberFields
     }

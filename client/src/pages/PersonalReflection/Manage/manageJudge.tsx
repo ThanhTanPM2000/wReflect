@@ -1,19 +1,22 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import React, { useEffect, useContext, useState } from 'react';
 import { AssessmentQueries, CriteriaQueries, TeamQueries } from '../../../grapql-client/queries';
 import { Assessment, Team } from '../../../types';
-import { Button, Input, Pagination, Select, Tooltip } from 'antd';
+import { Button, Input, Pagination, Select, Tooltip, Modal, Empty } from 'antd';
 import CreatingAssessmentModal from './creatingAssessmentModal';
 import { SortDescendingOutlined, SortAscendingOutlined, AimOutlined } from '@ant-design/icons';
 import { filterOfGetAssessmentList, sortType } from '../../../grapql-client/queries/assessmentQueries';
 import moment from 'moment';
 import SearchBar from '../../../components/SearchBar/SearchBar';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import UpdateAssessmentModal from './updateAssessmentModal';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { Loading } from '../../../components/Loading';
 import selfContext from '../../../contexts/selfContext';
-import _ from 'lodash';
+import _, { truncate } from 'lodash';
+import { AssessmentMutations } from '../../../grapql-client/mutations';
+import loading from '../../../components/Loading/loading';
+const { confirm } = Modal;
 
 const { Search } = Input;
 const { Option } = Select;
@@ -157,64 +160,114 @@ export default function ManageJudge({ teamId, setTeam }: Props) {
             setVisible={setIsUpdateModalVisible}
           />
           <div className="container">
-            <div style={{ marginTop: '50px' }} className="flex flex-ai-c flex-jc-c mt-25">
-              <Pagination
-                defaultCurrent={1}
-                current={page}
-                total={assessmentData?.getAssessmentsList?.total}
-                defaultPageSize={8}
-                pageSize={size}
-                onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
-              />
-            </div>
-            <div className="listOfAssessment">
-              {assessmentData?.getAssessmentsList?.data?.map((assessment) => (
-                <>
-                  <div key={assessment?.id} className={`assessmentCard ${assessment?.status == 'Complete' && 'done'}`}>
-                    <div className="inforAssessment">
-                      <div className="fieldInfor">
-                        <div className="upperCase">Name:</div>
-                        {assessment?.name?.toUpperCase()}
+            {assessmentData?.getAssessmentsList?.data?.length != 0 ? (
+              <>
+                <div style={{ marginTop: '50px' }} className="flex flex-ai-c flex-jc-c mt-25">
+                  <Pagination
+                    defaultCurrent={1}
+                    current={page}
+                    total={assessmentData?.getAssessmentsList?.total}
+                    defaultPageSize={8}
+                    pageSize={size}
+                    onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
+                  />
+                </div>
+                <div className="listOfAssessment">
+                  {assessmentData?.getAssessmentsList?.data?.map((assessment) => (
+                    <>
+                      <div
+                        key={assessment?.id}
+                        className={`assessmentCard ${assessment?.status == 'Complete' && 'done'}`}
+                      >
+                        <div className="inforAssessment">
+                          <div className="fieldInfor">
+                            <div className="upperCase">Name:</div>
+                            {assessment?.name?.toUpperCase()}
+                          </div>
+                          <div className="fieldInfor">
+                            <div className="upperCase">Status:</div>
+                            {assessment.status}
+                          </div>
+                          <div className="flex flex-dir-r">
+                            <h3>{moment(+assessment.startDate).format('DD/MM/YYYY')}</h3>
+                            <h3>{moment(+assessment.endDate).format('DD/MM/YYYY')}</h3>
+                          </div>
+                        </div>
+                        <div className="actionAssessment">
+                          <Tooltip title="Do Personal Reflection">
+                            <Button
+                              type="text"
+                              onClick={() => history.push(`/personal-reflect/do/${teamId}/${assessment?.id}`)}
+                              icon={<AimOutlined />}
+                            />
+                          </Tooltip>
+                          <Tooltip title="Edit">
+                            <Button
+                              type="text"
+                              onClick={() => {
+                                setSelectedAssessment(assessment);
+                                setIsUpdateModalVisible(true);
+                              }}
+                              icon={<EditOutlined />}
+                            />
+                          </Tooltip>
+                          {/* <Tooltip title="Delete">
+                        <Button onClick={(
+
+                        )} type="text" icon={<DeleteOutlined/> }>
+                        </Button>
+                      </Tooltip> */}
+                          <DeleteAssessmentButton teamId={teamId} assessmentId={assessment?.id} />
+                        </div>
                       </div>
-                      <div className="fieldInfor">
-                        <div className="upperCase">Status:</div>
-                        {assessment.status}
-                      </div>
-                      <div className="flex flex-dir-r">
-                        <h3>{moment(+assessment.startDate).format('DD/MM/YYYY')}</h3>
-                        <h3>{moment(+assessment.endDate).format('DD/MM/YYYY')}</h3>
-                      </div>
-                    </div>
-                    <div className="actionAssessment">
-                      <Tooltip title="Do Personal Reflection">
-                        <AimOutlined
-                          onClick={() => history.push(`/personal-reflect/do/${teamId}/${assessment?.id}`)}
-                          style={{ marginRight: 20, fontSize: 15 }}
-                        />
-                      </Tooltip>
-                      <Tooltip title="Edit">
-                        <EditOutlined
-                          onClick={() => {
-                            setSelectedAssessment(assessment);
-                            setIsUpdateModalVisible(true);
-                          }}
-                          style={{ marginRight: 20, fontSize: 15 }}
-                        />
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <DeleteOutlined
-                          onClick={() => console.log('Deleted')}
-                          style={{ marginRight: 20, fontSize: 15 }}
-                        />
-                      </Tooltip>
-                    </div>
-                  </div>
-                </>
-              ))}
-            </div>
+                    </>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Empty description="No Assessments Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
+            )}
           </div>
         </div>
       </>
     </Loading>
+  );
+}
+
+function DeleteAssessmentButton({ teamId, assessmentId }: { teamId: string; assessmentId: string }) {
+  const [deleteAssessment, { loading }] = useMutation<
+    AssessmentMutations.deleteAssessmentResult,
+    AssessmentMutations.deleteAssessmentVars
+  >(AssessmentMutations?.deleteAssessment, {
+    refetchQueries: ['getAssessmentsList'],
+  });
+
+  return (
+    <Tooltip title="Delete">
+      <Button
+        loading={loading}
+        onClick={async () =>
+          confirm({
+            title: 'Do you Want to delete these items?',
+            centered: true,
+            icon: <ExclamationCircleOutlined />,
+            content: 'Some descriptions',
+            onOk: async () => {
+              await deleteAssessment({
+                variables: {
+                  teamId,
+                  assessmentId,
+                },
+              });
+            },
+            onCancel() {
+              console.log('Cancel');
+            },
+          })
+        }
+        type="text"
+        icon={<DeleteOutlined />}
+      />
+    </Tooltip>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 
-import { Menu, Layout, Modal, Tooltip, Button, Row, Col, Tabs } from 'antd';
+import { Menu, Layout, Modal, Tooltip, Button, Row, Col, Tabs, Badge } from 'antd';
 import { Link } from 'react-router-dom';
 import { Logout } from '../Logout';
 
@@ -20,6 +20,8 @@ import {
 import { auth } from '../../apis';
 import selfContext from '../../contexts/selfContext';
 import Avatar from 'antd/lib/avatar/avatar';
+import { useQuery } from '@apollo/client';
+import { NotificationQueries } from '../../grapql-client/queries';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -54,6 +56,10 @@ const SideBar = ({ isAdmin }: Props) => {
       },
     });
   };
+
+  const { data: numUnSeenNoti } = useQuery<NotificationQueries.getNumOfUnSeenNotiResult>(
+    NotificationQueries?.getNumOfUnSeenNoti,
+  );
 
   return (
     <>
@@ -93,8 +99,15 @@ const SideBar = ({ isAdmin }: Props) => {
                 <Menu.Item style={{ marginTop: 20 }} icon={<GoldOutlined />} key="Teams">
                   <Link to="/teams">Teams</Link>
                 </Menu.Item>
-                <Menu.Item icon={<BellOutlined />} key="notification">
-                  <Link to="/teams">Teams</Link>
+                <Menu.Item
+                  icon={
+                    <Badge style={{ position: 'absolute' }} size="small" count={numUnSeenNoti?.getNumOfUnSeenNoti}>
+                      <BellOutlined style={{ color: 'white' }} />
+                    </Badge>
+                  }
+                  key="notification"
+                >
+                  <Link to="/notifications">Notifications</Link>
                 </Menu.Item>
                 {/* <Menu.Item icon={<AimOutlined />} key="actionTracker">
                   <Link to="/actions-tracker">Actions Tracker</Link>

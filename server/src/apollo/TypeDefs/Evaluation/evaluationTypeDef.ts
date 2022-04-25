@@ -7,6 +7,7 @@ const typeDefs = gql`
     assessorId: String
     isSubmit: Boolean
     assessmentId: String
+    createdAt: String
     assessor: Member
     results: [Result]
   }

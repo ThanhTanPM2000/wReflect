@@ -28,6 +28,7 @@ export const analysisAssessment = async (
       creator: true,
       evaluations: {
         where: {
+          isSubmit: true,
           results: {
             some: {
               concerningMemberId: args?.memberId,
@@ -66,11 +67,8 @@ export const analysisAssessment = async (
         },
       },
     },
+    rejectOnNotFound: true,
   });
-
-  if (!assessment || assessment?.evaluations.length == 0) {
-    return error?.NotFound();
-  }
 
   const areaRadarChartData: { isSubmit: boolean; criteria: Criteria; assessor: Member; point: number }[] = [];
   const cachedData = new Map<string, cachedValue>();

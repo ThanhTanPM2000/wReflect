@@ -11,6 +11,7 @@ export * as healthCheck from './healthcheck';
 export * as criteria from './criteria';
 export * as assessment from './assessment';
 export * as analysis from './analysis';
+export * as notification from './notification';
 
 export * as nodeMailer from './nodemailer';
 export * as aws from './aws';

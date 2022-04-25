@@ -24,6 +24,7 @@ import {
   criteria,
   assessment,
   analysis,
+  notification,
 } from '../services';
 import { withFilter } from 'graphql-subscriptions';
 
@@ -59,8 +60,10 @@ const resolvers = {
       const myTeam = await team.getTeam(args.teamId, isAdmin ? undefined : id);
       return myTeam;
     },
-    account: async (_, args) => {
-      return await user.getUser(args.userId);
+    account: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const userData = await user.getUser(meId);
+      return userData;
     },
 
     board: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -93,13 +96,31 @@ const resolvers = {
 
     getAnalysisAssessment: async (
       _,
-      args: { teamId: string; assessmentId: string, memberId: string },
+      args: { teamId: string; assessmentId: string; memberId: string },
       { req }: { req: RequestWithUserInfo },
     ) => {
       const { id: meId } = req?.user || {};
       const assessment = await analysis?.analysisAssessment(meId, args);
       return assessment;
     },
+
+    getNotifications: async (_, args: { offSet: number; limit: number }, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const notificationsList = await notification?.getListNotifications(meId, args);
+      return notificationsList;
+    },
+
+    getNumOfUnSeenNoti: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const numOfUnSeenNoti = await notification?.getNumOfUnSeenNoti(meId);
+      return numOfUnSeenNoti;
+    },
+
+    // getSkillsAnlytic: async (_, args, {req}: {req: RequestWithUserInfo}) => {
+    //   const {id: meId} = req?.user || {}
+    //   const getSkillData = await user?.getSkillsAnalytic(meId);
+    //   return getSkillData;
+    // }
   },
   Mutation: {
     updateMeetingNote: async (_, args, { req }: { req: RequestWithUserInfo }) => {
@@ -351,6 +372,38 @@ const resolvers = {
       const { id: meId } = req?.user || {};
       const assessmentData = await assessment?.submitDoPersonal(meId, args);
       return assessmentData;
+    },
+
+    updateAssessment: async (
+      _,
+      args: { teamId: string; assessmentId: string; assessmentName: string },
+      { req }: { req: RequestWithUserInfo },
+    ) => {
+      const { id: meId } = req?.user || {};
+      const updatingAssessment = await assessment?.updatingAssessment(meId, args);
+      return updatingAssessment;
+    },
+
+    deleteAssessment: async (
+      _,
+      args: { teamId: string; assessmentId: string },
+      { req }: { req: RequestWithUserInfo },
+    ) => {
+      const { id: meId } = req?.user || {};
+      const deletingAssessment = await assessment?.deleteAssessment(meId, args);
+      return deletingAssessment;
+    },
+
+    seenNotification: async (_, args: { notificationId: string }, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const updatedNotification = await notification?.seenNotification(meId, args);
+      return updatedNotification;
+    },
+
+    removeNotification: async (_, args: { notificationId: string }, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const removingNotification = await notification?.removeNotification(meId, args);
+      return removingNotification;
     },
   },
   Subscription: {

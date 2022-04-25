@@ -70,7 +70,7 @@ export default function AreaRadarChart({ areaRadarData }: Props) {
 
   return (
     <>
-      <h3 className="flex flex-ai-c flex-jc-c mb-14">Radar Chart</h3>
+      <h2 className="flex flex-ai-c flex-jc-c mb-14">Radar Chart</h2>
       <Radar {...config} />
     </>
   );

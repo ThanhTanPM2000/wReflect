@@ -7,3 +7,4 @@ export * as RemarkMutations from './RemarkMutations';
 export * as BoardMutations from './BoardMutations';
 export * as HealthCheckMutations from './HealthCheckMutation';
 export * as AssessmentMutations from './AssessmentMutations';
+export * as NotificationMutations from './NotificationMutations';

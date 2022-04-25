@@ -72,6 +72,11 @@ const typeDefs = gql`
     desc
   }
 
+  type getNotificationData {
+    data: [Notification]
+    total: Int
+  }
+
   type Query {
     teams(status: String, isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
     getOwnedTeams(isGettingAll: Boolean, search: String, page: Int, size: Int): Teams
@@ -92,7 +97,7 @@ const typeDefs = gql`
 
     getAssessment(teamId: ID!, assessmentId: ID!): Assessment
 
-    account(userId: String): User
+    account: User
     inviteLink(teamId: String): inviteResponse
 
     getHealthCheck(teamId: String, boardId: String): getHealthCheck
@@ -100,6 +105,12 @@ const typeDefs = gql`
     getEssentialData: essentialData
 
     getAnalysisAssessment(teamId: String!, assessmentId: String!, memberId: String!): analysisAssessmentData
+
+    getNotifications(offSet: Int!, limit: Int!): [Notification]
+
+    getNumOfUnSeenNoti: Int
+
+    # getSkillsAnalytic(notificationId): Assessment
   }
 `;
 

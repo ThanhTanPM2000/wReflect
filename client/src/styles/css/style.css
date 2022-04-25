@@ -1033,13 +1033,6 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     .personalReflectionPage .personalSection .manageJudge.primary,
     .personalReflectionPage .personalSection .analysis.primary {
       background-color: white; }
-  .personalReflectionPage .content {
-    flex: 1;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    margin-top: 30px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
 
 .containerModal {
   display: flex;
@@ -1074,6 +1067,24 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
       display: flex;
       gap: 10px;
       flex-direction: row; }
+
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  margin-top: 30px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px; }
+
+.notificationPage {
+  padding: 10px 60px 0px 60px; }
+  .notificationPage .headerSection {
+    font-size: 30px;
+    font-weight: bold !important; }
+  .notificationPage .container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column; }
 
 .sidebar .ant-layout-logo {
   height: 32px;

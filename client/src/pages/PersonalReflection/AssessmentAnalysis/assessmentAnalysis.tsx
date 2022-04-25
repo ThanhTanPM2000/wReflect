@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
-import { Avatar, Button, Select } from 'antd';
+import { Avatar, Button, notification, Select } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { AnalysisQueries, AssessmentQueries, TeamQueries } from '../../../grapql-client/queries';
 import { Evaluation, Team } from '../../../types';
@@ -8,6 +8,7 @@ import AreaRadarChart from './areaRadarChart';
 import RosePlotChart from './rosePlotChart';
 import GroupedBulletChart from './groupedBulletChart';
 import selfContext from '../../../contexts/selfContext';
+import _ from 'lodash';
 
 const { Option } = Select;
 
@@ -20,6 +21,7 @@ type Props = {
 export default function AssessmentAnalysis({ teamId, assessmentId, setTeam }: Props) {
   const history = useHistory();
   const [evaluation, setEvaluation] = useState<Evaluation>();
+  const [numEvaluated, setNumEvaluated] = useState(0);
   const me = useContext(selfContext);
 
   const { data: teamData } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(TeamQueries.getTeam, {
@@ -28,10 +30,14 @@ export default function AssessmentAnalysis({ teamId, assessmentId, setTeam }: Pr
     },
   });
 
-  const [getAnalyticData, { data: test }] = useLazyQuery<
+  const [getAnalyticData, { data: test, refetch: refetchChart, loading }] = useLazyQuery<
     AnalysisQueries.getAnalysisAssessmentResult,
     AnalysisQueries.getAnalysisAssessmentVars
-  >(AnalysisQueries?.getAnalysisAssessment);
+  >(AnalysisQueries?.getAnalysisAssessment, {
+    onError: (err) => {
+      notification?.error({ message: {} });
+    },
+  });
 
   useEffect(() => {
     if (evaluation?.assessmentId) {
@@ -44,6 +50,15 @@ export default function AssessmentAnalysis({ teamId, assessmentId, setTeam }: Pr
       });
     }
   }, [evaluation]);
+
+  useEffect(() => {
+    console.log('test', test?.getAnalysisAssessment?.areaRadarChartData);
+    const numEvaluatedMem = test?.getAnalysisAssessment?.areaRadarChartData?.reduce((value, curr) => {
+      if (curr.isSubmit) return value + 1;
+      return value;
+    }, 0);
+    setNumEvaluated(numEvaluatedMem);
+  }, [test]);
 
   useEffect(() => {
     setTeam(teamData?.team);
@@ -97,7 +112,7 @@ export default function AssessmentAnalysis({ teamId, assessmentId, setTeam }: Pr
         </div>
       </div>
       <div className="content flex">
-        <div className="flex flex-dir-r flex-ai-c">
+        <div className="flex flex-dir-r flex-ai-c flex-jc-sb">
           <Select
             onSelect={handleSelectEvaluation}
             value={evaluation?.id}
@@ -107,10 +122,19 @@ export default function AssessmentAnalysis({ teamId, assessmentId, setTeam }: Pr
           >
             {[...(renderEvaluationOption || [])]}
           </Select>
+
+          <div>
+            <RefrechChart loading={loading} refetchChart={refetchChart} />
+          </div>
         </div>
 
+        {/* <div className="content flex flex-dir-r flex-ai-c flex-jc-c flex-gap-5">
+          <h2>There are {`${numEvaluated} member(s) already evaluated `}</h2>
+          <h2 style={{ color: '#a4a0f1' }}>{_?.startCase(evaluation?.assessor?.user?.nickname)}</h2>
+        </div> */}
+
         <div className="content">
-          <div className="areaRadarChart">
+          <div className="areaRadarChart ">
             <AreaRadarChart areaRadarData={test?.getAnalysisAssessment?.areaRadarChartData} />
           </div>
         </div>
@@ -121,6 +145,39 @@ export default function AssessmentAnalysis({ teamId, assessmentId, setTeam }: Pr
           <GroupedBulletChart rosePlotData={test?.getAnalysisAssessment?.rosePlotChartData} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function RefrechChart({ loading, refetchChart }: { loading: boolean; refetchChart: () => void }) {
+  const [timeClick, setTimeClick] = useState(0);
+
+  useEffect(() => {
+    let intervalId;
+    if (timeClick > 0) {
+      intervalId = setInterval(() => {
+        setTimeClick(timeClick - 1);
+      }, 1000);
+    }
+    return () => clearInterval(intervalId);
+  }, [timeClick]);
+
+  return (
+    <div>
+      <Button
+        loading={loading}
+        disabled={timeClick > 0}
+        onClick={async () => {
+          await refetchChart();
+          setTimeClick(60);
+          notification?.success({
+            message: 'Refresh chart data successfully',
+            placement: 'bottomRight',
+          });
+        }}
+      >
+        Refresh Chart {`${timeClick ? timeClick + '(s)' : ''}`}
+      </Button>
     </div>
   );
 }

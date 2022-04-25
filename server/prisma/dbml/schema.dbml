@@ -23,6 +23,7 @@ Table Assessment {
   createdAt DateTime [default: `now()`, not null]
   startDate DateTime [not null]
   endDate DateTime [not null]
+  completedDate DateTime
   teamId String [not null]
   creatorId String [not null]
   status AssessmentStatus [not null]
@@ -36,6 +37,7 @@ Table Evaluation {
   assessorId String [not null]
   isSubmit Boolean [not null]
   assessmentId String
+  createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   assessor Member [not null]
   assessment Assessment
@@ -71,6 +73,7 @@ Table Criteria {
   name String [unique, not null]
   description String [not null]
   answerOnCriteriaList AnswerOnCriteria [not null]
+  UserOnCriteria UserOnCriteria [not null]
 }
 
 Table Team {
@@ -239,37 +242,6 @@ Table Member {
   }
 }
 
-Table Notification {
-  id String [pk]
-  userId String [not null]
-  title String [not null]
-  description String [not null]
-  linkRedirect String
-  isSeen Boolean [not null]
-  User User [not null]
-}
-
-Table User {
-  id String [pk]
-  email String [unique, not null]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  isAdmin Boolean [not null, default: false]
-  userStatus UserStatus [not null, default: 'OFFLINE']
-  nickname String [not null]
-  picture String [not null]
-  gender Gender [not null, default: 'UNSPECIFIED']
-  workplace String
-  address String
-  school String
-  introduction String
-  talents String
-  interests String
-  sessions Session [not null]
-  members Member [not null]
-  notifications Notification [not null]
-}
-
 Table MemberAnswer {
   id String [pk]
   templateId String [not null]
@@ -311,6 +283,63 @@ Table MemberComment {
   }
 }
 
+Table User {
+  id String [pk]
+  email String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  isAdmin Boolean [not null, default: false]
+  isSeenNotification Boolean [not null, default: false]
+  userStatus UserStatus [not null, default: 'OFFLINE']
+  nickname String [not null]
+  picture String [not null]
+  gender Gender [not null, default: 'UNSPECIFIED']
+  workplace String
+  address String
+  school String
+  introduction String
+  talents String
+  interests String
+  sessions Session [not null]
+  members Member [not null]
+  notifications Notification [not null]
+  skillValues UserOnCriteria [not null]
+}
+
+Table UserOnCriteria {
+  id String [pk]
+  userId String [not null]
+  criteriaId String [not null]
+  value Float [not null]
+  user User [not null]
+  criteria Criteria [not null]
+
+  indexes {
+    (userId, criteriaId) [unique]
+  }
+}
+
+Table Notification {
+  id String [pk]
+  receiverId String [not null]
+  senderId String [not null]
+  title String [not null]
+  description String [not null]
+  linkRedirect String
+  isSeen Boolean [not null, default: false]
+  createdAt DateTime [default: `now()`, not null]
+  receiver User [not null]
+}
+
+Table RemiderNotification {
+  id String [pk]
+  dateSent DateTime [not null]
+  title String [not null]
+  description String [not null]
+  sentBy String [not null]
+  sendTo String [not null]
+}
+
 Enum AssessmentStatus {
   Planned
   Doing
@@ -345,6 +374,11 @@ Enum OpinionStatus {
 Enum TeamStatus {
   DOING
   DONE
+}
+
+Enum UserConnectionStatus {
+  Connect
+  Sending
 }
 
 Enum Gender {
@@ -406,8 +440,6 @@ Ref: Member.userId > User.id
 
 Ref: Member.teamId > Team.id
 
-Ref: Notification.userId > User.id
-
 Ref: MemberAnswer.healthCheckId > HealthCheck.id
 
 Ref: MemberAnswer.memberId > Member.id
@@ -417,3 +449,9 @@ Ref: Answer.memberAnswersId > MemberAnswer.id
 Ref: MemberComment.memberId > Member.id
 
 Ref: MemberComment.healthCheckId > HealthCheck.id
+
+Ref: UserOnCriteria.userId > User.id
+
+Ref: UserOnCriteria.criteriaId > Criteria.id
+
+Ref: Notification.senderId > User.id

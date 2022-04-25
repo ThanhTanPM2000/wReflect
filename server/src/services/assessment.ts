@@ -38,19 +38,76 @@ export const createAssessment = async (meId: string, args: createAssessmentType)
       status:
         moment() < moment(args?.startDate).startOf('day')
           ? 'Planned'
-          : moment() > moment(args?.endDate).endOf('days')
-          ? 'Complete'
+          // : moment() > moment(args?.endDate).endOf('days')
+          // ? 'Complete'
           : 'Doing',
       name: args?.nameAssessment,
-      startDate: args?.startDate,
-      endDate: args?.endDate,
+      startDate: new Date(new Date(args?.startDate).setHours(0, 0, 0, 0)),
+      endDate: new Date(new Date(args?.endDate).setHours(23, 59, 59, 999)),
       evaluations: {
         create: [...evaluations],
       },
     },
+    include: {
+      team: true,
+      evaluations: true,
+    },
   });
 
+  const userIdList = await prisma?.member?.findMany({
+    where: {
+      id: {
+        in: args?.memberIds,
+      },
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  const creatingRemiderNoti = await prisma.remiderNotification?.create({
+    data: {
+      sentBy: meId,
+      sendTo: [...userIdList?.map((x) => x?.userId)],
+      dateSent: new Date(assessment?.startDate?.setHours(0, 0, 0, 0)),
+      title: `${assessment?.name} of ${assessment?.team?.name} is starting now`,
+      description: `${moment(assessment?.startDate).format('DD/MM/YYYY')}`,
+    },
+  });
+
+  if (creatingRemiderNoti) logger?.info('System Create Remider Noti Successfully');
+
   return assessment;
+};
+
+export const updatingAssessment = async (
+  meId: string,
+  args: { teamId: string; assessmentId: string; assessmentName: string },
+) => {
+  await checkIsMemberOwningTeam(args?.teamId, meId);
+
+  const updatingAssessment = await prisma?.assessment?.update({
+    where: {
+      id: args?.assessmentId,
+    },
+    data: {
+      name: args?.assessmentName,
+    },
+  });
+
+  return updatingAssessment;
+};
+
+export const deleteAssessment = async (meId: string, args: { teamId: string; assessmentId: string }) => {
+  await checkIsMemberOwningTeam(args?.teamId, meId);
+
+  const deletingAssessment = await prisma.assessment.delete({
+    where: {
+      id: args?.assessmentId,
+    },
+  });
+
+  return deletingAssessment;
 };
 
 export const getListAssessment = async (

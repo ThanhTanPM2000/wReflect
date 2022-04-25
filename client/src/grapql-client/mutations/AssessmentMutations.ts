@@ -39,6 +39,43 @@ export const createAssessment = gql`
   }
 `;
 
+export type updateAssessmentResult = {
+  updateAssessment: Assessment;
+};
+
+export type updateAssessmentVars = {
+  teamId: string;
+  assessmentId: string;
+  assessmentName: string;
+};
+
+export const updateAssessment = gql`
+  ${ASSESSMENT_FIELDS}
+  mutation updateAssessment($teamId: String!, $assessmentId: String!, $assessmentName: String!) {
+    updateAssessment(teamId: $teamId, assessmentId: $assessmentId, assessmentName: $assessmentName) {
+      ...AssessmentFields
+    }
+  }
+`;
+
+export type deleteAssessmentResult = {
+  deleteAssessment: Assessment;
+};
+
+export type deleteAssessmentVars = {
+  teamId: string;
+  assessmentId: string;
+};
+
+export const deleteAssessment = gql`
+  ${ASSESSMENT_FIELDS}
+  mutation deleteAssessment($teamId: String!, $assessmentId: String!) {
+    deleteAssessment(teamId: $teamId, assessmentId: $assessmentId) {
+      ...AssessmentFields
+    }
+  }
+`;
+
 export type submitDoPersonalResult = {
   doPersonalReflection: Assessment;
 };

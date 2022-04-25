@@ -6,3 +6,4 @@ export * as HealthCheckQueries from './HealthCheckQueries';
 export * as CriteriaQueries from './CriteriaQueries';
 export * as AssessmentQueries from './assessmentQueries';
 export * as AnalysisQueries from './AnalysisQueries';
+export * as NotificationQueries from './NotificationQueries';
