@@ -1,16 +1,16 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Tabs, Avatar, Tooltip, Button, Badge, Select } from 'antd';
 import { useMutation, useQuery } from '@apollo/client';
-import { AssessmentQueries, TeamQueries } from '../../../grapql-client/queries';
-import { Evaluation, Result, Team } from '../../../types';
+import { AssessmentQueries, TeamQueries } from '../../grapql-client/queries';
+import { Evaluation, Result, Team } from '../../types';
 import CriteriaQuestionsList from './criteriaQuestionsList';
-import selfContext from '../../../contexts/selfContext';
+import selfContext from '../../contexts/selfContext';
 import _ from 'lodash';
 import AvatarPersonalReflection from './avatarPersonalReflection';
 import moment from 'moment';
-import Countdown from '../../../components/CountDown/countdown';
+import Countdown from '../../components/CountDown/countdown';
 import { Link, useHistory } from 'react-router-dom';
-import { AssessmentMutations } from '../../../grapql-client/mutations';
+import { AssessmentMutations } from '../../grapql-client/mutations';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -188,8 +188,8 @@ export default function DoPersonalReflection({ teamId, assessmentId, setTeam }: 
                         <div style={{ margin: '0px 10px 0px 10px' }} className="actions flex flex-dir-c flex-gap-10">
                           {
                             <>
-                              <Button>ReOpen</Button>
-                              <Button>Share</Button>
+                              {/* <Button>ReOpen</Button>
+                              <Button>Share</Button> */}
                               <Button
                                 loading={isLoading}
                                 onClick={async () => {

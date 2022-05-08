@@ -72,10 +72,10 @@ const resolvers = {
       return myBoard;
     },
 
-    getHealthCheck: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      const result = await healthCheck.getHealthCheck(args?.teamId, args?.boardId);
-      return result;
-    },
+    // getHealthCheck: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+    //   const result = await healthCheck.getHealthCheck(args?.teamId, args?.boardId);
+    //   return result;
+    // },
 
     getEssentialData: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const criteriaList = await criteria.getListCriteria();
@@ -142,33 +142,33 @@ const resolvers = {
       return await team.deleteTeam(req, args?.teamId);
     },
 
-    startSurveyHealthCheck: async (_, args: startSurveyArgs, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const creatingHealthCheck = await healthCheck.createHealthCheck(meId, args);
-      pubsub.publish('START_SURVEY', {
-        subOnUpdateHealthCheck: creatingHealthCheck,
-        teamId: args.teamId,
-      });
-      return creatingHealthCheck;
-    },
-    answerHealthCheck: async (_, args: answerHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const setAnswerToHealthCheck = await healthCheck.setAnswerHealthCheck(meId, args);
-      pubsub.publish('ANSWER_HEALTH', {
-        updateGetHealthCheckData: setAnswerToHealthCheck,
-        teamId: args.teamId,
-      });
-      return setAnswerToHealthCheck;
-    },
-    reopenHealthCheck: async (_, args: reopenHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
-      const { id: meId } = req?.user;
-      const deletingHealthCheck = await healthCheck.reopenHealthCheck(meId, args);
-      pubsub.publish('REOPEN_HEALTH', {
-        subOnUpdateHealthCheck: deletingHealthCheck,
-        teamId: args.teamId,
-      });
-      return deletingHealthCheck;
-    },
+    // startSurveyHealthCheck: async (_, args: startSurveyArgs, { req }: { req: RequestWithUserInfo }) => {
+    //   const { id: meId } = req?.user;
+    //   const creatingHealthCheck = await healthCheck.createHealthCheck(meId, args);
+    //   pubsub.publish('START_SURVEY', {
+    //     subOnUpdateHealthCheck: creatingHealthCheck,
+    //     teamId: args.teamId,
+    //   });
+    //   return creatingHealthCheck;
+    // },
+    // answerHealthCheck: async (_, args: answerHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
+    //   const { id: meId } = req?.user;
+    //   const setAnswerToHealthCheck = await healthCheck.setAnswerHealthCheck(meId, args);
+    //   pubsub.publish('ANSWER_HEALTH', {
+    //     updateGetHealthCheckData: setAnswerToHealthCheck,
+    //     teamId: args.teamId,
+    //   });
+    //   return setAnswerToHealthCheck;
+    // },
+    // reopenHealthCheck: async (_, args: reopenHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
+    //   const { id: meId } = req?.user;
+    //   const deletingHealthCheck = await healthCheck.reopenHealthCheck(meId, args);
+    //   pubsub.publish('REOPEN_HEALTH', {
+    //     subOnUpdateHealthCheck: deletingHealthCheck,
+    //     teamId: args.teamId,
+    //   });
+    //   return deletingHealthCheck;
+    // },
 
     changeTeamAccess: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};

@@ -58,6 +58,7 @@ export default function NotificationComponent({ notification }: Props) {
               title: 'Do you Want to delete these items?',
               icon: <ExclamationCircleOutlined />,
               content: 'Some descriptions',
+              centered: true,
               onOk() {
                 removeNotification({
                   variables: {

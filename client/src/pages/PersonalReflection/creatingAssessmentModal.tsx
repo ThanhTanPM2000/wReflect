@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Modal, DatePicker, Form, Steps, message, Button, FormInstance, Input, Select, Tooltip } from 'antd';
 import { MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
-import { Assessment, Criteria, Team } from '../../../types';
+import { Assessment, Criteria, Team } from '../../types';
 import moment from 'moment';
 import { useMutation } from '@apollo/client';
-import { AssessmentMutations } from '../../../grapql-client/mutations';
+import { AssessmentMutations } from '../../grapql-client/mutations';
 import _ from 'lodash';
 import Search from 'antd/lib/transfer/search';
 
@@ -83,9 +83,9 @@ export default function CreatingAssessmentModal({ assessment, criteriaData, team
     });
   };
 
-  // function disabledDate(current) {
-  //   return current && current < moment().startOf('day');
-  // }
+  function disabledDate(current) {
+    return current && current < moment().startOf('day');
+  }
 
   const handleOnSelectAssigners = (value: string) => {
     if (value === 'selectAll') {
@@ -157,11 +157,7 @@ export default function CreatingAssessmentModal({ assessment, criteriaData, team
               name="range-picker"
               label="Start Date - End Date"
             >
-              <RangePicker
-                //  disabledDate={disabledDate}
-                defaultValue={[moment(), null]}
-                format="DD-MM-YYYY"
-              />
+              <RangePicker disabledDate={disabledDate} defaultValue={[moment(), null]} format="DD-MM-YYYY" />
             </Form.Item>
             <Form.Item
               rules={[

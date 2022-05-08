@@ -1,17 +1,12 @@
-import { useQuery } from '@apollo/client';
-import React, { useContext, useEffect, useState } from 'react';
-import { Redirect, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { TopNavBar } from '../../components/TopNavBar';
-import { TeamQueries } from '../../grapql-client/queries';
 import { Team } from '../../types';
-import AnalysisPersonal from './AnalysisPage/analysisPersonal';
-import ManageJudge from './Manage/manageJudge';
-import queryString from 'query-string';
-import { Loading } from '../../components/Loading';
+import AnalysisPersonal from './analysisPersonal';
+import ManageJudge from './manageJudge';
 import selfContext from '../../contexts/selfContext';
-import DoPersonalReflection from './Do/doPersonalReflection';
-import { Button } from 'antd';
-import AssessmentAnalysis from './AssessmentAnalysis/assessmentAnalysis';
+import DoPersonalReflection from './doPersonalReflection';
+import AssessmentAnalysis from './assessmentAnalysis';
 
 export default function personalReflectionPage() {
   const [team, setTeam] = useState<Team | null>();
