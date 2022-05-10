@@ -3,7 +3,11 @@ import { Card } from 'antd';
 
 const { Meta } = Card;
 
-export default function CriteriaConfiguration() {
+type Props = {
+  isAdmin: boolean;
+};
+
+export default function CriteriaConfiguration({ isAdmin }: Props) {
   return (
     <div className="criteriaConfiguration ">
       <Card className="purple mt-25" hoverable cover={<img alt="example" src="/images/criteria.jpeg" />}>

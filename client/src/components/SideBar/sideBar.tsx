@@ -1,6 +1,6 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 
-import { Menu, Layout, Modal, Tooltip, Button, Row, Col, Tabs, Badge } from 'antd';
+import { Menu, Layout, Modal, Tooltip, Row, Col, Tabs, Badge } from 'antd';
 import { Link, useHistory, useRouteMatch } from 'react-router-dom';
 import {
   CompassOutlined,
@@ -37,6 +37,7 @@ const SideBar = ({ isAdmin }: Props) => {
   const { path, url } = useRouteMatch();
   const history = useHistory();
   const me = useContext(selfContext);
+  const menuComp = useRef<Menu>(null);
 
   const handleShowModal = () => {
     setShowModal(true);
@@ -88,7 +89,7 @@ const SideBar = ({ isAdmin }: Props) => {
             </Tooltip>
           </div>
           {isSwitchAdmin && <div className="bold flex flex-ai-c flex-jc-c white mt-10">Admin</div>}
-          <Menu className="flex flex-1" theme="dark" defaultSelectedKeys={['1']} mode="inline">
+          <Menu className="flex flex-1" theme="dark" mode="inline">
             {isSwitchAdmin ? (
               <>
                 <Menu.Item key="2" icon={<BarChartOutlined />}>
@@ -103,7 +104,7 @@ const SideBar = ({ isAdmin }: Props) => {
               </>
             ) : (
               <>
-                <Menu.Item style={{ marginTop: 10 }} icon={<GoldOutlined />} key="Teams">
+                <Menu.Item style={{ marginTop: 10 }} icon={<GoldOutlined />} key="teams">
                   <Link to="/teams">Teams</Link>
                 </Menu.Item>
                 <Menu.Item icon={<CompassOutlined />} key="connect">

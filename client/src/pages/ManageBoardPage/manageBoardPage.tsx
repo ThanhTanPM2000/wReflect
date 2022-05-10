@@ -80,7 +80,7 @@ const ManageBoardPage = ({ teamId }: Props) => {
     <>
       <ConfigBoardModal teamId={teamId} setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
       <TopNavBar iMember={iMember} team={data?.team} title="Manage Board" />
-      <Loading refetch={refetch} data={data?.team} loading={loading} error={error}>
+      <Loading data={data?.team} loading={loading} error={error}>
         <>
           <div className="manage-board">
             <div className="board-selector">

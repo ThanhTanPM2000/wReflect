@@ -34,6 +34,7 @@ import ConnectPage from './pages/ConnectPage/connectPage';
 import UserManagementPage from './pages/Admin/UserManagerment/UserManagerment';
 import TeamManagerment from './pages/Admin/TeamManagerment/TeamManagerment';
 import SystemConfiguration from './pages/Admin/SystemConfiguration/SystemConfiguration';
+import AdminPage from './pages/Admin/AdminPage';
 
 const HealthCheck = React.lazy(() => import('./pages/HealthCheck/HealthCheck'));
 
@@ -71,21 +72,7 @@ const Routes = ({ me }: Props) => {
                       <>
                         <Switch>
                           <Route path="/admin">
-                            <Switch>
-                              <Route
-                                path="/admin/user-managerment"
-                                render={({ match }) => <UserManagementPage isAdmin={isAdmin} />}
-                              />
-                              <Route
-                                path="/admin/team-managerment"
-                                render={({ match }) => <TeamManagerment isAdmin={isAdmin} />}
-                              />
-                              <Route
-                                path="/admin/system-configuration"
-                                render={({ match }) => <SystemConfiguration isAdmin={isAdmin} />}
-                              />
-                              <Redirect from="/admin" to="/admin/user-managerment" />
-                            </Switch>
+                            <AdminPage isAdmin={isAdmin} />
                           </Route>
                           <Route path="/personal-reflect" render={({ match }) => <PersonalReflection />} />
                           <Route

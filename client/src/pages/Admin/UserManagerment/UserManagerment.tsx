@@ -69,10 +69,7 @@ export default function UserManagementPage({ isAdmin }: Props) {
 
   return (
     <div className="userManagementPage flex flex-1 flex-ai-c flex-jc-c">
-      {isAdmin ? (
-        <>
-          <div>hi</div>
-          {/* <>
+      {/* <>
             <div className="flex flex-dir-r flex-jc-sb flex-ai-c features-box">
               <div style={{ flex: 10, marginRight: 10 }}>
                 <SearchBar
@@ -106,10 +103,6 @@ export default function UserManagementPage({ isAdmin }: Props) {
               onChange={(page: number, pageSize?: number | undefined) => onPaginationChanged(page, pageSize)}
             />
           </div> */}
-        </>
-      ) : (
-        <div className="bold">Sorry, you need Admin permission to access this site. Thanks</div>
-      )}
     </div>
   );
 }

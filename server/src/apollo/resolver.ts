@@ -25,6 +25,7 @@ import {
   assessment,
   analysis,
   notification,
+  templateHealthCheck,
 } from '../services';
 import { withFilter } from 'graphql-subscriptions';
 
@@ -40,6 +41,11 @@ import {
 import { pubsub } from '../pubSub';
 import { updateBoardType, createBoardType, deleteBoardType } from './TypeDefs/Board/boardTypes';
 import { string } from 'zod';
+import {
+  createTemplateHealthCheckArgs,
+  updateTemplateHealthCheckArgs,
+  getTemplatesArgs,
+} from './TypeDefs/templateTypeDefs';
 
 const resolvers = {
   Query: {
@@ -121,8 +127,33 @@ const resolvers = {
     //   const getSkillData = await user?.getSkillsAnalytic(meId);
     //   return getSkillData;
     // }
+
+    getTemplates: async (_, args: getTemplatesArgs, { req }: { req: RequestWithUserInfo }) => {
+      const { isAdmin } = req?.user || {};
+      const templates = await templateHealthCheck.getTemplates(args);
+      return templates;
+    },
   },
   Mutation: {
+    createTemplateHealthCheck: async (
+      _,
+      args: createTemplateHealthCheckArgs,
+      { req }: { req: RequestWithUserInfo },
+    ) => {
+      const { isAdmin } = req?.user || {};
+      const creatingTemplate = await templateHealthCheck?.createTemplate(isAdmin, args);
+      return creatingTemplate;
+    },
+    updateTemplateHealthCheck: async (
+      _,
+      args: updateTemplateHealthCheckArgs,
+      { req }: { req: RequestWithUserInfo },
+    ) => {
+      const { isAdmin } = req?.user || {};
+      const updatingTemplate = await templateHealthCheck?.updateTemplate(isAdmin, args);
+      return updatingTemplate;
+    },
+
     updateMeetingNote: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};
       const updatingMember = await member.updateMeetingNote(meId, args.teamId, args.meetingNote);

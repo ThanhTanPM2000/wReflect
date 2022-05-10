@@ -89,16 +89,10 @@ export default function ManageJudge({ teamId, setTeam }: Props) {
     pageSize && setSize(pageSize);
   };
 
-  const handleRefetch = () => {
-    teamRefetch();
-    assessmentDataRefetch();
-  };
-
   const iMember = data?.team?.members.find((member) => member.userId === me?.id);
 
   return (
     <Loading
-      refetch={handleRefetch}
       data={!_?.isNull(data) && !_?.isNull(assessmentData)}
       loading={loading}
       error={teamError || assessmentError}

@@ -233,30 +233,30 @@ export default function board({ teamId, boardId }: Props) {
         selectedBoard={board}
         setSelectedBoard={setBoard}
       />
-      <div>
-        <Loading refetch={refetch} data={board} loading={loading} error={error}>
-          <>
-            {data?.team && board ? (
-              <>
-                <ConfigBoardModal teamId={teamId} setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
-                <ModalMeetingNote
-                  visible={isVisibleMeetingNote}
-                  setVisible={setIsVisibleMeetingNote}
-                  team={data?.team}
-                  iMember={iMember}
-                />
-                <ConfigBoardModal
-                  teamId={teamId}
-                  board={board}
-                  setVisible={setIsUpdateModalVisible}
-                  visible={isUpdateModalVisible}
-                />
-                <ConfigTimeTrackingModal
-                  team={data?.team}
-                  board={board}
-                  setVisible={setTimeTrackingModalVisible}
-                  visible={isTimeTrackingModalVisible}
-                />
+      <Loading data={board} loading={loading} error={error}>
+        <>
+          {data?.team && board ? (
+            <>
+              <ConfigBoardModal teamId={teamId} setVisible={setIsCreateModalVisible} visible={isCreateModalVisible} />
+              <ModalMeetingNote
+                visible={isVisibleMeetingNote}
+                setVisible={setIsVisibleMeetingNote}
+                team={data?.team}
+                iMember={iMember}
+              />
+              <ConfigBoardModal
+                teamId={teamId}
+                board={board}
+                setVisible={setIsUpdateModalVisible}
+                visible={isUpdateModalVisible}
+              />
+              <ConfigTimeTrackingModal
+                team={data?.team}
+                board={board}
+                setVisible={setTimeTrackingModalVisible}
+                visible={isTimeTrackingModalVisible}
+              />
+              <div>
                 <div className="boardTools">
                   <div className="countDown">
                     {board.timerInProgress && board.endTime ? (
@@ -571,35 +571,34 @@ export default function board({ teamId, boardId }: Props) {
                     )}
                   </div>
                 </div>
-
-                <div className="board flex flex-dir-r">
-                  <DragDropContext onDragEnd={handleOnDragEnd}>
-                    {board?.columns?.map((column, index) => {
-                      if (column.isActive) {
-                        return (
-                          <ColumnComponent
-                            setIsUpdateModalVisible={setIsUpdateModalVisible}
-                            iMember={iMember}
-                            currentNumVotes={currentNumVotes}
-                            setCurrentNumVotes={setCurrentNumVotes}
-                            team={data?.team}
-                            board={board}
-                            index={index}
-                            key={column.id}
-                            column={column}
-                          />
-                        );
-                      }
-                    })}
-                  </DragDropContext>
-                </div>
-              </>
-            ) : (
-              <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
-            )}
-          </>
-        </Loading>
-      </div>
+              </div>
+              <div className="board flex flex-dir-r scrollable">
+                <DragDropContext onDragEnd={handleOnDragEnd}>
+                  {board?.columns?.map((column, index) => {
+                    if (column.isActive) {
+                      return (
+                        <ColumnComponent
+                          setIsUpdateModalVisible={setIsUpdateModalVisible}
+                          iMember={iMember}
+                          currentNumVotes={currentNumVotes}
+                          setCurrentNumVotes={setCurrentNumVotes}
+                          team={data?.team}
+                          board={board}
+                          index={index}
+                          key={column.id}
+                          column={column}
+                        />
+                      );
+                    }
+                  })}
+                </DragDropContext>
+              </div>
+            </>
+          ) : (
+            <Empty description="No Teams Data" className="flex flex-dir-c flex-ai-c flex-jc-c" />
+          )}
+        </>
+      </Loading>
     </>
   );
 }

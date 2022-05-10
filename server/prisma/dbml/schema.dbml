@@ -96,20 +96,26 @@ Table Team {
 Table Template {
   id String [pk]
   title String [not null]
-  type String [not null]
+  isDefault Boolean [not null]
   teamId String
-  description String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
   team Team
   healthCheckQuestions TemplateQuestion [not null]
+
+  indexes {
+    (title) [unique]
+  }
 }
 
 Table TemplateQuestion {
   id String [pk]
   title String [not null]
   templateId String [not null]
+  color String [not null]
   healthCheckTemplate Template [not null]
   description String [not null]
-  MemberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
+  memberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
 }
 
 Table Board {
@@ -162,7 +168,7 @@ Table MemberOnHealthCheckOnQuestion {
   healthCheckId String [not null]
   questionId String [not null]
   memberId String [not null]
-  point String [not null]
+  point Int [not null]
   comment String [not null]
   healthCheck HealthCheck [not null]
   question TemplateQuestion [not null]

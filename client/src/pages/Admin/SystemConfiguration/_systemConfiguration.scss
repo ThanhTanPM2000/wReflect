@@ -1,18 +1,11 @@
 .systemConfiguration {
   overflow: auto;
-  .healthCheckConfiguration,
-  .criteriaConfiguration {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 380px;
-    .ant-card {
-      height: inherit;
-    }
-    img {
-      height: 250px;
-      object-fit: cover;
-    }
+
+  img {
+    height: 250px;
+    object-fit: cover;
+  }
+  .ant-card {
+    height: inherit;
   }
 }
