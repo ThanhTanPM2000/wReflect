@@ -262,6 +262,24 @@ code {
   width: 100%;
   overflow-y: auto; }
 
+.home-page {
+  overflow: scroll; }
+  .home-page::-webkit-scrollbar {
+    display: none; }
+
+.ant-row {
+  justify-content: space-around;
+  padding: 5%; }
+
+p {
+  font-size: 15px; }
+
+.button-home-page {
+  margin-top: 30px; }
+  .button-home-page button {
+    width: 184px;
+    height: 40px; }
+
 .ant-menu.ant-menu-dark .ant-menu-sub, .ant-layout-sider-trigger {
   background: #a4a0f1; }
 
