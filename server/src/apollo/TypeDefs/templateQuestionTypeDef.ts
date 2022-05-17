@@ -7,7 +7,6 @@ const typeDefs = gql`
     templateId: String
     color: String
     description: String
-    memberOnHealthCheck: [MemberOnHealthCheckOnQuestion]
   }
 `;
 
