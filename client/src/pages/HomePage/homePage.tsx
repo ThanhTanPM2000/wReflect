@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Image, Col, Row, Tabs, Modal, Button } from 'antd';
 import { QuestionOutlined, UserOutlined } from '@ant-design/icons';
 
+
 import { Header } from './../../components/Header';
 
 type Props = {
