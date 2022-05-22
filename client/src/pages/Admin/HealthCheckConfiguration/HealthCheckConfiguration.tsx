@@ -158,7 +158,7 @@ export default function HealthCheckConfiguration({ isAdmin }: Props) {
                           </div>
                         </div>
                         <div className="flex flex-dir-r flex-jc-sb flex-ai-bl  mt-10">
-                          <div className="flex flex-dir-r flex-gap-5">
+                          <div className="flex flex-dir-r flex-gap-5 flex-wrap">
                             {template?.healthCheckQuestions?.map((question) => (
                               <Tooltip title={question?.description} key={question?.id} placement={'bottom'}>
                                 <span className={`statement ${question?.color}`}>{question?.title}</span>

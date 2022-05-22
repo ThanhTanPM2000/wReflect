@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Button, Modal, notification, Select, Switch, Spin, Card } from 'antd';
+import { Button, notification, Select, Switch, Spin, Card } from 'antd';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { useTranslation } from 'react-i18next';
 
 import { Board, Member, Template } from '../../../types';
 import { TopNavBar } from '../../../components/TopNavBar';
@@ -43,7 +44,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
   const [selecteTemplate, setSelectedTemplate] = useState<Template>();
   const [answers, setAnswers] = useState<answerType[]>([]);
   const [numOfMemberDoHealthCheck, setNumMembersDoHealthCheck] = useState<number>(0);
-  // const [comments, setComments] = useState<{ questionId: string; text: string }[]>([]);
+  const { t, i18n } = useTranslation();
 
   const { data } = useQuery<TeamQueries.getTeamResult, TeamQueries.getTeamVars>(TeamQueries.getTeam, {
     variables: {
@@ -348,6 +349,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                           {renderListOptionBoard}
                         </Select>
                         <div>
+                          <Button onClick={() => i18n.changeLanguage('vi')}>Translate to Vn</Button>
                           <Button onClick={() => history.push(`/reflect/${teamId}/${boardId}`)} type="ghost">
                             Go To Board
                           </Button>
@@ -359,7 +361,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                             style={{ justifyContent: 'space-between' }}
                             className="flex flex-1 flex-dir-c flex-gap-10 poll-center-items"
                           >
-                            <h3>Create Custom Health Check</h3>
+                            <h3>{t('Create Custom Health Check')}</h3>
                             <Button
                               onClick={() => setIsVisibleCreateCustom(true)}
                               type="primary"
@@ -387,7 +389,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                               }}
                               className="flex flex-1 flex-dir-c flex-gap-24 poll-center-items"
                             >
-                              <h3>{template?.title}</h3>
+                              <h3>{t(template?.title)}</h3>
                               <div className="statement-wrapper poll-center-items">
                                 {template?.healthCheckQuestions?.map((questions) => (
                                   <span className={`statement ${questions.color}`} key={questions?.id}>

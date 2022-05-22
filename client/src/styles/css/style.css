@@ -322,8 +322,7 @@ code {
     display: none; }
 
 .ant-row {
-  justify-content: space-around;
-  padding: 5%; }
+  justify-content: space-around; }
 
 p {
   font-size: 15px; }
@@ -1216,3 +1215,9 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
   backdrop-filter: saturate(200%) blur(1.875rem); }
+
+.header {
+  background-color: #f7f7f7; }
+  .header .titlePage {
+    font-size: x-large;
+    font-weight: bold; }

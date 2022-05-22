@@ -12,6 +12,7 @@ import { notification } from 'antd';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { updateLoginState } from './apis/axios';
 import { Criteria } from './types';
+import './i18n';
 
 const httpLink = new HttpLink({
   uri: `${config.SERVER_BASE_URL}/graphql`,

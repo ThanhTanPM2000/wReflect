@@ -90,6 +90,8 @@ CREATE TABLE "AnswerOnCriteria" (
 CREATE TABLE "Criteria" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "description" TEXT NOT NULL,
 
     PRIMARY KEY ("id")
@@ -115,6 +117,7 @@ CREATE TABLE "Template" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "isDefault" BOOLEAN NOT NULL,
+    "isBlocked" BOOLEAN NOT NULL DEFAULT false,
     "teamId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -164,12 +167,8 @@ CREATE TABLE "HealthCheck" (
     "boardId" TEXT NOT NULL,
     "templateId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" TEXT NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "updatedBy" TEXT,
     "isAnonymous" BOOLEAN NOT NULL,
-    "isCustom" BOOLEAN NOT NULL,
-    "status" "StatusHealthCheck" NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -256,6 +255,7 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "isSeenNotification" BOOLEAN NOT NULL DEFAULT false,
+    "isRegistered" BOOLEAN NOT NULL DEFAULT true,
     "userStatus" "UserStatus" NOT NULL DEFAULT E'OFFLINE',
     "nickname" VARCHAR(150) NOT NULL,
     "picture" VARCHAR(500) NOT NULL,
@@ -266,6 +266,19 @@ CREATE TABLE "User" (
     "introduction" VARCHAR(500),
     "talents" VARCHAR(500),
     "interests" VARCHAR(500),
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BanningUser" (
+    "id" TEXT NOT NULL,
+    "isBannedForever" BOOLEAN NOT NULL DEFAULT false,
+    "startBanned" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "endBanned" TIMESTAMP(3) NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
 
     PRIMARY KEY ("id")
 );
@@ -335,6 +348,9 @@ CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
 
 -- CreateIndex
 CREATE INDEX "User.email_index" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BanningUser.userId_unique" ON "BanningUser"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserOnCriteria.userId_criteriaId_unique" ON "UserOnCriteria"("userId", "criteriaId");
@@ -410,6 +426,9 @@ ALTER TABLE "Member" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELET
 
 -- AddForeignKey
 ALTER TABLE "Member" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BanningUser" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UserOnCriteria" ADD FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
