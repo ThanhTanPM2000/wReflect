@@ -286,13 +286,21 @@ const typeDefs = gql`
     seenNotification(notificationId: String!): Notification
     removeNotification(notificationId: String!): Notification
 
-    createTemplateHealthCheck(name: String!, questions: [questionsInput!]!): Template
-    updateTemplateHealthCheck(templateId: String!, name: String!, questions: [questionsInput!]!): Template
-    deleteTemplateHealthCheck(templateId: String!): Template
+    createHealthCheck(teamId: String!, boardId: String, templateId: String!, isAnonymous: Boolean!): HealthCheck
+    submitHealthCheckAnswer(teamId: String!, boardId: String!, answers: [healthCheckAnswer]!): HealthCheck
+    reopenHealthCheck(teamId: String!, boardId: String!): HealthCheck
+
+    createCustomTemplate(teamId: String!, name: String!, questions: [questionsInput!]!): Template
+
+    # admin api(s)
+    createHealthCheckTemplate(name: String!, questions: [questionsInput!]!): Template
+    updateHealthCheckTemplate(templateId: String!, name: String!, questions: [questionsInput!]!): Template
+    deleteHealthCheckTemplate(templateId: String!): Template
 
     createCriteria(name: String!, description: String!): Criteria
     updateCriteria(criteriaId: String!, name: String!, description: String!): Criteria
     deleteCriteria(criteriaId: String!): Criteria
+
     banUser(
       userId: String!
       title: String!
@@ -302,12 +310,6 @@ const typeDefs = gql`
       endDate: String
     ): User
     # getAnalysisForAdmin(): analysisForAdmin
-
-    createHealthCheck(teamId: String!, boardId: String, templateId: String!, isAnonymous: Boolean!): HealthCheck
-    submitHealthCheckAnswer(teamId: String!, boardId: String!, answers: [healthCheckAnswer]!): HealthCheck
-    reopenHealthCheck(teamId: String!, boardId: String!): HealthCheck
-
-    createCustomTemplateForTeam(teamId: String!, name: String!, questions: [questionsInput!]!): Template
   }
 `;
 

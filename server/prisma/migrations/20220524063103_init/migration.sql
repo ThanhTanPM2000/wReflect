@@ -156,6 +156,24 @@ CREATE TABLE "Board" (
     "type" "BoardType" NOT NULL DEFAULT E'PHASE',
     "currentPhase" "PhaseType" NOT NULL DEFAULT E'REFLECT',
     "endTime" TIMESTAMP(3),
+    "boardTemplateId" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BoardTemplate" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+
+    PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ColumnTemplate" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "boardTemplateId" TEXT,
 
     PRIMARY KEY ("id")
 );
@@ -191,6 +209,7 @@ CREATE TABLE "Column" (
     "boardId" TEXT NOT NULL,
     "color" TEXT NOT NULL DEFAULT E'white',
     "title" TEXT NOT NULL,
+    "columnTemplateId" TEXT NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "position" INTEGER NOT NULL,
 
@@ -332,6 +351,9 @@ CREATE UNIQUE INDEX "Evaluation.assessmentId_assessorId_unique" ON "Evaluation"(
 CREATE UNIQUE INDEX "Criteria.name_unique" ON "Criteria"("name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Template.title_unique" ON "Template"("title");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "TemplateQuestion.title_templateId_unique" ON "TemplateQuestion"("title", "templateId");
 
 -- CreateIndex
@@ -392,6 +414,9 @@ ALTER TABLE "TemplateQuestion" ADD FOREIGN KEY ("templateId") REFERENCES "Templa
 ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "ColumnTemplate" ADD FOREIGN KEY ("boardTemplateId") REFERENCES "BoardTemplate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "HealthCheck" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -408,6 +433,9 @@ ALTER TABLE "MemberOnHealthCheckOnQuestion" ADD FOREIGN KEY ("memberId") REFEREN
 
 -- AddForeignKey
 ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Column" ADD FOREIGN KEY ("columnTemplateId") REFERENCES "ColumnTemplate"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;

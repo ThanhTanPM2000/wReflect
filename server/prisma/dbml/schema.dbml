@@ -91,11 +91,11 @@ Table Team {
   members Member [not null]
   boards Board [not null]
   healthChecks HealthCheck [not null]
-  teamTemplate Template [not null]
+  teamTemplate HealthCheckTemplate [not null]
   assessments Assessment [not null]
 }
 
-Table Template {
+Table HealthCheckTemplate {
   id String [pk]
   title String [not null]
   isDefault Boolean [not null]
@@ -116,7 +116,7 @@ Table TemplateQuestion {
   title String [not null]
   templateId String [not null]
   color String [not null]
-  healthCheckTemplate Template [not null]
+  healthCheckTemplate HealthCheckTemplate [not null]
   description String [not null]
   memberOnHealthCheck MemberOnHealthCheckOnQuestion [not null]
 
@@ -145,8 +145,23 @@ Table Board {
   currentPhase PhaseType [not null, default: 'REFLECT']
   endTime DateTime
   team Team [not null]
+  boardTemplateId String [not null]
   columns Column [not null]
   healthCheck HealthCheck
+}
+
+Table BoardTemplate {
+  id String [pk]
+  title String [not null]
+  columnTemplates ColumnTemplate [not null]
+}
+
+Table ColumnTemplate {
+  id String [pk]
+  title String [not null]
+  BoardTemplate BoardTemplate
+  boardTemplateId String
+  Column Column [not null]
 }
 
 Table HealthCheck {
@@ -183,10 +198,12 @@ Table Column {
   boardId String [not null]
   color String [not null, default: 'white']
   title String [not null]
+  columnTemplateId String [not null]
   isActive Boolean [not null, default: true]
   position Int [not null]
   board Board [not null]
   opinions Opinion [not null]
+  ColumnTemplate ColumnTemplate [not null]
 }
 
 Table Opinion {
@@ -387,11 +404,13 @@ Ref: AnswerOnCriteria.criteriaId > Criteria.id
 
 Ref: AnswerOnCriteria.resultId > Result.id
 
-Ref: Template.teamId > Team.id
+Ref: HealthCheckTemplate.teamId > Team.id
 
-Ref: TemplateQuestion.templateId > Template.id
+Ref: TemplateQuestion.templateId > HealthCheckTemplate.id
 
 Ref: Board.teamId > Team.id
+
+Ref: ColumnTemplate.boardTemplateId > BoardTemplate.id
 
 Ref: HealthCheck.boardId - Board.id
 
@@ -404,6 +423,8 @@ Ref: MemberOnHealthCheckOnQuestion.questionId > TemplateQuestion.id
 Ref: MemberOnHealthCheckOnQuestion.memberId > Member.id
 
 Ref: Column.boardId > Board.id
+
+Ref: Column.columnTemplateId > ColumnTemplate.id
 
 Ref: Opinion.authorId > Member.id
 
