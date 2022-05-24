@@ -5,33 +5,22 @@ import { createTeamType, RequestWithUserInfo, updateTeamType } from '../types';
 import { Team, TeamStatus, BanningUser } from '@prisma/client';
 import { errorName } from '../constant/errorsConstant';
 import { ForbiddenError, ApolloError } from 'apollo-server-errors';
-import { checkIsMemberOfTeam, checkIsMemberOwningTeam, allowUpdatingOpinion } from './essential';
+import { checkIsMemberOfTeam, checkIsMemberOwningTeam, allowUpdatingOpinion, checkIsAdmin } from './essential';
 import error from '../errorsManagement';
 import { updateActionTrackerType } from '../apollo/TypeDefs/opinionTypeDefs';
 
 export const getTeams = async (
   isAdmin: boolean,
-  meId: string,
   isGettingAll = false,
   page = 1,
   size = 8,
   search = '',
   status?: TeamStatus,
-  userId?: string,
 ) => {
-  const where = isAdmin
-    ? undefined
-    : {
-        members: {
-          some: {
-            userId,
-          },
-        },
-      };
+  await checkIsAdmin(isAdmin);
 
   const data = await prisma.team.findMany({
     where: {
-      ...where,
       AND: [
         {
           name: {
@@ -57,7 +46,6 @@ export const getTeams = async (
 
   const total = await prisma.team.count({
     where: {
-      ...where,
       AND: [
         {
           name: {
@@ -80,7 +68,7 @@ export const getTeams = async (
   };
 };
 
-export const getMyTeams = async (isGettingAll = false, page = 1, size = 8, search = '', meId: string) => {
+export const getTeamsOfUser = async (meId: string, isGettingAll = false, page = 1, size = 8, search = '') => {
   const myTeams = await prisma.team.findMany({
     where: {
       members: {
@@ -100,6 +88,11 @@ export const getMyTeams = async (isGettingAll = false, page = 1, size = 8, searc
 
   const total = await prisma.team.count({
     where: {
+      members: {
+        some: {
+          userId: meId,
+        },
+      },
       name: {
         contains: search,
         mode: 'insensitive',

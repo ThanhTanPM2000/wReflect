@@ -332,7 +332,7 @@ CREATE UNIQUE INDEX "Evaluation.assessmentId_assessorId_unique" ON "Evaluation"(
 CREATE UNIQUE INDEX "Criteria.name_unique" ON "Criteria"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Template.title_unique" ON "Template"("title");
+CREATE UNIQUE INDEX "TemplateQuestion.title_templateId_unique" ON "TemplateQuestion"("title", "templateId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "HealthCheck.boardId_unique" ON "HealthCheck"("boardId");
