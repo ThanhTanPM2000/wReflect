@@ -3,6 +3,8 @@
   "txt_doing": "Doing",
   "txt_done": "Done",
 
+  "txt_default": "Default",
+
   "txt_createTeam": "New Team",
   "txt_reflectTeam": "Reflect Team",
   "txt_reflectPersonal": "Reflect Personal",
@@ -11,7 +13,6 @@
   "txt_members": "Members",
   "txt_boards": "Boards",
   "txt_setting": "Setting",
-  "txt_action": "Action",
 
   "txt_boards_reflect": "Reflect",
   "txt_boards_group": "Group",

@@ -3,6 +3,8 @@
   "txt_doing": "Đang thực hiện",
   "txt_done": "Đã xong",
 
+  "txt_default": "Mặc Định",
+
   "txt_createTeam": "Tạo team mới",
   "txt_reflectTeam": "Nhìn lại team",
   "txt_reflectPersonal": "Nhìn lại cá nhân",
@@ -11,7 +13,6 @@
   "txt_members": "Thành viên",
   "txt_boards": "Bảng",
   "txt_setting": "Cài đặt",
-  "txt_action": "Công cụ",
 
   "txt_boards_reflect": "Phản ánh",
   "txt_boards_group": "Gộp ý kiến",
