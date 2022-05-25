@@ -55,6 +55,13 @@ const typeDefs = gql`
     color: String
   }
 
+  input questionsWithIdInput {
+    id: String
+    title: String
+    description: String
+    color: String
+  }
+
   input healthCheckAnswer {
     questionId: String!
     point: Int!
@@ -291,6 +298,13 @@ const typeDefs = gql`
     reopenHealthCheck(teamId: String!, boardId: String!): HealthCheck
 
     createCustomTemplate(teamId: String!, name: String!, questions: [questionsInput!]!): Template
+    updateCustomTemplate(
+      teamId: String!
+      templateId: String!
+      name: String!
+      questions: [questionsWithIdInput!]!
+    ): Template
+    deleteCustomTemplate(teamId: String!, templateId: String!): Template
 
     # admin api(s)
     createHealthCheckTemplate(name: String!, questions: [questionsInput!]!): Template

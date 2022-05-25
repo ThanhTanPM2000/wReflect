@@ -113,7 +113,7 @@ CREATE TABLE "Team" (
 );
 
 -- CreateTable
-CREATE TABLE "Template" (
+CREATE TABLE "HealthCheckTemplate" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "isDefault" BOOLEAN NOT NULL,
@@ -157,23 +157,6 @@ CREATE TABLE "Board" (
     "currentPhase" "PhaseType" NOT NULL DEFAULT E'REFLECT',
     "endTime" TIMESTAMP(3),
     "boardTemplateId" TEXT NOT NULL,
-
-    PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "BoardTemplate" (
-    "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-
-    PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ColumnTemplate" (
-    "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "boardTemplateId" TEXT,
 
     PRIMARY KEY ("id")
 );
@@ -351,7 +334,7 @@ CREATE UNIQUE INDEX "Evaluation.assessmentId_assessorId_unique" ON "Evaluation"(
 CREATE UNIQUE INDEX "Criteria.name_unique" ON "Criteria"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Template.title_unique" ON "Template"("title");
+CREATE UNIQUE INDEX "HealthCheckTemplate.title_unique" ON "HealthCheckTemplate"("title");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TemplateQuestion.title_templateId_unique" ON "TemplateQuestion"("title", "templateId");
@@ -405,16 +388,13 @@ ALTER TABLE "AnswerOnCriteria" ADD FOREIGN KEY ("criteriaId") REFERENCES "Criter
 ALTER TABLE "AnswerOnCriteria" ADD FOREIGN KEY ("resultId") REFERENCES "Result"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Template" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "HealthCheckTemplate" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TemplateQuestion" ADD FOREIGN KEY ("templateId") REFERENCES "Template"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TemplateQuestion" ADD FOREIGN KEY ("templateId") REFERENCES "HealthCheckTemplate"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Board" ADD FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ColumnTemplate" ADD FOREIGN KEY ("boardTemplateId") REFERENCES "BoardTemplate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "HealthCheck" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -433,9 +413,6 @@ ALTER TABLE "MemberOnHealthCheckOnQuestion" ADD FOREIGN KEY ("memberId") REFEREN
 
 -- AddForeignKey
 ALTER TABLE "Column" ADD FOREIGN KEY ("boardId") REFERENCES "Board"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Column" ADD FOREIGN KEY ("columnTemplateId") REFERENCES "ColumnTemplate"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Opinion" ADD FOREIGN KEY ("authorId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -138,30 +138,14 @@ Table Board {
   isAnonymous Boolean [not null, default: false]
   votesLimit Int [not null, default: 25]
   meetingNote String [not null, default: 'My meeting note...']
-  currentColumnId String
   title String [not null]
   timerInProgress Boolean [not null, default: false]
   type BoardType [not null, default: 'PHASE']
   currentPhase PhaseType [not null, default: 'REFLECT']
   endTime DateTime
   team Team [not null]
-  boardTemplateId String [not null]
   columns Column [not null]
   healthCheck HealthCheck
-}
-
-Table BoardTemplate {
-  id String [pk]
-  title String [not null]
-  columnTemplates ColumnTemplate [not null]
-}
-
-Table ColumnTemplate {
-  id String [pk]
-  title String [not null]
-  BoardTemplate BoardTemplate
-  boardTemplateId String
-  Column Column [not null]
 }
 
 Table HealthCheck {
@@ -198,12 +182,10 @@ Table Column {
   boardId String [not null]
   color String [not null, default: 'white']
   title String [not null]
-  columnTemplateId String [not null]
   isActive Boolean [not null, default: true]
   position Int [not null]
   board Board [not null]
   opinions Opinion [not null]
-  ColumnTemplate ColumnTemplate [not null]
 }
 
 Table Opinion {
@@ -410,8 +392,6 @@ Ref: TemplateQuestion.templateId > HealthCheckTemplate.id
 
 Ref: Board.teamId > Team.id
 
-Ref: ColumnTemplate.boardTemplateId > BoardTemplate.id
-
 Ref: HealthCheck.boardId - Board.id
 
 Ref: HealthCheck.teamId > Team.id
@@ -423,8 +403,6 @@ Ref: MemberOnHealthCheckOnQuestion.questionId > TemplateQuestion.id
 Ref: MemberOnHealthCheckOnQuestion.memberId > Member.id
 
 Ref: Column.boardId > Board.id
-
-Ref: Column.columnTemplateId > ColumnTemplate.id
 
 Ref: Opinion.authorId > Member.id
 

@@ -1,23 +1,19 @@
-import { createCustomTemplateForTeamArgs, getTemplatesArgs } from './../apollo/TypeDefs/templateTypeDefs';
+import {
+  createCustomTemplateArgs,
+  deleteCustomTemplateForTeamArgs,
+  getTemplatesArgs,
+  updateCustomTemplateArgs,
+} from '../apollo/TypeDefs/templateTypeDefs';
 import { createTemplateHealthCheckArgs, updateTemplateHealthCheckArgs } from '../apollo/TypeDefs/templateTypeDefs';
 import { checkIsAdmin, checkIsMemberOfTeam, checkIsMemberOwningTeam } from './essential';
 import error from '../errorsManagement';
 import prisma from '../prisma';
-
-export const checkTemplateTilteIsExist = async (name: string) => {
-  const isExistTemplate = await prisma?.template?.findUnique({
-    where: {
-      title: name,
-    },
-  });
-
-  if (isExistTemplate) return error?.BadRequest('This name of template is already taked');
-};
+import errorsManagement from '../errorsManagement';
 
 export const getTemplatesOfTeam = async (teamId, meId) => {
   await checkIsMemberOfTeam(teamId, meId);
 
-  const gettingTemplates = await prisma?.template.findMany({
+  const gettingTemplates = await prisma?.healthCheckTemplate.findMany({
     where: {
       OR: [
         {
@@ -34,10 +30,10 @@ export const getTemplatesOfTeam = async (teamId, meId) => {
     },
     orderBy: [
       {
-        createdAt: 'desc',
+        isDefault: 'asc',
       },
       {
-        isDefault: 'asc',
+        createdAt: 'desc',
       },
     ],
   });
@@ -45,7 +41,7 @@ export const getTemplatesOfTeam = async (teamId, meId) => {
 };
 
 export const getTemplates = async (isGettingAll = false, search = '', page = 1, size = 10) => {
-  const templates = await prisma?.template?.findMany({
+  const templates = await prisma?.healthCheckTemplate?.findMany({
     where: {
       isDefault: true,
       title: {
@@ -67,7 +63,7 @@ export const getTemplates = async (isGettingAll = false, search = '', page = 1, 
     },
   });
 
-  const total = await prisma.template.count({
+  const total = await prisma.healthCheckTemplate.count({
     where: {
       isDefault: true,
       title: {
@@ -84,7 +80,6 @@ export const getTemplates = async (isGettingAll = false, search = '', page = 1, 
 
 export const createTemplate = async (isAdmin: boolean, args: createTemplateHealthCheckArgs) => {
   await checkIsAdmin(isAdmin);
-  await checkTemplateTilteIsExist(args?.name);
 
   const createHealthCheckQuestion = args?.questions?.map((question) => ({
     title: question?.title,
@@ -92,7 +87,7 @@ export const createTemplate = async (isAdmin: boolean, args: createTemplateHealt
     color: question?.color,
   }));
 
-  const creatingTemplate = await prisma?.template?.create({
+  const creatingTemplate = await prisma.healthCheckTemplate?.create({
     data: {
       title: args?.name,
       isDefault: true,
@@ -112,7 +107,7 @@ export const createTemplate = async (isAdmin: boolean, args: createTemplateHealt
   return creatingTemplate;
 };
 
-export const createCustomForHealthCheck = async (meId: string, args: createCustomTemplateForTeamArgs) => {
+export const createCustomTemplate = async (meId: string, args: createCustomTemplateArgs) => {
   await checkIsMemberOwningTeam(args?.teamId, meId);
 
   const generateQuestions = args?.questions?.map((question) => ({
@@ -121,7 +116,7 @@ export const createCustomForHealthCheck = async (meId: string, args: createCusto
     color: question?.color,
   }));
 
-  const creatingCustomTemplate = await prisma?.template.create({
+  const creatingCustomTemplate = await prisma.healthCheckTemplate.create({
     data: {
       teamId: args?.teamId,
       title: args?.name,
@@ -139,9 +134,57 @@ export const createCustomForHealthCheck = async (meId: string, args: createCusto
   return creatingCustomTemplate;
 };
 
+export const updateCustomTemplate = async (meId: string, args: updateCustomTemplateArgs) => {
+  await checkIsMemberOwningTeam(args?.teamId, meId);
+
+  const updateQuestions = args?.questions?.map((question) => ({
+    where: {
+      id: question?.id,
+    },
+    data: {
+      title: question?.title,
+      description: question?.description,
+      color: question?.color,
+    },
+  }));
+
+  const updatingTemplate = await prisma?.team?.update({
+    where: {
+      id: args?.teamId,
+    },
+    data: {
+      teamTemplate: {
+        update: {
+          where: {
+            id: args?.templateId,
+          },
+          data: {
+            title: args?.name,
+            healthCheckQuestions: {
+              update: [...updateQuestions],
+            },
+          },
+        },
+      },
+    },
+    select: {
+      teamTemplate: {
+        include: {
+          healthCheckQuestions: true,
+        },
+      },
+    },
+  });
+
+  const template = updatingTemplate?.teamTemplate?.find((x) => x?.id === args?.templateId);
+
+  if (!template) return errorsManagement?.NotFound('Id of template not found');
+
+  return template;
+};
+
 export const updateTemplate = async (isAdmin: boolean, args: updateTemplateHealthCheckArgs) => {
   checkIsAdmin(isAdmin);
-  await checkTemplateTilteIsExist(args?.name);
 
   const updateHealthCheckQuestion = args?.questions?.map((question) => ({
     title: question?.title,
@@ -149,7 +192,7 @@ export const updateTemplate = async (isAdmin: boolean, args: updateTemplateHealt
     color: question?.color,
   }));
 
-  const updatingTemplate = await prisma?.template?.update({
+  const updatingTemplate = await prisma.healthCheckTemplate?.update({
     where: {
       id: args?.templateId,
     },
@@ -160,7 +203,6 @@ export const updateTemplate = async (isAdmin: boolean, args: updateTemplateHealt
         deleteMany: {
           templateId: args?.templateId,
         },
-        create: [...updateHealthCheckQuestion],
       },
     },
     include: {
@@ -178,7 +220,7 @@ export const updateTemplate = async (isAdmin: boolean, args: updateTemplateHealt
 export const deleteTemplate = async (isAdmin: boolean, templateId: string) => {
   await checkIsAdmin(isAdmin);
 
-  const deletingTemplate = await prisma.template.delete({
+  const deletingTemplate = await prisma.healthCheckTemplate.delete({
     where: {
       id: templateId,
     },
@@ -186,4 +228,31 @@ export const deleteTemplate = async (isAdmin: boolean, templateId: string) => {
 
   if (!deletingTemplate) return error?.NotFound('Cant find template to delete');
   return deletingTemplate;
+};
+
+export const deleteCustomTemplate = async (meId: string, args: deleteCustomTemplateForTeamArgs) => {
+  await checkIsMemberOwningTeam(args?.teamId, meId);
+
+  const deletingCustomTemplate = await prisma?.team.update({
+    where: {
+      id: args?.teamId,
+    },
+    data: {
+      teamTemplate: {
+        delete: {
+          id: args?.templateId,
+        },
+      },
+    },
+    select: {
+      teamTemplate: {
+        include: {
+          healthCheckQuestions: true,
+        },
+      },
+    },
+  });
+
+  const template = deletingCustomTemplate?.teamTemplate?.find((x) => x?.id === args?.templateId);
+  return template;
 };
