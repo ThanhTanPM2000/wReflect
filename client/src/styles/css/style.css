@@ -542,7 +542,6 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
         .board-header .board-tracking .phase-header .board-phase .phase-step {
           padding: 10px;
           border-radius: 10px;
-          flex: 1;
           display: flex;
           flex-direction: row;
           gap: 5px;
@@ -814,23 +813,6 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light {
     .manage-board .board-items .board-icons .text-button:hover {
       color: #6d7982;
       cursor: auto; }
-
-.configBoard .listColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 10px; }
-  .configBoard .listColumn .configColumn {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px; }
-
-.configBoard .buttonGenerate {
-  margin-top: 20px;
-  text-align: center; }
-
-.configBoard .fieldsConfig {
-  margin-top: 10px; }
 
 .actionsTracker .header h2 {
   font-size: 22px;
