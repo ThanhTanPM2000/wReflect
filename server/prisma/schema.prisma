@@ -120,11 +120,7 @@ model HealthCheckTemplate {
   team                 Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   healthCheckQuestions TemplateQuestion[]
 
-<<<<<<< Updated upstream
   @@unique([title])
-=======
-  @@map("Template")
->>>>>>> Stashed changes
 }
 
 model TemplateQuestion {
@@ -152,31 +148,15 @@ model Board {
   isAnonymous     Boolean      @default(false)
   votesLimit      Int          @default(25)
   meetingNote     String       @default("My meeting note...")
-  currentColumnId String?
   title           String
   timerInProgress Boolean      @default(false)
   type            BoardType    @default(PHASE)
   currentPhase    PhaseType    @default(REFLECT)
   endTime         DateTime?
   team            Team         @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  // boardTemplateId String
   columns         Column[]
   healthCheck     HealthCheck?
 }
-
-// model BoardTemplate {
-//   id              String           @id @default(uuid())
-//   title           String
-//   columnTemplates ColumnTemplate[]
-// }
-
-// model ColumnTemplate {
-//   id              String         @id @default(uuid())
-//   title           String
-//   BoardTemplate   BoardTemplate? @relation(fields: [boardTemplateId], references: [id])
-//   boardTemplateId String?
-//   Column          Column[]
-// }
 
 model HealthCheck {
   id                  String                          @id @default(uuid())
@@ -185,10 +165,7 @@ model HealthCheck {
   templateId          String
   createdAt           DateTime                        @default(now())
   updatedAt           DateTime                        @updatedAt()
-  // updatedBy           String?
   isAnonymous         Boolean
-  // isCustom            Boolean
-  // status              StatusHealthCheck
   board               Board                           @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   team                Team                            @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   memberOnHealthCheck MemberOnHealthCheckOnQuestion[]
@@ -221,16 +198,14 @@ enum PhaseType {
 }
 
 model Column {
-  id               String    @id @default(uuid())
-  boardId          String
-  color            String    @default("white")
-  title            String
-  columnTemplateId String
-  isActive         Boolean   @default(true)
-  position         Int
-  board            Board     @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  // columnTemplate   ColumnTemplate @relation(fields: [columnTemplateId], references: [id])
-  opinions         Opinion[]
+  id       String    @id @default(uuid())
+  boardId  String
+  color    String    @default("white")
+  title    String
+  isActive Boolean   @default(true)
+  position Int
+  board    Board     @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  opinions Opinion[]
 }
 
 model Opinion {
