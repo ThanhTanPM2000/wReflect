@@ -321,7 +321,7 @@ model BanningUser {
   title           String
   description     String
   userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model UserOnCriteria {
