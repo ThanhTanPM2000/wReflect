@@ -44,11 +44,13 @@ const HomePage = ({ email, picture }: Props) => {
         <div className="height-30" />
         <Row>
           <Col style={{ padding: 15, textAlign: 'center', marginTop: 20 }} span={20}>
-            <h1 style={{ fontSize: 40 }}>{t(`txt_homepage_title_6`)}</h1>
-            <p style={{ color: 'gray', letterSpacing: 1 }}>
-              <b>{t(`txt_homepage_content_retrospective_1`)}</b> {t(`txt_homepage_content_retrospective_2`)}{' '}
-              {t(`txt_homepage_content_retrospective_3`)}
-            </p>
+            <div style={{ marginTop: 30 }}>
+              <h1 style={{ fontSize: 40 }}>{t(`txt_homepage_title_6`)}</h1>
+              <p style={{ color: 'gray', letterSpacing: 1 }}>
+                <b>{t(`txt_homepage_content_retrospective_1`)}</b> {t(`txt_homepage_content_retrospective_2`)}{' '}
+                {t(`txt_homepage_content_retrospective_3`)}
+              </p>
+            </div>
           </Col>
         </Row>
         <div className="height-30" />
@@ -67,15 +69,14 @@ const HomePage = ({ email, picture }: Props) => {
         <div className="height-30" />
         <Row style={{ marginBottom: 20 }}>
           <Col style={{ textAlign: 'center', padding: 40 }} span={24}>
-            <div style={{ padding: '0px 40px' }}>
-              <h1 style={{ fontSize: 40, marginBottom: 10, background: '#f7f7f7' }}>{t(`txt_homepage_title_3`)} </h1>
-            </div>
+            <h1 style={{ fontSize: 40, marginBottom: 10, background: '#bfbdf0' }}>{t(`txt_homepage_title_3`)} </h1>
             <Carousel
               style={{
                 color: 'gray',
                 letterSpacing: 1,
                 textAlign: 'center',
                 padding: 50,
+                background: '#f7f7f7',
               }}
             >
               <div>
@@ -104,8 +105,8 @@ const HomePage = ({ email, picture }: Props) => {
             </Carousel>
           </Col>
           <Col style={{ marginBottom: 5, textAlign: 'center', padding: 40 }} span={24}>
-            <div style={{ padding: '0px 40px' }}>
-              <h1 style={{ fontSize: 40, marginBottom: 10, background: '#f7f7f7' }}>{t(`txt_homepage_title_4`)} </h1>
+            <div>
+              <h1 style={{ fontSize: 40, marginBottom: 10, background: '#bfbdf0' }}>{t(`txt_homepage_title_4`)} </h1>
             </div>
             <Carousel
               style={{
@@ -113,6 +114,7 @@ const HomePage = ({ email, picture }: Props) => {
                 letterSpacing: 1,
                 textAlign: 'center',
                 padding: 50,
+                background: '#f7f7f7',
               }}
               autoplay
             >
@@ -162,7 +164,7 @@ const HomePage = ({ email, picture }: Props) => {
             <div className="button-home-page">
               <a href="https://dev-m0ubghav.us.auth0.com/u/signup?state=hKFo2SA1MGI3VTFwWGs0Q2h3MjhUNWZjcXhPVjB1eFhZRzR3eaFur3VuaXZlcnNhbC1sb2dpbqN0aWTZIEwxRUNyNGd5eFNCUVRaeUtScnFpS0k0UTJnTjVnalVOo2NpZNkgY09LQTFUWXN3V0YwU3R1bkpLT2p0MXY0T0JWV1R0dEE">
                 <Button shape="round" type="primary" icon={<UserOutlined />} style={{ marginRight: 20 }}>
-                  Sign Up
+                  Login / Sign Up
                 </Button>
               </a>
               <Button shape="round" type="dashed" icon={<QuestionOutlined />} onClick={handleShowModal}>

@@ -12,7 +12,7 @@ type Props = {
 const LoginSection = ({ email }: Props) => {
   return (
     <Login isLoggedIn={!!email}>
-      <span  style={{ width: 90 }}>Login</span>
+      <span style={{ width: 120 }}>Login / Sign Up</span>
     </Login>
   );
 };
@@ -26,7 +26,15 @@ const Header = ({ email, picture }: Props) => {
   }, [language]);
   return (
     <div className="header">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '1rem',
+          background: '#a4a0f1',
+        }}
+      >
         <div className="flex flex-dir-r flex-ai-e">
           <img height="50px" src="../../images/shortLogo.png" alt="wReflect Logo" />{' '}
           <div className="titlePage">WReflect</div>
@@ -37,7 +45,7 @@ const Header = ({ email, picture }: Props) => {
             unselectable="on"
             key="12"
             icon={<span className={`flag-icon flag-icon-${language == 'vi' ? 'vn' : 'us'}`}></span>}
-            style={{ width: 120 }}
+            style={{ width: 150 }}
           >
             &nbsp;{`${language == 'en' ? 'English' : 'Vietnam'}`}
           </Button>

@@ -178,12 +178,12 @@
   "txt_team_detail_public": "PUBLIC",
   "txt_team_detail_member": "Member",
 
-  "txt_homepage_title_1": "WHAT IS REFLECT ?",
-  "txt_homepage_title_2": "WHY HAVE wREFLECT?  ",
-  "txt_homepage_title_3": "wREFLECT VALUES FOR PERSONALITY ?",
-  "txt_homepage_title_4": "wREFLECT VALUES FOR GROUP ?",
-  "txt_homepage_title_5": "IN SHORT",
-  "txt_homepage_title_6": "WHAT ROLE DOES wREFLECT ?",
+  "txt_homepage_title_1": "What Is Reflect ?",
+  "txt_homepage_title_2": "Why Have WReflect?  ",
+  "txt_homepage_title_3": "WReflect Values For Personal ?",
+  "txt_homepage_title_4": "WReflect Values For Group ?",
+  "txt_homepage_title_5": "In Short",
+  "txt_homepage_title_6": "What Role Does WReflect ?",
 
   "txt_homepage_content_with_member": "With Member :",
   "txt_homepage_content_with_reflection_board": "With Reflection Board :",
