@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Image, Col, Row, Tabs, Modal, Button } from 'antd';
 import { QuestionOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { Carousel } from 'antd';
 
 import { Header } from './../../components/Header';
 
@@ -36,24 +37,23 @@ const HomePage = ({ email, picture }: Props) => {
               {t`txt_homepage_content_retrospective_3`}
             </p>
           </Col>
-          <Col span={10}>
+          <Col span={8}>
             <Image preview={false} src="/images/teamwork-gif1.gif" height={330} style={{ objectFit: 'cover' }} />
           </Col>
         </Row>
         <div className="height-30" />
         <Row>
-          <Col style={{ padding: 15, textAlign: 'center', marginTop: 20 }} span={24}>
+          <Col style={{ padding: 15, textAlign: 'center', marginTop: 20 }} span={20}>
             <h1 style={{ fontSize: 40 }}>{t(`txt_homepage_title_6`)}</h1>
             <p style={{ color: 'gray', letterSpacing: 1 }}>
-              <b>{t(`txt_homepage_content_retrospective_1`)}</b>
-              {''}
-              {t(`txt_homepage_content_retrospective_2`)} {t(`txt_homepage_content_retrospective_3`)}
+              <b>{t(`txt_homepage_content_retrospective_1`)}</b> {t(`txt_homepage_content_retrospective_2`)}{' '}
+              {t(`txt_homepage_content_retrospective_3`)}
             </p>
           </Col>
         </Row>
         <div className="height-30" />
         <Row>
-          <Col span={10}>
+          <Col span={8}>
             <Image preview={false} src="/images/teamwork-gif2.gif" height={390} style={{ objectFit: 'cover' }} />
           </Col>
           <Col style={{ paddingTop: 70 }} span={8}>
@@ -65,62 +65,93 @@ const HomePage = ({ email, picture }: Props) => {
           </Col>
         </Row>
         <div className="height-30" />
-        <Row>
-          <Col style={{ padding: 15 }} span={24}>
-            <h1 style={{ fontSize: 40, textAlign: 'center' }}>GIÁ TRỊ CỦA wREFLECT ĐEM LẠI CHO CÁ NHÂN ? </h1>
-            <div style={{ color: 'gray', letterSpacing: 1 }}>
-              <p>
-                <b>- {t(`txt_homepage_content_with_member`)}</b> : {t(`txt_homepage_content_evaluate_1`)}{' '}
-                {t(`txt_homepage_content_evaluate_3`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_reflection_board`)}</b> : {t(`txt_homepage_content_evaluate_4`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_action_tracker`)}</b> : {t(`txt_homepage_content_evaluate_5`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_personal_profile`)}</b> : {t(`txt_homepage_content_evaluate_6`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_searching_profile`)}</b> : {t(`txt_homepage_content_evaluate_7`)}
-              </p>
+        <Row style={{ marginBottom: 20 }}>
+          <Col style={{ textAlign: 'center', padding: 40 }} span={24}>
+            <div style={{ padding: '0px 40px' }}>
+              <h1 style={{ fontSize: 40, marginBottom: 10, background: '#f7f7f7' }}>{t(`txt_homepage_title_3`)} </h1>
             </div>
+            <Carousel
+              style={{
+                color: 'gray',
+                letterSpacing: 1,
+                textAlign: 'center',
+                padding: 50,
+              }}
+            >
+              <div>
+                <b>{t(`txt_homepage_content_with_member`)}</b>
+                <p>
+                  {t(`txt_homepage_content_evaluate_1`)} {` `}
+                  {t(`txt_homepage_content_evaluate_3`)}
+                </p>
+              </div>
+              <div>
+                <b> {t(`txt_homepage_content_with_reflection_board`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_4`)}</p>
+              </div>
+              <div>
+                <b>{t(`txt_homepage_content_with_action_tracker`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_5`)}</p>
+              </div>
+              <div>
+                <b> {t(`txt_homepage_content_with_personal_profile`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_6`)}</p>
+              </div>
+              <div>
+                <b> {t(`txt_homepage_content_with_searching_profile`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_7`)}</p>
+              </div>
+            </Carousel>
+          </Col>
+          <Col style={{ marginBottom: 5, textAlign: 'center', padding: 40 }} span={24}>
+            <div style={{ padding: '0px 40px' }}>
+              <h1 style={{ fontSize: 40, marginBottom: 10, background: '#f7f7f7' }}>{t(`txt_homepage_title_4`)} </h1>
+            </div>
+            <Carousel
+              style={{
+                color: 'gray',
+                letterSpacing: 1,
+                textAlign: 'center',
+                padding: 50,
+              }}
+              autoplay
+            >
+              <div>
+                <b> {t(`txt_homepage_content_with_member`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_8`)}</p>
+              </div>
+              <div>
+                <b>{t(`txt_homepage_content_with_reflection_board`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_9`)}</p>
+              </div>
+              <div>
+                <b> {t(`txt_homepage_content_with_action_tracker`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_10`)}</p>
+              </div>
+              <div>
+                <b> {t(`txt_homepage_content_with_health_check`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_11`)}</p>
+              </div>
+              <div>
+                <b>{t(`txt_homepage_content_with_personal_reflection`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_12`)}</p>
+              </div>
+              <div>
+                <b> {t(`txt_homepage_content_with_personal_profile`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_13`)}</p>
+              </div>
+              <div>
+                <b>{t(`txt_homepage_content_with_searching_profile`)}</b>
+                <p>{t(`txt_homepage_content_evaluate_14`)}</p>
+              </div>
+            </Carousel>
           </Col>
         </Row>
+
         <div className="height-30" />
         <Row>
-          <Col style={{ padding: 15 }} span={24}>
-            <h1 style={{ fontSize: 40, textAlign: 'center' }}>{t(`txt_homepage_title_4`)} </h1>
-            <div style={{ color: 'gray', letterSpacing: 1 }}>
-              <p>
-                <b>- {t(`txt_homepage_content_with_member`)}</b> : {t(`txt_homepage_content_evaluate_8`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_reflection_board`)}</b> :{t(`txt_homepage_content_evaluate_9`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_action_tracker`)}</b> :{t(`txt_homepage_content_evaluate_10`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_health_check`)}</b> : {t(`txt_homepage_content_evaluate_11`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_personal_reflection`)}</b> : {t(`txt_homepage_content_evaluate_12`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_personal_profile`)}</b> : {t(`txt_homepage_content_evaluate_13`)}
-              </p>
-              <p>
-                <b>- {t(`txt_homepage_content_with_searching_profile`)}</b> : {t(`txt_homepage_content_evaluate_14`)}
-              </p>
-            </div>
-          </Col>
-        </Row>
-        <div className="height-30" />
-        <Row>
-          <Col style={{ padding: 15 }} span={11}>
-            <h1 style={{ fontSize: 40 }}>TÓM LẠI</h1>
+          <Col style={{ padding: 15 }} span={9}>
+            <h1 style={{ fontSize: 40 }}>{t(`txt_homepage_title_5`)}</h1>
             <p style={{ color: 'gray', letterSpacing: 1 }}>
               {t(`txt_homepage_content_evaluate_15`)} <b>{t(`txt_homepage_content_evaluate_16`)}</b>{' '}
               {t(`txt_homepage_content_evaluate_17`)}
@@ -139,8 +170,8 @@ const HomePage = ({ email, picture }: Props) => {
               </Button>
             </div>
           </Col>
-          <Col span={10}>
-            <Image preview={false} src="/images/teamwork-gif3.gif" height={400} style={{ objectFit: 'cover' }} />
+          <Col span={8}>
+            <Image preview={false} src="/images/teamwork-gif3.gif" height={360} style={{ objectFit: 'cover' }} />
           </Col>
 
           <Modal className="modal-userguide" title="User Guide" visible={showModal} onCancel={handleCancel}>
