@@ -114,7 +114,7 @@ const Login = ({ isLoggedIn, children, redirectUri }: Props): JSX.Element => {
         webAuth={webAuth}
         needsEmailVerification={needsEmailVerification}
       />
-      <Button type="primary" loading={loading} onClick={() => webAuth.authorize({ prompt: 'login' })}>
+      <Button loading={loading} onClick={() => webAuth.authorize({ prompt: 'login' })}>
         {children}
       </Button>
     </div>
