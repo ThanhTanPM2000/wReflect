@@ -266,7 +266,6 @@ model Member {
   isSuperOwner        Boolean                         @default(false)
   isPendingInvitation Boolean                         @default(false)
   isGuess             Boolean                         @default(false)
-  meetingNote         String?
   invitedBy           String?
   joinedAt            DateTime                        @default(now())
   user                User                            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

@@ -36,7 +36,12 @@ import {
   updateActionTrackerType,
 } from './TypeDefs/opinionTypeDefs';
 import { pubsub } from '../pubSub';
-import { updateBoardType, createBoardType, deleteBoardType } from './TypeDefs/Board/boardTypes';
+import {
+  updateBoardArgs,
+  createBoardArgs,
+  deleteBoardArgs,
+  updatingMeetingNoteArgs,
+} from './TypeDefs/Board/boardTypes';
 import {
   createTemplateHealthCheckArgs,
   updateTemplateHealthCheckArgs,
@@ -212,13 +217,15 @@ const resolvers = {
       return deletingCriteria;
     },
 
-    updateMeetingNote: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+    updateMeetingNote: async (_, args: updatingMeetingNoteArgs, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};
-      const updatingMember = await member.updateMeetingNote(meId, args.teamId, args.meetingNote);
-      // pubsub.publish('UPDATE_MEMBER', {
-      //   subOnUpdateMember: updatingMember,
-      // });
-      return updatingMember;
+      const updatingBoard = await board.updateMeetingNote(meId, args.teamId, args.boardId, args.meetingNote);
+      pubsub.publish('UPDATE_MEETINGNOTE', {
+        subOnUpdateMeetingNote: updatingBoard,
+        teamId: args?.teamId,
+        boardId: args?.boardId,
+      });
+      return updatingBoard;
     },
     createTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
       const myTeam = await team.createTeam(req, args);
@@ -268,7 +275,7 @@ const resolvers = {
     // usingCurrentBoard: async (_, args, {req}: {req: RequestWithUserInfo}) => {
     //   return await team.changeCurrentBoard
     // },
-    createBoard: async (_, args: createBoardType, { req }: { req: RequestWithUserInfo }) => {
+    createBoard: async (_, args: createBoardArgs, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};
       const team = await board.createBoard(meId, args);
       pubsub.publish('CREATE_BOARD', {
@@ -277,7 +284,7 @@ const resolvers = {
       });
       return team;
     },
-    updateBoard: async (_, args: updateBoardType, { req }: { req: RequestWithUserInfo }) => {
+    updateBoard: async (_, args: updateBoardArgs, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req?.user || {};
       const myBoard = await board.updateBoard(meId, args);
       pubsub.publish('UPDATE_BOARD', {
@@ -286,7 +293,7 @@ const resolvers = {
       });
       return myBoard;
     },
-    deleteBoard: async (_, args: deleteBoardType, { req }: { req: RequestWithUserInfo }) => {
+    deleteBoard: async (_, args: deleteBoardArgs, { req }: { req: RequestWithUserInfo }) => {
       const { id: meId } = req.user || {};
       const team = await board.deleteBoard(meId, args);
       pubsub.publish('DELETE_BOARD', {
@@ -533,6 +540,14 @@ const resolvers = {
     //     },
     //   ),
     // },
+    subOnUpdateMeetingNote: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(['UPDATE_MEETINGNOTE']),
+        (_, args) => {
+          return _?.teamId === args?.teamId && _?.boardId === args?.boardId;
+        },
+      ),
+    },
 
     subOnUpdateTeams: {
       subscribe: withFilter(

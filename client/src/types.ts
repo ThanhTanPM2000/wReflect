@@ -75,6 +75,7 @@ export type Board = {
   disableUpVote: boolean;
   isAnonymous: boolean;
   votesLimit: number;
+  meetingNote: string;
   title: string;
   timerInProgress: boolean;
   type: BoardType;

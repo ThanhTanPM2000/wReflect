@@ -202,18 +202,3 @@ export const changeRoleMember = async (meId: string, args: setRoleMemberType) =>
   return team;
 };
 
-export const updateMeetingNote = async (meId: string, teamId: string, meetingNote: string) => {
-  const member = await prisma.member.update({
-    where: {
-      userId_teamId: {
-        userId: meId,
-        teamId,
-      },
-    },
-    data: {
-      meetingNote,
-    },
-  });
-
-  return member;
-};

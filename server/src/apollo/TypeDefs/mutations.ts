@@ -95,7 +95,7 @@ const typeDefs = gql`
   # }
 
   type Mutation {
-    updateMeetingNote(teamId: String!, meetingNote: String!): Member
+    updateMeetingNote(teamId: ID!, boardId: ID!, meetingNote: String!): Board
 
     createTeam(
       name: String!
@@ -107,7 +107,7 @@ const typeDefs = gql`
       picture: String
     ): Team
     updateTeam(
-      id: String!
+      id: ID!
       name: String
       startDate: String
       endDate: String
@@ -141,7 +141,7 @@ const typeDefs = gql`
     # usingCurrentBoard(teamId: String!, boardId: String!): Team
 
     createBoard(
-      teamId: String!
+      teamId: ID!
       isPublic: Boolean
       isLocked: Boolean
       disableDownVote: Boolean
@@ -166,8 +166,8 @@ const typeDefs = gql`
     ): Team
 
     updateBoard(
-      teamId: String!
-      boardId: String!
+      teamId: ID!
+      boardId: ID!
       isPublic: Boolean
       isLocked: Boolean
       disableDownVote: Boolean
@@ -191,7 +191,7 @@ const typeDefs = gql`
       isActiveCol5: Boolean
     ): Board
 
-    deleteBoard(teamId: String!, boardId: String!): Team
+    deleteBoard(teamId: ID!, boardId: ID!): Team
 
     convertOpinionsInColumn(teamId: String!, boardId: String!, columnId: String!, action: ActionConvertColumn!): Column
     emptyColumn(teamId: String!, boardId: String!, columnId: String): Column

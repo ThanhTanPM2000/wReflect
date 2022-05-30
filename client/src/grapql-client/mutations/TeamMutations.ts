@@ -70,7 +70,7 @@ const createTeam = gql`
 const updateTeam = gql`
   ${TEAM_FIELDS}
   mutation updateTeam(
-    $id: String!
+    $id: ID!
     $name: String
     $startDate: String
     $endDate: String

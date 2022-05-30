@@ -26,6 +26,7 @@ import {
   SnippetsOutlined,
   StarOutlined,
   QuestionCircleOutlined,
+  TrademarkCircleOutlined,
 } from '@ant-design/icons';
 import _ from 'lodash';
 import selfContext from '../../../contexts/selfContext';
@@ -269,6 +270,7 @@ export default function BoardComponent({ teamId, boardId }: Props) {
                   visible={isVisibleMeetingNote}
                   setVisible={setIsVisibleMeetingNote}
                   team={data?.team}
+                  board={board}
                   iMember={iMember}
                 />
                 <ConfigBoardModal
@@ -378,7 +380,7 @@ export default function BoardComponent({ teamId, boardId }: Props) {
                         </a>
                       </li> */}
                           <li>
-                            <PlusCircleOutlined className="boardPanelIcon " />
+                            <TrademarkCircleOutlined className="boardPanelIcon " />
                             <a className="addBoard" onClick={() => setIsCreateModalVisible(true)}>
                               {t(`txt_boards_reset_all_votes`)}
                             </a>
