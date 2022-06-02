@@ -36,8 +36,8 @@ const HomePage = ({ email, redirectUrl }: Props) => {
           <Col style={{ paddingTop: 70 }} span={8}>
             <h1 style={{ fontSize: 40 }}>{t(`txt_homepage_title_1`)}</h1>
             <p style={{ color: 'gray', letterSpacing: 1 }}>
-              {t(`txt_homepage_content_retrospective_1`)} <b>{t(`txt_homepage_content_retrospective_2`)}</b>{' '}
-              {t`txt_homepage_content_retrospective_3`}
+              {t(`txt_homepage_content_retrospective_1`)} <b>{t(`txt_homepage_content_reflection`)}</b>{' '}
+              {t`txt_homepage_content_reflection_2`}
             </p>
           </Col>
           <Col span={8}>
