@@ -26,7 +26,7 @@ import { AccountSetting } from './pages/AccountSettingPage';
 import { NotFound } from './pages/NotFoundPage';
 import { ManageBoardPage } from './pages/Team/ManageBoardPage';
 import HealthCheck from './pages/Team/HealthCheck/HealthCheck';
-import TeamDetail from './pages/Team/TeamDetailPage/teamDetail';
+import TeamSetting from './pages/Team/TeamSettingPage/TeamSetting';
 import { PersonalReflection } from './pages/Team/PersonalReflection';
 import NotificationPage from './pages/NotificationPage/notificationList';
 import UserManagementPage from './pages/Admin/UserManagerment/UserManagerment';
@@ -49,7 +49,6 @@ const Routes = ({ me }: Props) => {
   // const isLoggedIn = true;
   const email = me?.email || null;
   const isAdmin = me?.isAdmin || null;
-  const picture = me?.picture || null;
   // const { path } = useRouteMatch();
 
   return (
@@ -110,7 +109,7 @@ const Routes = ({ me }: Props) => {
                       />
                       <Route
                         path="/team-details/:teamId"
-                        render={({ match }) => <TeamDetail teamId={match.params.teamId} />}
+                        render={({ match }) => <TeamSetting teamId={match.params.teamId} />}
                       />
                       <Route path="/not-found" component={NotFound} />
                       <Redirect to="/not-found" />
@@ -128,7 +127,7 @@ const Routes = ({ me }: Props) => {
                   exact
                   render={({ location }: { location: any }) => (
                     <>
-                      <HomePage redirectUrl={location?.state?.from} email={email} picture={picture} />
+                      <HomePage redirectUrl={location?.state?.from} email={email} />
                     </>
                   )}
                 />

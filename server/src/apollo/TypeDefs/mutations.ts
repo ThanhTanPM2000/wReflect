@@ -107,17 +107,16 @@ const typeDefs = gql`
       picture: String
     ): Team
     updateTeam(
-      id: ID!
-      name: String
-      startDate: String
-      endDate: String
-      status: String
-      isPublic: Boolean
-      picture: String
-      description: String
+      teamId: ID!
+      name: String!
+      startDate: String!
+      endDate: String!
+      isPublic: Boolean!
+      picture: String!
+      description: String!
     ): Team
+    deleteTeam(teamId: ID!): Team
 
-    deleteTeam(teamId: String!): BatchPayload
     changeTeamAccess(teamId: String!, isPublic: Boolean!): Team
 
     startSurveyHealthCheck(
@@ -314,6 +313,18 @@ const typeDefs = gql`
     createCriteria(name: String!, description: String!): Criteria
     updateCriteria(criteriaId: String!, name: String!, description: String!): Criteria
     deleteCriteria(criteriaId: String!): Criteria
+
+    updateUser(
+      nickName: String
+      picture: String
+      gender: String
+      workplace: String
+      address: String
+      school: String
+      introduction: String
+      talents: String
+      interests: String
+    ): User
 
     banUser(
       userId: String!

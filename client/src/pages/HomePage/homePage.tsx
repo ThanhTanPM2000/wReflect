@@ -8,12 +8,11 @@ import { useHistory } from 'react-router-dom';
 type Props = {
   redirectUrl?: string;
   email: string | null;
-  picture: string | null;
 };
 
 const { TabPane } = Tabs;
 
-const HomePage = ({ email, picture, redirectUrl }: Props) => {
+const HomePage = ({ email, redirectUrl }: Props) => {
   const [showModal, setShowModal] = useState(false);
 
   console.log(redirectUrl);
@@ -27,7 +26,7 @@ const HomePage = ({ email, picture, redirectUrl }: Props) => {
   };
   return (
     <div className="home-page">
-      <Header redirectUrl={redirectUrl} email={email} picture={picture} />
+      <Header redirectUrl={redirectUrl} email={email} />
       <Row>
         <Col span={8}>
           <h1 style={{ fontSize: 40 }}>RETROSPECTIVE IS GOOD</h1>

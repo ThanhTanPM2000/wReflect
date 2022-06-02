@@ -4,6 +4,20 @@
   "txt_done": "Đã xong",
 
   "txt_default": "Mặc Định",
+  "txt_team": "Nhóm",
+
+  "txt_edit": "Chỉnh sửa",
+  "txt_update": "Cập nhật",
+  "txt_create": "Tạo",
+  "txt_delete": "Xóa",
+  "txt_cancel": "Hủy",
+  "txt_upload": "Tải lên",
+
+  "noti_update_success": "Cập nhật thành công",
+  "noti_create_success": "Tạo thành công",
+  "noti_delete_success": "Xóa dữ liệu thành công",
+
+  "txt_joinedAt": "Tham gia vào",
 
   "txt_createTeam": "Tạo team mới",
   "txt_reflectTeam": "Nhìn lại team",
@@ -172,10 +186,12 @@
   "txt_team_detail_status": "Trạng thái",
   "txt_team_detail_doing": "Đang hoạt động",
   "txt_team_detail_done": "Ngưng hoạt động",
-  "txt_team_detail_scope": "Phạm vị",
+  "txt_team_detail_scope": "Phạm vi",
   "txt_team_detail_private": "Riêng tư",
   "txt_team_detail_public": "Cộng đồng",
   "txt_team_detail_member": "Thành viên",
+  "txt_team_detail_numberOfBoard": "Thành viên",
+  "txt_team_detail_createdSince": "Nhóm được tạo kể từ",
 
   "txt_teams": "Nhóm",
   "txt_notifications": "Thông báo",

@@ -7,7 +7,6 @@ import { auth } from '../../apis';
 type Props = {
   redirectUrl?: string;
   email: null | string;
-  picture: null | string;
 };
 
 const LoginSection = ({ email, redirectUrl }: Props) => {
@@ -18,7 +17,7 @@ const LoginSection = ({ email, redirectUrl }: Props) => {
   );
 };
 
-const Header = ({ email, picture, redirectUrl }: Props) => {
+const Header = ({ email, redirectUrl }: Props) => {
   return (
     <div className="header">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
@@ -27,7 +26,7 @@ const Header = ({ email, picture, redirectUrl }: Props) => {
           <div className="titlePage">WReflect</div>
         </div>
         <div style={{ flexGrow: 1, textAlign: 'right' }}>
-          <LoginSection redirectUrl={redirectUrl} email={email} picture={picture} />
+          <LoginSection redirectUrl={redirectUrl} email={email} />
         </div>
       </div>
     </div>

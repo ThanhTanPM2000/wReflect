@@ -72,6 +72,7 @@ export const addMembersToTeam = async (meId: string, args: addMemberToTeamType) 
           data: {
             email: email,
             isRegistered: false,
+            sub: 'temp',
             members: {
               create: {
                 teamId: args.teamId,
@@ -201,4 +202,3 @@ export const changeRoleMember = async (meId: string, args: setRoleMemberType) =>
   if (!team) return error.NotFound("Can't found a member to change role ");
   return team;
 };
-

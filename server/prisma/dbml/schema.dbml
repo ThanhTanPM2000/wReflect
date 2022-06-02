@@ -257,6 +257,7 @@ Table User {
   nickname String [not null]
   picture String [not null]
   gender Gender [not null, default: 'UNSPECIFIED']
+  sub String [not null]
   workplace String
   address String
   school String

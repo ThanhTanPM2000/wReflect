@@ -1,4 +1,4 @@
-import { getUsersArgs, banUserArgs } from './TypeDefs/userTypeDefs';
+import { getUsersArgs, banUserArgs, updateUserArgs } from './TypeDefs/userTypeDefs';
 import { getCriteriaListArgs, updateCriteriaArgs, createCriteriaArgs } from './TypeDefs/Criteria/criteriaTypeDefs';
 import _ from 'lodash';
 import {
@@ -8,7 +8,7 @@ import {
   submitDoPersonalReflection,
 } from './TypeDefs/Assessment/assessmentTypes';
 import { createRemarkType, removeRemarkType } from './TypeDefs/remarkTypeDefs';
-import { addMemberToTeamType, RequestWithUserInfo } from './../types';
+import { addMemberToTeamType, RequestWithUserInfo, updateTeamArgs } from './../types';
 import {
   member,
   team,
@@ -147,11 +147,11 @@ const resolvers = {
       return numOfUnSeenNoti;
     },
 
-    // getSkillsAnlytic: async (_, args, {req}: {req: RequestWithUserInfo}) => {
-    //   const {id: meId} = req?.user || {}
+    // getSkillsAnlytic: async (_, args, { req }: { req: RequestWithUserInfo }) => {
+    //   const { id: meId } = req?.user || {};
     //   const getSkillData = await user?.getSkillsAnalytic(meId);
     //   return getSkillData;
-    // }
+    // },
 
     getTemplates: async (_, args: getTemplatesArgs, { req }: { req: RequestWithUserInfo }) => {
       const { isAdmin } = req?.user || {};
@@ -163,6 +163,11 @@ const resolvers = {
       const { isGettingAll, search, page, size } = args;
       const criteriaList = await criteria?.getCriteriaList(isGettingAll, search, page, size);
       return criteriaList;
+    },
+    getUser: async (_, args: { userId?: string }, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const getUser = await user?.getUser(meId, args?.userId);
+      return getUser;
     },
     getUsers: async (_, args: getUsersArgs, { req }: { req: RequestWithUserInfo }) => {
       const { isAdmin } = req?.user || {};
@@ -231,11 +236,13 @@ const resolvers = {
       const myTeam = await team.createTeam(req, args);
       return myTeam;
     },
-    updateTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      return await team.updateTeam(req, args);
+    updateTeam: async (_, args: updateTeamArgs, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      return await team.updateTeam(meId, args);
     },
     deleteTeam: async (_, args, { req }: { req: RequestWithUserInfo }) => {
-      return await team.deleteTeam(req, args?.teamId);
+      const { id: meId } = req?.user || {};
+      return await team.deleteTeam(meId, args?.teamId);
     },
 
     createHealthCheck: async (_, args: createHealthCheckArgs, { req }: { req: RequestWithUserInfo }) => {
@@ -507,6 +514,12 @@ const resolvers = {
       const { id: meId } = req?.user || {};
       const removingNotification = await notification?.removeNotification(meId, args);
       return removingNotification;
+    },
+
+    updateUser: async (_, args: updateUserArgs, { req }: { req: RequestWithUserInfo }) => {
+      const { id: meId } = req?.user || {};
+      const updatingUser = await user?.updateUser(meId, args);
+      return updatingUser;
     },
 
     banUser: async (_, args: banUserArgs, { req }: { req: RequestWithUserInfo }) => {

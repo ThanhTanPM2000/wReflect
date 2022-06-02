@@ -39,6 +39,7 @@ import { Board } from '../../../types';
 import ModalMeetingNote from './modalMeetingNote';
 import { isMemberName } from 'typescript';
 import moment from 'moment';
+import BookmarkedModal from './BookmarkedModal/BookmarkedModal';
 
 type Props = {
   teamId: string;
@@ -53,6 +54,7 @@ export default function BoardComponent({ teamId, boardId }: Props) {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isTimeTrackingModalVisible, setTimeTrackingModalVisible] = useState(false);
+  const [isBookmarkedVisible, setIsBookmarkedVisible] = useState(false);
   const history = useHistory();
   const client = useApolloClient();
   const me = useContext(selfContext);
@@ -285,6 +287,13 @@ export default function BoardComponent({ teamId, boardId }: Props) {
                   setVisible={setTimeTrackingModalVisible}
                   visible={isTimeTrackingModalVisible}
                 />
+                <BookmarkedModal
+                  iMember={iMember}
+                  team={data?.team}
+                  board={board}
+                  isVisible={isBookmarkedVisible}
+                  setIsVisible={setIsBookmarkedVisible}
+                />
                 <div>
                   <div className="boardTools">
                     <div className="countDown">
@@ -387,7 +396,7 @@ export default function BoardComponent({ teamId, boardId }: Props) {
                           </li>
                           <li>
                             <StarOutlined className="boardPanelIcon " />
-                            <a className="addBoard" onClick={() => setIsCreateModalVisible(true)}>
+                            <a className="addBoard" onClick={() => setIsBookmarkedVisible(true)}>
                               {t(`txt_boards_show_bookmarks`)}
                             </a>
                           </li>

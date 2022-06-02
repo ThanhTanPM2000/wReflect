@@ -245,6 +245,7 @@ export type User = {
   introduction: string | null;
   talents: string | null;
   interests: string | null;
+  sessions: Session[];
   notifications: Notification[];
   skillValues: UserOnCriteria[];
 };
