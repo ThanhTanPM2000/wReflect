@@ -143,6 +143,7 @@ model Board {
   createdBy       String
   isPublic        Boolean      @default(true)
   isLocked        Boolean      @default(false)
+  currentColumnId String?
   disableDownVote Boolean      @default(false)
   disableUpVote   Boolean      @default(false)
   isAnonymous     Boolean      @default(false)
@@ -297,7 +298,7 @@ model User {
   nickname           String           @db.VarChar(150)
   picture            String           @db.VarChar(500)
   gender             Gender           @default(UNSPECIFIED)
-  sub                String
+  sub                String?
   workplace          String?          @db.VarChar(300)
   address            String?          @db.VarChar(300)
   school             String?          @db.VarChar(300)

@@ -133,6 +133,7 @@ Table Board {
   createdBy String [not null]
   isPublic Boolean [not null, default: true]
   isLocked Boolean [not null, default: false]
+  currentColumnId String
   disableDownVote Boolean [not null, default: false]
   disableUpVote Boolean [not null, default: false]
   isAnonymous Boolean [not null, default: false]
@@ -257,7 +258,7 @@ Table User {
   nickname String [not null]
   picture String [not null]
   gender Gender [not null, default: 'UNSPECIFIED']
-  sub String [not null]
+  sub String
   workplace String
   address String
   school String

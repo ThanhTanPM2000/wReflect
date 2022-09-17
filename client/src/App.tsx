@@ -4,12 +4,11 @@ import { User } from './types';
 import Routes from './Routes';
 // const Routes = React.lazy(() => import('./Routes'));
 
-import { auth, setUpdateLoginState, user } from './apis';
+import { setUpdateLoginState, user } from './apis';
 import SelfContext from './contexts/selfContext';
 import { Spin } from 'antd';
 import './styles/css/antd.css';
 import 'flag-icon-css/css/flag-icons.min.css';
-import _ from 'lodash';
 
 const App = (): JSX.Element => {
   const [me, setMe] = useState<null | User>(null);
