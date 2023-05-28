@@ -7,8 +7,10 @@ RUN yarn build
 
 # Production stage
 FROM bitnami/nginx:1.20 as production-stage
-COPY --from=build-stage /app/build /app
-COPY keyreply-entrypoint.sh /app
-COPY nginx.conf /opt/bitnami/nginx/conf/server_blocks/default.conf
-CMD ["/opt/bitnami/scripts/nginx/entrypoint.sh", "/opt/bitnami/scripts/nginx/run.sh"]
+# Copy the custom Nginx configuration
+COPY nginx.conf /opt/bitnami/nginx/conf/server_blocks/
+COPY --from=build-stage /app/build /usr/share/nginx/html
+EXPOSE 3000
+CMD ["nginx", "-g", "daemon off;"]
+
 

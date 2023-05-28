@@ -10,23 +10,23 @@ services:
     build: ./server
     ports: 
       - 4000:4000
-    depends_on:
-      - db
-    restart: on-failure
     environment:
-      POSTGRES_DATABASE_URL: postgres://postgres:514723@db:5432/wReflect
+      POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
     volumes:
       - ./server:/app
     command: ./docker-entrypoint.sh
-  db:
+    depends_on:
+      - postgres
+    links:
+      - postgres
+  postgres:
     image: postgres:14.8-bullseye
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 514723
       POSTGRES_DB: wReflect
-    ports:
-      - '5432:5432'
-    volumes: 
-      - wreflect:/data/db
+    volumes:
+      - postgres:/var/lib/postgresql/data
 volumes:
-  wreflect: 
+  postgres: 
