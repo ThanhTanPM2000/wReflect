@@ -22,8 +22,8 @@
   "dependencies": {
     "@ant-design/charts": "^1.2.14",
     "@apollo/client": "^3.5.5",
-    "@ckeditor/ckeditor5-react": "^5.0.2",
     "@ckeditor/ckeditor5-build-classic": "34.1.0",
+    "@ckeditor/ckeditor5-react": "^5.0.2",
     "@giphy/js-fetch-api": "^4.1.2",
     "@giphy/react-components": "^5.6.1",
     "@reduxjs/toolkit": "^1.6.2",
@@ -47,7 +47,7 @@
     "less": "^4.1.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
-    "node-sass": "^6.0.1",
+    "node-sass": "^9.0.0",
     "query-string": "6.13.8",
     "rc-tween-one": "^3.0.3",
     "react": "^17.0.2",

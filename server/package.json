@@ -6,14 +6,17 @@
   "license": "ISC",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "node dist/app.js",
     "build": "yarn run prisma migrate deploy && yarn run prisma generate && tsc --build tsconfig.json",
+    "compile": "tsc --build tsconfig.json",
     "generate-prisma-migration": "prisma migrate dev --name init",
     "deploy-prisma-migrations": "prisma migrate resolve --applied '20220321052821_init' --preview-feature",
     "generate-prisma-client": "prisma generate",
     "prod": "pm2 startOrReload prod-ecosystem.json --env production"
   },
   "dependencies": {
+    "@graphql-tools/schema": "^8.3.0",
+    "@graphql-tools/utils": "^8.5.1",
     "@prisma/client": "3.10.0",
     "@types/aws-sdk": "^2.7.0",
     "@types/multer-s3": "^2.7.11",
@@ -26,7 +29,7 @@
     "cookie-parser": "1.4.5",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
-    "date-fns": "^2.26.0",
+    "date-fns": "^2.30.0",
     "dotenv": "^10.0.0",
     "express": "4.17.1",
     "express-graphql": "^0.12.0",
@@ -55,7 +58,7 @@
     "subscriptions-transport-ws": "^0.11.0",
     "uuid": "^8.3.2",
     "uuid-apikey": "^1.5.3",
-    "zod": "^3.11.6"
+    "zod": "3.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",

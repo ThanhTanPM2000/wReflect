@@ -1,0 +1,27 @@
+version: "3.8"
+services: 
+  client:
+    build: ./client
+    ports: 
+      - 3000:3000
+    volumes:
+      - ./client:/app
+  backend:
+    build: ./server
+    ports: 
+      - 4000:4000
+    environment:
+      POSTGRES_DATABASE_URL: postgres://postgres:514723@db:5432/wReflect
+    volumes:
+      - ./server:/app
+    command: ./docker-entrypoint.sh
+  db:
+    image: postgres:14.8-bullseye
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 514723
+      POSTGRES_DB: wReflect
+    volumes: 
+      - wreflect:/data/db
+volumes:
+  wreflect: 
