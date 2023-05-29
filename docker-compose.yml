@@ -2,9 +2,12 @@ version: "3.8"
 services: 
   client:
     build: ./client
-    restart: unless-stopped
     ports: 
-      - 3000:3000
+      - 80:80
+    restart: unless-stopped
+    environment:
+      REACT_APP_REDIRECT_URI: http://localhost:80
+      REACT_APP_SERVER_BASE_URL: http://localhost:4000
   backend:
     build: ./server
     restart: unless-stopped
@@ -14,9 +17,13 @@ services:
       - postgres
     ports: 
       - 4000:4000
+    env_file:
+      - ./server/.env
     environment:
       POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
-    command: ./docker-entrypoint.sh
+      AUTH0_CALLBACK_URL: http://localhost:80
+      SERVER_URL: http://localhost:4000
+      CLIENT_URL: http://localhost
   postgres:
     image: postgres:14.8-bullseye
     restart: unless-stopped

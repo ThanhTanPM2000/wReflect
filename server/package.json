@@ -6,8 +6,7 @@
   "license": "ISC",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node app.js",
-    "build": " prisma generate && tsc --build tsconfig.json",
+    "build": " tsc --build tsconfig.json",
     "migrate": "prisma migrate deploy",
     "compile": "tsc --build tsconfig.json",
     "generate-prisma-migration": "prisma migrate dev --name init",

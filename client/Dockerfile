@@ -6,11 +6,11 @@ COPY . .
 RUN yarn build
 
 # Production stage
-FROM bitnami/nginx:1.20 as production-stage
+FROM nginx:stable as production-stage
 # Copy the custom Nginx configuration
-COPY nginx.conf /opt/bitnami/nginx/conf/server_blocks/
+# COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build-stage /app/build /usr/share/nginx/html
-EXPOSE 3000
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
 

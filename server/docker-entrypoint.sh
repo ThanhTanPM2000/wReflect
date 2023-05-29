@@ -1,3 +1,2 @@
 #!/bin/sh
-
-yarn migrate && yarn start
+yarn migrate && node app.js
