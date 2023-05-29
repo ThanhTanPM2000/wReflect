@@ -2,26 +2,24 @@ version: "3.8"
 services: 
   client:
     build: ./client
+    restart: unless-stopped
     ports: 
       - 3000:3000
-    volumes:
-      - ./client:/app
   backend:
     build: ./server
-    ports: 
-      - 4000:4000
-    environment:
-      POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
-    volumes:
-      - ./server:/app
-    command: ./docker-entrypoint.sh
+    restart: unless-stopped
     depends_on:
       - postgres
     links:
       - postgres
+    ports: 
+      - 4000:4000
+    environment:
+      POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
+    command: ./docker-entrypoint.sh
   postgres:
     image: postgres:14.8-bullseye
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 514723
