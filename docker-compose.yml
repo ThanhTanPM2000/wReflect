@@ -6,7 +6,7 @@ services:
       - 80:3000
     restart: unless-stopped
     environment:
-      REACT_APP_REDIRECT_URI: http://client
+      REACT_APP_REDIRECT_URI: http://4.193.194.60
       REACT_APP_SERVER_BASE_URL: http://backend:4000
   backend:
     build: ./server
