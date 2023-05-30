@@ -8,9 +8,9 @@ RUN yarn build
 # Production stage
 FROM nginx:stable as production-stage
 # Copy the custom Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/build /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]
 
 
