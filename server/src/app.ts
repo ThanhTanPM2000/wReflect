@@ -33,7 +33,7 @@ async function startApolloServer(typeDefs, resolvers) {
 
   app.use(
     cors({
-      origin: [config.CLIENT_URL, 'http://localhost:4000', 'https://studio.apollographql.com'],
+      origin: [config.CLIENT_URL, 'http://localhost:4000', 'http://localhost', 'https://studio.apollographql.com'],
       credentials: true,
     }),
   );
@@ -131,7 +131,7 @@ async function startApolloServer(typeDefs, resolvers) {
   server.applyMiddleware({
     app,
     cors: {
-      origin: [config.CLIENT_URL, 'http://localhost:4000'],
+      origin: [config.CLIENT_URL, 'http://localhost:4000', 'http://localhost'],
       credentials: true,
     },
   });
