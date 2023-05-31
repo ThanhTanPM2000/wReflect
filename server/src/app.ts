@@ -36,6 +36,7 @@ async function startApolloServer(typeDefs, resolvers) {
       origin: [
         config.CLIENT_URL,
         'https://wreflect.southeastasia.cloudapp.azure.com',
+        'https://wreflect.duckdns.org',
         'http://localhost:4000',
         'http://localhost',
         'https://studio.apollographql.com',
@@ -140,6 +141,7 @@ async function startApolloServer(typeDefs, resolvers) {
       origin: [
         config.CLIENT_URL,
         'https://wreflect.southeastasia.cloudapp.azure.com',
+        'https://wreflect.duckdns.org',
         'http://localhost:4000',
         'http://localhost',
       ],
