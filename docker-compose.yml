@@ -8,8 +8,8 @@ services:
     env_file:
       - ./client/.env
     environment:
-      REACT_APP_REDIRECT_URI: http://4.193.194.60:3000
-      REACT_APP_SERVER_BASE_URL: http://4.193.194.60:4000
+      REACT_APP_REDIRECT_URI: https://4.193.194.60:3000
+      REACT_APP_SERVER_BASE_URL: https://4.193.194.60:4000
   backend:
     build: ./server
     restart: unless-stopped
@@ -23,9 +23,9 @@ services:
       - ./server/.env
     environment:
       POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
-      AUTH0_CALLBACK_URL: http://4.193.194.60:3000
-      SERVER_URL: http://4.193.194.60:4000
-      CLIENT_URL: http://4.193.194.60:3000
+      AUTH0_CALLBACK_URL: https://4.193.194.60:3000
+      SERVER_URL: https://4.193.194.60:4000
+      CLIENT_URL: https://4.193.194.60:3000
   postgres:
     image: postgres:14.8-bullseye
     restart: unless-stopped
