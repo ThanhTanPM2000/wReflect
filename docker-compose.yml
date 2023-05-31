@@ -3,12 +3,12 @@ services:
   client:
     build: ./client
     ports: 
-      - 443:3000
+      - 3000:3000
     restart: unless-stopped
     env_file:
       - ./client/.env
     environment:
-      REACT_APP_REDIRECT_URI: https://4.193.194.60
+      REACT_APP_REDIRECT_URI: http://4.193.194.60:3000
       REACT_APP_SERVER_BASE_URL: http://4.193.194.60:4000
   backend:
     build: ./server
@@ -23,7 +23,7 @@ services:
       - ./server/.env
     environment:
       POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
-      AUTH0_CALLBACK_URL: https://4.193.194.60
+      AUTH0_CALLBACK_URL: http://4.193.194.60:3000
       SERVER_URL: http://4.193.194.60:4000
       CLIENT_URL: http://4.193.194.60:3000
   postgres:
