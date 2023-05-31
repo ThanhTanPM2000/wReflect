@@ -7,7 +7,7 @@ export const setCookie = (key: string, value: string, maxAgeMilliseconds: number
     maxAge: maxAgeMilliseconds,
     sameSite: 'none',
     httpOnly: true,
-    // secure: true
+    secure: true,
   });
 };
 
