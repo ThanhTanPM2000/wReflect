@@ -9,7 +9,7 @@ services:
       - ./client/.env
     environment:
       REACT_APP_REDIRECT_URI: https://wreflect.southeastasia.cloudapp.azure.com
-      REACT_APP_SERVER_BASE_URL: https://api.wreflect.southeastasia.cloudapp.azure.com
+      REACT_APP_SERVER_BASE_URL: https://wreflect.duckdns.org
   backend:
     build: ./server
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
     environment:
       POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
       AUTH0_CALLBACK_URL: https://wreflect.southeastasia.cloudapp.azure.com
-      SERVER_URL: https://api.wreflect.southeastasia.cloudapp.azure.com
+      SERVER_URL: https://wreflect.duckdns.org
       CLIENT_URL: https://wreflect.southeastasia.cloudapp.azure.com
   postgres:
     image: postgres:14.8-bullseye
