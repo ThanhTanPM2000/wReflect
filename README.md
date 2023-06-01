@@ -53,7 +53,7 @@ docker-compose up -d
 - Add your domain name that you wanted (for me i create wreflect.duckdns.org)
 
 - Copy token in duckdns
-![duckdns](../../Screenshot%202023-06-01%20at%2012.17.16.png "Duck DNS")
+![duckdns](Screenshot%202023-06-01%20at%2012.17.16.png "Duck DNS")
 
 - Go to your terminal in host machin (i use bash)
 
