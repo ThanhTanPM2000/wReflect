@@ -1,0 +1,39 @@
+version: "3.8"
+services: 
+  client:
+    build: ./client
+    ports: 
+      - 3000:3000
+    restart: unless-stopped
+    env_file:
+      - ./client/.env
+    environment:
+      REACT_APP_REDIRECT_URI: https://wreflect.southeastasia.cloudapp.azure.com
+      REACT_APP_SERVER_BASE_URL: https://wreflect.duckdns.org
+  backend:
+    build: ./server
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports: 
+      - 4000:4000
+    env_file:
+      - ./server/.env
+    environment:
+      POSTGRES_DATABASE_URL: postgresql://postgres:514723@postgres:5432/wReflect
+      AUTH0_CALLBACK_URL: https://wreflect.southeastasia.cloudapp.azure.com
+      SERVER_URL: https://wreflect.duckdns.org
+      CLIENT_URL: https://wreflect.southeastasia.cloudapp.azure.com
+  postgres:
+    image: postgres:14.8-bullseye
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 514723
+      POSTGRES_DB: wReflect
+    volumes:
+      - postgres:/var/lib/postgresql/data
+volumes:
+  postgres: 

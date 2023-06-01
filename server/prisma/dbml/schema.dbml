@@ -97,7 +97,7 @@ Table Team {
 
 Table HealthCheckTemplate {
   id String [pk]
-  title String [not null]
+  title String [unique, not null]
   isDefault Boolean [not null]
   isBlocked Boolean [not null, default: false]
   teamId String
@@ -105,10 +105,6 @@ Table HealthCheckTemplate {
   updatedAt DateTime [not null]
   team Team
   healthCheckQuestions TemplateQuestion [not null]
-
-  indexes {
-    (title) [unique]
-  }
 }
 
 Table TemplateQuestion {
@@ -196,13 +192,13 @@ Table Opinion {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   text String [not null]
-  upVote String [not null]
-  downVote String [not null]
+  upVote String[] [not null]
+  downVote String[] [not null]
   updatedBy String [not null]
   isAction Boolean [not null, default: false]
   isBookmarked Boolean [not null, default: false]
   responsible String [not null, default: 'not-assigned']
-  mergedAuthors String [not null]
+  mergedAuthors String[] [not null]
   color String [not null, default: 'pink']
   position Int [not null]
   status OpinionStatus [not null, default: 'NEW']
@@ -314,7 +310,7 @@ Table RemiderNotification {
   title String [not null]
   description String [not null]
   sentBy String [not null]
-  sendTo String [not null]
+  sendTo String[] [not null]
 }
 
 Enum AssessmentStatus {
@@ -369,58 +365,58 @@ Enum UserStatus {
   OFFLINE
 }
 
-Ref: Session.userId > User.id
+Ref: Session.userId > User.id [delete: Cascade]
 
-Ref: Assessment.teamId > Team.id
+Ref: Assessment.teamId > Team.id [delete: Cascade]
 
-Ref: Assessment.creatorId > Member.id
+Ref: Assessment.creatorId > Member.id [delete: Cascade]
 
-Ref: Evaluation.assessorId > Member.id
+Ref: Evaluation.assessorId > Member.id [delete: Cascade]
 
-Ref: Evaluation.assessmentId > Assessment.id
+Ref: Evaluation.assessmentId > Assessment.id [delete: Cascade]
 
-Ref: Result.concerningMemberId > Member.id
+Ref: Result.concerningMemberId > Member.id [delete: Cascade]
 
-Ref: Result.evaluationId > Evaluation.id
+Ref: Result.evaluationId > Evaluation.id [delete: Cascade]
 
-Ref: AnswerOnCriteria.criteriaId > Criteria.id
+Ref: AnswerOnCriteria.criteriaId > Criteria.id [delete: Cascade]
 
-Ref: AnswerOnCriteria.resultId > Result.id
+Ref: AnswerOnCriteria.resultId > Result.id [delete: Cascade]
 
-Ref: HealthCheckTemplate.teamId > Team.id
+Ref: HealthCheckTemplate.teamId > Team.id [delete: Cascade]
 
-Ref: TemplateQuestion.templateId > HealthCheckTemplate.id
+Ref: TemplateQuestion.templateId > HealthCheckTemplate.id [delete: Cascade]
 
-Ref: Board.teamId > Team.id
+Ref: Board.teamId > Team.id [delete: Cascade]
 
-Ref: HealthCheck.boardId - Board.id
+Ref: HealthCheck.boardId - Board.id [delete: Cascade]
 
-Ref: HealthCheck.teamId > Team.id
+Ref: HealthCheck.teamId > Team.id [delete: Cascade]
 
-Ref: MemberOnHealthCheckOnQuestion.healthCheckId > HealthCheck.id
+Ref: MemberOnHealthCheckOnQuestion.healthCheckId > HealthCheck.id [delete: Cascade]
 
-Ref: MemberOnHealthCheckOnQuestion.questionId > TemplateQuestion.id
+Ref: MemberOnHealthCheckOnQuestion.questionId > TemplateQuestion.id [delete: Cascade]
 
-Ref: MemberOnHealthCheckOnQuestion.memberId > Member.id
+Ref: MemberOnHealthCheckOnQuestion.memberId > Member.id [delete: Cascade]
 
-Ref: Column.boardId > Board.id
+Ref: Column.boardId > Board.id [delete: Cascade]
 
-Ref: Opinion.authorId > Member.id
+Ref: Opinion.authorId > Member.id [delete: Cascade]
 
-Ref: Opinion.columnId > Column.id
+Ref: Opinion.columnId > Column.id [delete: Cascade]
 
-Ref: Remark.opinionId > Opinion.id
+Ref: Remark.opinionId > Opinion.id [delete: Cascade]
 
-Ref: Remark.authorId > Member.id
+Ref: Remark.authorId > Member.id [delete: Cascade]
 
-Ref: Member.userId > User.id
+Ref: Member.userId > User.id [delete: Cascade]
 
-Ref: Member.teamId > Team.id
+Ref: Member.teamId > Team.id [delete: Cascade]
 
-Ref: BanningUser.userId - User.id
+Ref: BanningUser.userId - User.id [delete: Cascade]
 
-Ref: UserOnCriteria.userId > User.id
+Ref: UserOnCriteria.userId > User.id [delete: Cascade]
 
-Ref: UserOnCriteria.criteriaId > Criteria.id
+Ref: UserOnCriteria.criteriaId > Criteria.id [delete: Cascade]
 
-Ref: Notification.senderId > User.id
+Ref: Notification.senderId > User.id [delete: Cascade]

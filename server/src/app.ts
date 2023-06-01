@@ -1,7 +1,5 @@
-import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
-dotenv.config();
 import http from 'http';
 import cors from 'cors';
 import express from 'express';
@@ -13,7 +11,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
 import cron from 'node-cron';
-
+import './loadEnv';
 import './prisma'; // eager load to test connection
 import logger from './logger';
 import config from './config';
@@ -33,7 +31,16 @@ async function startApolloServer(typeDefs, resolvers) {
 
   app.use(
     cors({
-      origin: [config.CLIENT_URL, 'http://localhost:4000', 'https://studio.apollographql.com'],
+      origin: [
+        config.CLIENT_URL,
+        'https://wreflect.southeastasia.cloudapp.azure.com',
+        'https://wreflect.duckdns.org',
+        'http://4.193.194.60:4000',
+        'http://4.193.194.60:3000',
+        'http://localhost:3000',
+        'http://localhost:4000',
+        'https://studio.apollographql.com',
+      ],
       credentials: true,
     }),
   );
@@ -131,7 +138,15 @@ async function startApolloServer(typeDefs, resolvers) {
   server.applyMiddleware({
     app,
     cors: {
-      origin: [config.CLIENT_URL, 'http://localhost:4000'],
+      origin: [
+        config.CLIENT_URL,
+        'https://wreflect.southeastasia.cloudapp.azure.com',
+        'https://wreflect.duckdns.org',
+        'http://4.193.194.60:4000',
+        'http://4.193.194.60:3000',
+        'http://localhost:3000',
+        'http://localhost:4000',
+      ],
       credentials: true,
     },
   });
