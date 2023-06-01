@@ -1,7 +1,5 @@
-import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
 import { ApolloError } from 'apollo-server-errors';
-dotenv.config();
 import http from 'http';
 import cors from 'cors';
 import express from 'express';
@@ -13,7 +11,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { constraintDirective, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
 import cron from 'node-cron';
-
+import './loadEnv';
 import './prisma'; // eager load to test connection
 import logger from './logger';
 import config from './config';
