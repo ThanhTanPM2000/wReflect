@@ -6,6 +6,7 @@
   "license": "ISC",
   "main": "dist/app.js",
   "scripts": {
+    "seed": "ts-node prisma/seed.ts",
     "dev": "cross-env NODE_ENV=development ts-node src/app.ts",
     "build": " tsc --build tsconfig.json",
     "migrate": "prisma migrate deploy",
