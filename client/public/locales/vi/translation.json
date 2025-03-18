@@ -167,6 +167,32 @@
   "txt_heal_check_secret": "Thu thập phản hồi ẩn danh",
   "txt_heal_check_submit": "Gửi đi",
 
+  "txt_health_check_template_default": "Mẫu Kiểm Tra Sức Khỏe",
+  "txt_template_question_1": "Mục tiêu",
+  "txt_template_question_1_description": "Xấu: Mục tiêu không rõ ràng, cụ thể, thiếu cam kết \nTốt: Mục tiêu được xác định rõ ràng, tất cả các thành viên đều cam kết hoàn thành.",
+  "txt_template_question_2": "Vai trò & Trách nhiệm",
+  "txt_template_question_2_description": "Xấu: Vai trò và trách nhiệm của từng thành viên không được xác định và chia sẻ rõ ràng.\nTốt: Vai trò và trách nhiệm của từng thành viên đều rõ ràng với mọi người.",
+  "txt_template_question_3": "Sự cởi mở",
+  "txt_template_question_3_description": "Xấu: Khi trao đổi và làm việc, các thành viên thận trọng.\nTốt: Trong thảo luận và làm việc, các thành viên được khuyến khích chia sẻ ý tưởng, quan điểm và suy nghĩ của mình.",
+  "txt_template_question_4": "Niềm tin",
+  "txt_template_question_4_description": "Xấu: Các thành viên có sự nghi ngờ và thiếu tin tưởng lẫn nhau.\nTốt: Các thành viên tin tưởng lẫn nhau.",
+  "txt_template_question_5": "Xung đột & Phân biệt",
+  "txt_template_question_5_description": "Xấu: Khi làm việc, các thành viên hoặc thụ động hoặc cố gắng tránh tranh cãi và bất đồng.\nTốt: Các thành viên cởi mở thảo luận về vấn đề và bất đồng để tìm ra giải pháp tốt nhất.",
+  "txt_template_question_6": "Hợp tác",
+  "txt_template_question_6_description": "Xấu: Các thành viên thụ động yêu cầu hợp tác hoặc hỗ trợ.\nTốt: Các thành viên chủ động phối hợp với nhau.",
+  "txt_template_question_7": "Đóng góp",
+  "txt_template_question_7_description": "Xấu: Một số ít thành viên kiểm soát cuộc thảo luận và quá trình làm việc.\nTốt: Trong các cuộc trò chuyện và nhiệm vụ, tất cả thành viên đều tham gia tích cực.",
+  "txt_template_question_8": "Quyết định",
+  "txt_template_question_8_description": "Xấu: Một số ít thành viên kiểm soát quá trình ra quyết định.\nTốt: Trong việc ra quyết định, tất cả thành viên đều tham gia tích cực.",
+  "txt_template_question_9": "Linh hoạt",
+  "txt_template_question_9_description": "Xấu: Các thành viên bị ép buộc tuân theo các quy định và nguyên tắc nghiêm ngặt.\nTốt: Các thành viên linh hoạt điều chỉnh các quy tắc làm việc để thích nghi với các điều kiện phát sinh.",
+  "txt_template_question_10": "Tài nguyên",
+  "txt_template_question_10_description": "Xấu: Khả năng và kinh nghiệm của từng cá nhân bị lãng phí.\nTốt: Khả năng và kinh nghiệm của từng cá nhân được tận dụng tối đa.",
+  "txt_template_question_11": "Niềm vui",
+  "txt_template_question_11_description": "Xấu: Chúng tôi không thích công việc và không mong muốn đi làm.\nTốt: Chúng tôi yêu thích công việc và có niềm vui khi làm việc cùng nhau.",
+  "txt_template_question_12": "Học hỏi",
+  "txt_template_question_12_description": "Xấu: Chúng tôi không bao giờ có thời gian để học hỏi thêm điều gì mới.\nTốt: Chúng tôi luôn học hỏi được nhiều điều thú vị mọi lúc.",
+
   "txt_member_add": "Thêm thành viên nhóm",
   "txt_member_URL": "Mời qua URL",
   "txt_member_join_link": "Bất kỳ ai có liên kết đều có thể tham gia nhóm của bạn.",
@@ -251,5 +277,7 @@
   "txt_teamsManagement": "Quản lý nhóm",
   "txt_usersManagement": "Quản lý người dùng",
   "txt_variablesConfiguration": "Điều chỉnh giá trị",
-  "txt_analysis": "Phân tích"
+  "txt_analysis": "Phân tích",
+  
+  "txt_average" : "Tổng trung bình"
 }

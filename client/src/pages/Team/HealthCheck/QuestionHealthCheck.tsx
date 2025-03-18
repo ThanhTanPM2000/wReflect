@@ -4,18 +4,27 @@ import { MemberAnswer, MemberComment, MemberOnHealthCheckOnQuestion, TemplateQue
 import { MessageOutlined } from '@ant-design/icons';
 import Comment from './comment';
 import { answerType } from './HealthCheck';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   answer?: MemberOnHealthCheckOnQuestion;
   question: TemplateQuestion;
   comments?: MemberOnHealthCheckOnQuestion[];
   handleUpdateAnswer: (value: answerType) => void;
+  isDefaultTemplate: boolean;
 };
 
-export default function QuestionHealthCheck({ answer, comments, question, handleUpdateAnswer }: Props) {
+export default function QuestionHealthCheck({
+  answer,
+  isDefaultTemplate,
+  comments,
+  question,
+  handleUpdateAnswer,
+}: Props) {
   const [point, setPoint] = useState<number>(answer?.point);
   const [commentText, setCommentText] = useState('');
   const [isOpenComment, setIsOpenComment] = useState(false);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     handleUpdateAnswer({
@@ -43,8 +52,10 @@ export default function QuestionHealthCheck({ answer, comments, question, handle
       className="templates-overview-card"
     >
       <div className="flex flex-1 flex-dir-c flex-ai-c flex-jc-sb poll-center-items">
-        <h3>{question?.title}</h3>
-        <p style={{ textAlign: 'center' }}>{question?.description}</p>
+        <h3>{isDefaultTemplate ? t(question?.id) : question?.title}</h3>
+        <p style={{ textAlign: 'center' }}>
+          {isDefaultTemplate ? t(`${question?.id}_description`) : question?.description}
+        </p>
         <div style={answer && { cursor: 'default' }} className="num-wrapper poll-center-items">
           <span
             style={answer && { cursor: 'default' }}

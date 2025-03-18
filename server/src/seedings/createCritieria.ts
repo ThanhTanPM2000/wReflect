@@ -51,7 +51,7 @@ const criteriaDataList = [
     const creatingNewCriteria = await prisma.criteria.createMany({
       data: [...criteriaDataList],
     });
-    logger.info('createing criteria data susscussfully', creatingNewCriteria);
+    logger.info('Creating criteria data susscussfully', creatingNewCriteria);
   } catch (error) {
     logger.error('error occur: ', error);
   }

@@ -168,6 +168,32 @@
   "txt_heal_check_submit": "Submit",
   "txt_heal_check_response": "Response Rate",
 
+  "txt_health_check_template_default": "Health Check Template",
+  "txt_template_question_1": "Objective",
+  "txt_template_question_1_description": "Bad: Objectives are not clear, specific, lack of commitment \nGood: Objectives are identified clearly, fully committed by all members.",
+  "txt_template_question_2": "Roles & Responsibilities",
+  "txt_template_question_2_description": "Bad: The roles and responsibilities of each team member are not identified and shared clearly.\nGood: The roles and responsibilities of each team member are clear to everyone.",
+  "txt_template_question_3": "Openness",
+  "txt_template_question_3_description": "Bad: When it comes to conversation and work, members are cautious.\nGood: In discussion and work, members are allowed to share their ideas, opinions, and thoughts.",
+  "txt_template_question_4": "Trust",
+  "txt_template_question_4_description": "Bad: Members have doubts and mistrust for one another.\nGood: Members trust each other.",
+  "txt_template_question_5": "Conflict & Differentiation",
+  "txt_template_question_5_description": "Bad: While working, members are either passive or try to avoid disputes and disagreements.\nGood: Members openly discuss problems and disagreements in order to find the best solution.",
+  "txt_template_question_6": "Collaboration",
+  "txt_template_question_6_description": "Bad: Members passively request to cooperate or aid.\nGood: Members actively coordinate with each other.",
+  "txt_template_question_7": "Contribution",
+  "txt_template_question_7_description": "Bad: A few members control the discussion and working process.\nGood: In conversations and tasks, all members actively participate.",
+  "txt_template_question_8": "Decisions",
+  "txt_template_question_8_description": "Bad: A few members control the decision-making.\nGood: In decision-making, all members actively participate.",
+  "txt_template_question_9": "Flexibility",
+  "txt_template_question_9_description": "Bad: Members are forced to strict regulations and principles.\nGood: Members flexibly adjust working rules to adapt to emergent conditions.",
+  "txt_template_question_10": "Resources",
+  "txt_template_question_10_description": "Bad: Each individual's ability and experience are underutilized.\nGood: Each individual's ability and experience are put to the best possible use.",
+  "txt_template_question_11": "Fun",
+  "txt_template_question_11_description": "Bad: We don't enjoy our work and look forward to coming to work.\nGood: We love going to work and have great fun working together.",
+  "txt_template_question_12": "Learning",
+  "txt_template_question_12_description": "Bad: We never have time to learn anything.\nGood: We're learning lots of interesting stuff all the time.",
+
   "txt_member_find": "Find members",
   "txt_member_add": "Add Team Members",
   "txt_member_URL": "Invite via URL",
@@ -258,5 +284,7 @@
   "txt_teamsManagement": "Teams Management",
   "txt_usersManagement": "Users Management",
   "txt_variablesConfiguration": "Variables Configuration",
-  "txt_analysis": "Analysis"
+  "txt_analysis": "Analysis",
+
+  "txt_average" : "Average"
 }

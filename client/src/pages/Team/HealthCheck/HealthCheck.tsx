@@ -274,7 +274,9 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                   <div className="health-check-answer">
                     <div className="templates-overview poll-center-items">
                       <Card className="flex flex-1 flex-dir-r flex-ai-c flex-jc-c">
-                        <h3 className="flex flex-ai-c flex-jc-c">{selecteTemplate?.title}</h3>
+                        <h3 className="flex flex-ai-c flex-jc-c">
+                          {selecteTemplate?.isDefault ? t(selecteTemplate?.id) : selecteTemplate?.title}
+                        </h3>
                       </Card>
                     </div>
                     {isViewResult || answerOfMembers?.length > 0 ? (
@@ -310,6 +312,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                                   )}
                                   handleUpdateAnswer={handleOnUpdateAnswer}
                                   question={question}
+                                  isDefaultTemplate={selecteTemplate.isDefault}
                                 />
                               </>
                             ))}
@@ -324,6 +327,7 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                               key={question.id}
                               handleUpdateAnswer={handleOnUpdateAnswer}
                               question={question}
+                              isDefaultTemplate={selecteTemplate.isDefault}
                             />
                           ))}
                         </div>
@@ -411,29 +415,61 @@ export default function HealthCheck({ teamId, boardId }: Props) {
                         />
                       </div>
                       <Card className="flex flex-ai-c flex-jc-c">
-                        <h3 className="flex flex-ai-c flex-jc-c">{selecteTemplate?.title}</h3>
+                        <h3 className="flex flex-ai-c flex-jc-c">
+                          {selecteTemplate?.isDefault
+                            ? t(selecteTemplate?.id)
+                            : selecteTemplate?.title}
+                        </h3>
                       </Card>
                       <div className="templates-overview poll-center-items flex-wrap">
-                        {selecteTemplate?.healthCheckQuestions?.map((question) => (
-                          <Card
-                            hoverable
-                            className="templates-overview-card"
-                            style={{ cursor: 'auto' }}
-                            key={question?.id}
-                          >
-                            <div className="flex flex-1 flex-dir-c flex-gap-10 flex-jc-sb poll-center-items">
-                              <h3>{question?.title}</h3>
-                              <p style={{ textAlign: 'center' }}>{question?.description}</p>
-                              <div className="num-wrapper poll-center-items">
-                                <span className="num orange">1</span>
-                                <span className="num blue">2</span>
-                                <span className="num purple">3</span>
-                                <span className="num lpink">4</span>
-                                <span className="num green">5</span>
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
+                        {console.log({ selecteTemplate })}
+                        {selecteTemplate.isDefault ? (
+                          <>
+                            {selecteTemplate?.healthCheckQuestions?.map((question) => (
+                              <Card
+                                hoverable
+                                className="templates-overview-card"
+                                style={{ cursor: 'auto' }}
+                                key={question?.id}
+                              >
+                                <div className="flex flex-1 flex-dir-c flex-gap-10 flex-jc-sb poll-center-items">
+                                  <h3>{t(question.id)}</h3>
+                                  <p style={{ textAlign: 'center' }}>{t(question.id + '_description')}</p>
+                                  <div className="num-wrapper poll-center-items">
+                                    <span className="num orange">1</span>
+                                    <span className="num blue">2</span>
+                                    <span className="num purple">3</span>
+                                    <span className="num lpink">4</span>
+                                    <span className="num green">5</span>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            {selecteTemplate?.healthCheckQuestions?.map((question) => (
+                              <Card
+                                hoverable
+                                className="templates-overview-card"
+                                style={{ cursor: 'auto' }}
+                                key={question?.id}
+                              >
+                                <div className="flex flex-1 flex-dir-c flex-gap-10 flex-jc-sb poll-center-items">
+                                  <h3>{question?.title}</h3>
+                                  <p style={{ textAlign: 'center' }}>{question?.description}</p>
+                                  <div className="num-wrapper poll-center-items">
+                                    <span className="num orange">1</span>
+                                    <span className="num blue">2</span>
+                                    <span className="num purple">3</span>
+                                    <span className="num lpink">4</span>
+                                    <span className="num green">5</span>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
+                          </>
+                        )}
                       </div>
                     </div>
                   )}

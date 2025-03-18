@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Radar } from '@ant-design/plots';
 import { templateHealthCheckType } from '../../../const/healthCheckTemplate';
 import { HealthCheck, MemberAnswer, MemberComment, Team, Template } from '../../../types';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   team: Team;
@@ -31,6 +32,7 @@ export default function ResultHealthCheck({
       item: question?.title,
     })) || [],
   );
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (healthCheck?.memberOnHealthCheck?.length > 0) {
@@ -44,8 +46,8 @@ export default function ResultHealthCheck({
         const avg =
           selectedTemplate?.healthCheckQuestions?.map((statement) => {
             return {
-              item: statement?.title,
-              user: 'Average',
+              item: selectedTemplate?.isDefault ? t(statement.id) : statement?.title,
+              user: t('txt_average'),
               value:
                 resultOfMembers.reduce((prev, cur) => {
                   if (cur?.item === statement?.title) {
@@ -61,12 +63,12 @@ export default function ResultHealthCheck({
     } else {
       setData(
         selectedTemplate?.healthCheckQuestions?.map((question) => ({
-          item: question?.title,
+          item: selectedTemplate?.isDefault ? t(question.id) : question?.title,
         })),
       );
     }
     setIsLoading(false);
-  }, [teamId, boardId, healthCheck, selectedTemplate, numOfMembersDoHealthCheck]);
+  }, [teamId, boardId, healthCheck, selectedTemplate, numOfMembersDoHealthCheck, t]);
 
   const config = {
     data,
